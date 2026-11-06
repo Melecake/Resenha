@@ -1,0 +1,155 @@
+{
+  "spyImage": "https://rollingstone.com.br/wp-content/uploads/2026/09/O-motivo-pelo-qual-o-Prime-Video-cancelou-a-serie-Spider-Noir-com-Nicolas-Cage.jpg",
+  "locations": [
+    {
+      "name": "Avião",
+      "icon": "✈️",
+      "img": "https://media.istockphoto.com/id/155150766/pt/foto/passageiros-de-avi%C3%A3o-a-jato-a-voar-acima-de-nuvens.jpg?s=612x612&w=0&k=20&c=UZ0FGfAph4G_0qIZDxNVe257irUJiFTw6WfkW9q6Qs8="
+    },
+    {
+      "name": "Banco",
+      "icon": "🏦",
+      "img": "https://storage.googleapis.com/bucket.timesbrasil.com.br/sites/2026/01/31995b31-banco-master-usando-%E2%80%98laranjas-entenda-o-que-isso-significa-708x416.webp"
+    },
+    {
+      "name": "Praia",
+      "icon": "🏖️",
+      "img": "https://static.nationalgeographicbrasil.com/files/styles/image_3200/public/gettyimages-2202479142resized.webp?w=1600&h=1067"
+    },
+    {
+      "name": "Teatro",
+      "icon": "🎭",
+      "img": "https://www.coladaweb.com/wp-content/uploads/2017/05/20170531-teatro.png"
+    },
+    {
+      "name": "Cassino",
+      "icon": "🎰",
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeh9FEDTIo5GJT1af8VbQLEqhNoDwmID0iB3qXd7o3M67of-4VMmCms3kT&s=10"
+    },
+    {
+      "name": "Igreja",
+      "icon": "⛪",
+      "img": "https://img.magnific.com/fotos-gratis/edificio-vazio-de-uma-igreja-crista_23-2151103910.jpg?semt=ais_hybrid&w=740&q=80"
+    },
+    {
+      "name": "Circo",
+      "icon": "🎪",
+      "img": "https://piracicaba.sp.gov.br/wp-content/uploads/2026/09/O-Festival-segue-ate-segunda-feira-07.11-sao-mais-de-100-atracoes-gratuitas-1024x576.jpg"
+    },
+    {
+      "name": "Festa de Empresa",
+      "icon": "🥂",
+      "img": "https://lets.events/blog/wp-content/uploads/2022/05/salao-festa-scaled.jpg"
+    },
+    {
+      "name": "Parque de Diversões",
+      "icon": "🎡",
+      "img": "https://www.civitatis.com/blog/wp-content/uploads/2025/05/shutterstock_2498769433.jpg"
+    },
+    {
+      "name": "Spa",
+      "icon": "💆",
+      "img": "https://blog.adcosprofissional.com.br/wp-content/uploads/2025/02/cuidaod-para-o-dia-da-mulher.jpg"
+    },
+    {
+      "name": "Embaixada",
+      "icon": "🏛️",
+      "img": "https://admin.cnnbrasil.com.br/wp-content/uploads/sites/12/2021/10/foto1-embaixada-site.jpg?w=1200&h=1200&crop=1"
+    },
+    {
+      "name": "Hospital",
+      "icon": "🏥",
+      "img": "https://reduz.ia.br/hospital/assets/img/hospital-fachada.jpg"
+    },
+    {
+      "name": "Hotel",
+      "icon": "🏨",
+      "img": "https://www.ahstatic.com/photos/9952_ho_00_p_1024x768.jpg"
+    },
+    {
+      "name": "Base militar",
+      "icon": "🪖",
+      "img": "https://ogimg.infoglobo.com.br/in/24228712-70d-c99/FT1086A/760/Anapolis01.jpg"
+    },
+    {
+      "name": "Estúdio de cinema",
+      "icon": "🎬",
+      "img": "https://ecdd.blog/wp-content/uploads/sites/2/2021/05/estudio-cinema-chromakey-1024x601.jpg"
+    },
+    {
+      "name": "Cruzeiro",
+      "icon": "🚢",
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3YtQbb0YUksqx5ekK2Bi13X-mOVL-onySTugbqKz8NqtAMNSa8T1OfZI&s=10"
+    },
+    {
+      "name": "Trem",
+      "icon": "🚆",
+      "img": "https://www.melhoresdestinos.com.br/wp-content/uploads/2026/03/trem-sp-campinas-capa.jpg"
+    },
+    {
+      "name": "Navio pirata",
+      "icon": "🏴‍☠️",
+      "img": "https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/b/b3/Ss1.jpg/revision/latest?cb=20150624221232"
+    },
+    {
+      "name": "Estação polar",
+      "icon": "🧊",
+      "img": ""
+    },
+    {
+      "name": "Delegacia",
+      "icon": "🚓",
+      "img": ""
+    },
+    {
+      "name": "Restaurante",
+      "icon": "🍽️",
+      "img": ""
+    },
+    {
+      "name": "Escola",
+      "icon": "🏫",
+      "img": ""
+    },
+    {
+      "name": "Posto de gasolina",
+      "icon": "⛽",
+      "img": ""
+    },
+    {
+      "name": "Estação espacial",
+      "icon": "🛰️",
+      "img": ""
+    },
+    {
+      "name": "Submarino",
+      "icon": "🌊",
+      "img": ""
+    },
+    {
+      "name": "Supermercado",
+      "icon": "🛒",
+      "img": ""
+    },
+    {
+      "name": "Universidade",
+      "icon": "🎓",
+      "img": ""
+    },
+    {
+      "name": "Zoológico",
+      "icon": "🦁",
+      "img": ""
+    },
+    {
+      "name": "Biblioteca",
+      "icon": "📚",
+      "img": ""
+    },
+    {
+      "name": "Padaria",
+      "icon": "🥖",
+      "img": ""
+    }
+  ]
+}
