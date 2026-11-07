@@ -37,11 +37,12 @@ function board(s,items,end){
   const voted=s.voted.includes(s.you);
   return `<div class="vgrid">${items.map(e=>{
     const me=e.id===s.you,c=s.counts[e.id]||0,who=Object.keys(s.intents).filter(k=>s.intents[k]===e.id);
+    const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
     const can=!end&&(!me||s.players.length===1)&&!voted;
     return `<div class="vc">${c?`<span class="vcnt">${c} voto${c>1?'s':''}</span>`:''}
       <div class="vh">${av(e.id)}<b>${esc(e.name)}${me?' <small>(você)</small>':''}</b></div>
       ${e.text!=null?`<div class="vt">${esc(e.text)}</div>`:''}
-      <div class="mv">${who.map(k=>av(+k)).join('')}</div>
+      <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*6+16}px">${who.map(k=>av(+k)).join('')}</div>
       ${can?`<div class="vb"><button class="sec" onclick="tx({type:'intent',target:${e.id}})">Declarar intenção</button><button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`}).join('')}</div>`;
 }
 
@@ -51,7 +52,8 @@ function pikaView(){
   const head=`<div class="card ctr"><label>Tema</label><h2 style="margin:4px 0 14px">${esc(s.theme)}</h2><label>Letra</label><div class="big" style="font-size:3.4rem">${s.letter||''}</div></div>`;
   let h=E;
   if(ph==='lobby'){
-    h+=`<div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${players()}</div>
+    h+=`<div class="hero" style="padding:0 0 6px"><div class="eyebrow">Sala de espera</div><h1>O meu é mais Pika</h1></div>
+    <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${players()}</div>${profileCard()}
     <div class="card"><label>Tema</label>${host?`<input id="theme" maxlength="60" placeholder="Ex.: Comidas, Animais, Filmes…" value="${esc(P.theme??s.theme)}" oninput="P.theme=this.value;pikaCfg()">`:`<p style="font-size:1.4rem;margin:8px 0">${s.theme?esc(s.theme):'<span class="mut">Aguardando o líder escolher…</span>'}</p>`}
     <label style="margin-top:18px">Letras</label><p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">${host?'Toque em uma letra para excluí-la do sorteio.':'Letras riscadas foram excluídas.'}</p>
     <div class="letters">${ALPHA.map(l=>`<div class="lt ${s.excluded.includes(l)?'off':''}" ${host?`onclick="pikaLetter('${l}')"`:''}>${l}</div>`).join('')}</div></div>
@@ -73,8 +75,8 @@ function pikaView(){
     const end=ph==='end',voted=s.voted.includes(s.you);
     h+=head;
     if(end){const r=s.result;
-      h+=`<div class="card ctr"><h2 style="color:var(--acc)">${r.losers.length>1?'Empate! Os piores nomes foram de':'O pior nome foi de'}</h2><div style="font-size:1.8rem;font-weight:700">${r.losers.map(l=>esc(l.name)).join(' e ')}</div><p class="mut">${r.max} voto${r.max>1?'s':''}</p>
-      ${host?`<div class="row" style="max-width:520px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera? Você poderá mudar o tema e as letras.',{type:'lobby'})">Jogar novamente</button><button onclick="pikaAsk('Jogar novamente o mesmo tema, com uma nova letra?',{type:'replay'})">Jogar novamente o tema</button></div>`:'<p class="mut">Aguardando o líder…</p>'}</div>`;
+      h+=`<div class="card ctr"><label>${r.losers.length>1?'As piores escolhas foram:':'A pior escolha foi:'}</label>${r.losers.map(l=>`<div class="worst">“${esc(l.text)}” <span>- ${esc(l.name)}</span></div>`).join('')}<p class="mut">${r.max} voto${r.max>1?'s':''}</p>
+      ${host?`<div class="row" style="max-width:560px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera para mudar o tema e as letras?',{type:'lobby'})">Nova partida</button><button onclick="pikaAsk('Jogar novamente o mesmo tema, com uma nova letra?',{type:'replay'})">Jogar novamente o mesmo tema</button></div>`:'<p class="mut">Aguardando o líder…</p>'}</div>`;
     }else h+=`<p class="mut">Declare sua intenção e vote no pior nome. ${voted?'Você já votou.':''}</p>`;
     h+=board(s,s.entries,end);
   }

@@ -4,6 +4,7 @@ const pika = require('./pika');
 const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
+const EMOJIS = 20, COLORS = 12;
 const readLocs = () => JSON.parse(fs.readFileSync(LOC, 'utf8'));
 const body = q => new Promise(r => { let b = ''; q.on('data', c => { b += c; if (b.length > 2e6) q.destroy(); }); q.on('end', () => { try { r(JSON.parse(b)); } catch { r(null); } }); });
 const json = (s, c, o) => { s.writeHead(c, { 'Content-Type': 'application/json' }); s.end(JSON.stringify(o)); };
@@ -44,23 +45,29 @@ const count = r => { const c = {}; Object.values(r.votes || {}).forEach(t => c[t
 const valid = (r, me, t) => (t !== me.id || r.players.length === 1) && r.players.some(p => p.id === t);
 
 function begin(r) {
-  const d = readLocs(), seen = new Set();
-  r.locs = [...d.locations, ...(r.custom || [])].map(cleanLoc).filter(l => l && !seen.has(l.name) && seen.add(l.name)).slice(0, 150);
-  r.spyImg = d.spyImage || '';
-  r.loc = r.locs[Math.random() * r.locs.length | 0];
-  r.spy = r.players[Math.random() * r.players.length | 0].id;
+  const d = readLocs(), pick = new Set(r.sel || d.locations.map(l => l.name));
+  const locs = d.locations.filter(l => pick.has(l.name)).map(cleanLoc).filter(Boolean).slice(0, 150);
+  if (locs.length < 2) return false;
+  r.locs = locs; r.spyImg = d.spyImage || '';
+  r.loc = locs[Math.random() * locs.length | 0];
+  const sp = r.players[Math.random() * r.players.length | 0];
+  r.spy = sp.id; r.spyName = sp.name; r.spyGone = false;
   r.phase = 'play'; r.ready = {}; r.intents = {}; r.votes = {}; r.result = null;
+  return true;
 }
 function view(r, p) {
   if (r.game === 'pika') return pika.view(r, p);
   const v = { type: 'state', you: p.id, code: r.code, phase: r.phase, host: r.players[0].id,
-    players: r.players.map(x => ({ id: x.id, name: x.name })), result: r.result || null,
+    players: r.players.map(x => ({ id: x.id, name: x.name, emo: x.emo, color: x.color })), result: r.result || null,
     ready: Object.keys(r.ready || {}).map(Number), intents: r.intents || {}, voted: Object.keys(r.votes || {}).map(Number), counts: count(r) };
-  if (r.phase !== 'lobby') v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };
+  if (r.phase === 'lobby') {
+    v.all = readLocs().locations.map(l => ({ name: l.name, icon: l.icon || '', img: l.img || '' }));
+    v.selected = r.sel || v.all.map(l => l.name);
+  } else v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };
   return v;
 }
 const push = r => r.players.forEach(p => send(p.ws, view(r, p)));
-const err = (w, msg) => send(w, { type: 'error', msg });
+const err = (w, msg, alert) => send(w, { type: 'error', msg, alert: !!alert });
 const ctx = { push, err };
 
 function step(r) {
@@ -69,14 +76,15 @@ function step(r) {
     const c = count(r), max = Math.max(...Object.values(c));
     const top = Object.keys(c).filter(k => c[k] === max).map(Number);
     const name = id => (r.players.find(p => p.id === id) || {}).name || '?';
-    r.result = { caught: top.length === 1 && top[0] === r.spy, top: top.map(name), max, spy: name(r.spy), loc: r.loc };
+    r.result = { caught: !r.spyGone && top.length === 1 && top[0] === r.spy, top: top.map(name), max,
+      spy: r.spyName + (r.spyGone ? ' (saiu da partida)' : ''), loc: r.loc };
     r.phase = 'end';
   }
   push(r);
 }
 
 wss.on('connection', ws => {
-  const me = { id: nextId++, ws, name: '' };
+  const me = { id: nextId++, ws, name: '', emo: 0, color: 0 };
   let room = null;
   const leave = () => {
     if (!room) return;
@@ -84,7 +92,7 @@ wss.on('connection', ws => {
     r.players = r.players.filter(p => p !== me);
     if (!r.players.length) return void delete rooms[r.code];
     if (r.game === 'pika') return pika.leave(r, me, ctx);
-    if (r.phase !== 'lobby' && me.id === r.spy) { r.phase = 'lobby'; r.result = null; return push(r); }
+    if (r.phase !== 'lobby' && me.id === r.spy) r.spyGone = true;
     for (const o of [r.ready, r.intents, r.votes]) {
       if (!o) continue;
       delete o[me.id];
@@ -101,25 +109,38 @@ wss.on('connection', ws => {
       if (!me.name) return err(ws, 'Digite seu nome.');
       if (m.type === 'create') {
         const c = newCode();
-        room = rooms[c] = { code: c, game: m.game === 'pika' ? 'pika' : 'locais', players: [], phase: 'lobby' };
+        room = rooms[c] = { code: c, game: m.game === 'pika' ? 'pika' : 'locais', players: [], phase: 'lobby', sel: null };
         if (room.game === 'pika') pika.init(room);
       } else {
         room = rooms[String(m.code || '').toUpperCase().trim()];
         if (!room) return err(ws, 'Sala não encontrada.');
         if (m.game && room.game !== m.game) { room = null; return err(ws, 'Essa sala é de outro jogo.'); }
-        if (room.phase !== 'lobby') { room = null; return err(ws, 'A partida já começou.'); }
-        if (room.players.length >= 10) { room = null; return err(ws, 'Sala cheia (máx. 10).'); }
+        if (room.phase !== 'lobby') { room = null; return err(ws, 'Não é possível entrar em uma partida em andamento.', true); }
       }
+      const used = new Set(room.players.map(p => p.emo)); let e = 0;
+      while (used.has(e)) e++;
+      if (e >= EMOJIS) { room = null; return err(ws, 'Sala cheia (máx. 20 jogadores).'); }
+      me.emo = e; me.color = e % COLORS;
       room.players.push(me); return push(room);
     }
     if (!room) return;
     const r = room, isHost = r.players[0] === me;
-    if (r.game === 'pika') return pika.handle(r, me, m, ctx);
-    if (m.type === 'start' && isHost && r.phase === 'lobby') {
-      r.custom = Array.isArray(m.custom) ? m.custom.slice(0, 50) : [];
-      begin(r); return push(r);
+    if (m.type === 'profile' && r.phase === 'lobby') {
+      const e = +m.emo, c = +m.color;
+      if (Number.isInteger(e) && e >= 0 && e < EMOJIS && !r.players.some(p => p !== me && p.emo === e)) me.emo = e;
+      if (Number.isInteger(c) && c >= 0 && c < COLORS) me.color = c;
+      return push(r);
     }
-    if (m.type === 'again' && isHost && r.phase === 'end') { begin(r); return push(r); }
+    if (r.game === 'pika') return pika.handle(r, me, m, ctx);
+    if (m.type === 'locs' && isHost && r.phase === 'lobby') {
+      const ok = new Set(readLocs().locations.map(l => l.name));
+      r.sel = (Array.isArray(m.selected) ? m.selected : []).filter(n => ok.has(n));
+      return push(r);
+    }
+    if ((m.type === 'start' && r.phase === 'lobby' || m.type === 'again' && r.phase === 'end') && isHost) {
+      if (!begin(r)) return err(ws, 'Escolha pelo menos 2 localidades.');
+      return push(r);
+    }
     if (m.type === 'ready' && r.phase === 'play') {
       if (m.ready) r.ready[me.id] = true; else delete r.ready[me.id];
       return step(r);
