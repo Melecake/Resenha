@@ -5,36 +5,51 @@ const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.r
 const okTarget = (r, me, t) => { const vs = voters(r); return vs.some(p => p.id === t) && (t !== me.id || vs.length === 1); };
 const reset = r => {
   clearTimeout(r.timer);
-  Object.assign(r, { qi: '', qn: '', impostor: null, impName: '', impGone: false, answers: {}, names: {}, order: [], revealed: 0, showQ: false, intents: {}, votes: {}, result: null });
+  Object.assign(r, { qi: '', qn: '', impostor: null, impName: '', impGone: false, answers: {}, names: {}, order: [], layout: [], revealed: 0, showQ: false, intents: {}, votes: {}, result: null });
 };
 
 exports.init = r => { r.hostId = null; reset(r); };
 
 exports.view = (r, p) => {
-  const ph = r.phase, isHost = p.id === r.hostId, vs = voters(r).map(x => x.id);
+  const ph = r.phase, isHost = p.id === r.hostId, isImp = p.id === r.impostor, vs = voters(r).map(x => x.id);
   const row = id => ({ id, name: r.names[id] || '', text: r.answers[id] });
   const v = { type: 'state', game: 'perguntas', you: p.id, code: r.code, phase: ph, host: r.players[0].id, hostId: r.hostId,
+    me: isHost ? 'host' : isImp ? 'imp' : 'inn',
     players: r.players.map(x => ({ id: x.id, name: x.name, emo: x.emo, color: x.color })),
     answered: Object.keys(r.answers).map(Number), total: vs.length,
     intents: r.intents, voted: Object.keys(r.votes).map(Number), counts: counts(r), result: r.result };
-  if ((ph === 'answer' || ph === 'reveal') && !isHost) v.myQ = p.id === r.impostor ? r.qi : r.qn;
-  if ((isHost && ph !== 'lobby') || ph === 'end') { v.qn = r.qn; v.qi = r.qi; v.impostor = r.impostor; }
-  if (ph === 'reveal') { v.revealed = r.order.slice(0, r.revealed).map(row); v.showQ = r.showQ; v.count = r.order.length; v.wait = r.wait; if (r.showQ) v.qn = r.qn; }  if (ph === 'vote' || ph === 'end') { v.qn = r.qn; v.entries = r.order.filter(id => vs.includes(id)).map(row); }
+  if ((ph === 'answer' || ph === 'reveal') && !isHost) v.myQ = isImp ? r.qi : r.qn;
+  if (isHost && ph !== 'lobby') { v.qn = r.qn; v.qi = r.qi; v.impostor = r.impostor; }
+  if (ph === 'end') { v.qn = r.qn; v.qi = r.qi; v.impostor = r.impostor; }
+  if (ph === 'reveal') {
+    const done = new Set(r.order.slice(0, r.revealed));
+    v.slots = r.layout.map(id => done.has(id) ? row(id) : null);
+    v.last = r.revealed ? r.order[r.revealed - 1] : null;
+    v.count = r.order.length;
+    v.qReady = r.revealed >= r.order.length;
+    v.showQ = r.showQ;
+    if (r.showQ) v.qn = r.qn;
+  }
+  if (ph === 'vote' || ph === 'end') {
+    v.qn = r.qn;
+    if (isHost || isImp) v.qi = r.qi;
+    v.entries = r.layout.filter(id => vs.includes(id)).map(row);
+  }
   return v;
 };
 
 function reveal(r, ctx) {
-  const FIRST = 2500, GAP = 4000, QWAIT = 5000, VOTE = 6000;
-  r.order = shuffle(Object.keys(r.answers).map(Number)); r.revealed = 0; r.showQ = false; r.phase = 'reveal';
-  r.wait = FIRST; ctx.push(r);
+  const FIRST = 1500, GAP = 2500, QWAIT = 3000, VOTE = 5000;
+  const ids = Object.keys(r.answers).map(Number);
+  r.order = shuffle(ids.slice()); r.layout = shuffle(ids.slice());
+  r.revealed = 0; r.showQ = false; r.phase = 'reveal'; ctx.push(r);
   const tick = () => {
     if (!r.players.length || r.phase !== 'reveal') return;
     if (r.revealed < r.order.length) {
       r.revealed++;
-      r.wait = r.revealed < r.order.length ? GAP : QWAIT;
-      ctx.push(r); r.timer = setTimeout(tick, r.wait);
+      ctx.push(r); r.timer = setTimeout(tick, r.revealed < r.order.length ? GAP : QWAIT);
     } else if (!r.showQ) {
-      r.showQ = true; r.wait = VOTE; ctx.push(r); r.timer = setTimeout(tick, VOTE);
+      r.showQ = true; ctx.push(r); r.timer = setTimeout(tick, VOTE);
     } else { r.phase = 'vote'; ctx.push(r); }
   };
   r.timer = setTimeout(tick, FIRST);

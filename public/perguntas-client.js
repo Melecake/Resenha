@@ -1,22 +1,21 @@
 const Q={qn:'',qi:'',a:''};
+const PH=['Fulano: resposta escondida','Ciclano: uma resposta bem curtinha','Beltrano: aqui vai uma resposta um pouco mais comprida'];
 (()=>{const s=document.createElement('style');s.textContent=`
 .areas{display:grid;gap:0}
 .slot{border:2px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--mut)}
-.ans{padding:14px 16px;background:#0a1230;border:2px solid var(--line);border-radius:14px;margin:10px 0;word-break:break-word}.ans b{color:var(--acc)}
-.ans.new{animation:pop .4s both}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:8px}
+.ans{padding:14px 16px;background:#0a1230;border:2px solid var(--line);border-radius:14px;word-break:break-word}.ans b{color:var(--acc)}
+.ans.new{animation:unb .9s both}
+.ans.blur{filter:blur(7px);opacity:.55;user-select:none;pointer-events:none;animation:flt 2.4s ease-in-out infinite alternate}
+@keyframes unb{from{filter:blur(9px);transform:scale(.94);opacity:.4}to{filter:none;transform:none;opacity:1}}
+@keyframes flt{from{opacity:.4}to{opacity:.7}}
 .qbox{font-size:1.4rem;font-weight:700;padding:16px;background:#0a1230;border-radius:14px;margin-top:6px;word-break:break-word}
-.ld{position:relative;overflow:hidden;padding:18px 16px;border:2px dashed var(--line);border-radius:14px;margin:10px 0;color:var(--mut);text-align:center}
-.ld::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,194,51,.14),transparent);transform:translateX(-100%);animation:shm 1.4s infinite}
-@keyframes shm{to{transform:translateX(100%)}}
-.ld.q{border-style:solid;border-color:var(--acc);padding:30px 16px;margin:16px 0;color:var(--txt);font-weight:700;font-size:1.1rem;background:linear-gradient(180deg,var(--n2),var(--n1))}
+.qbox.blurq{filter:blur(8px);user-select:none;opacity:.6}.qbox.blurq.glow{animation:flt .8s ease-in-out infinite alternate}
+.qnew{animation:unb .9s both}
 .dd i{display:inline-block;width:9px;height:9px;margin:0 4px;border-radius:50%;background:var(--acc);animation:bnc 1s infinite ease-in-out}
 .dd i:nth-child(2){animation-delay:.15s}.dd i:nth-child(3){animation-delay:.3s}
 @keyframes bnc{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
-.ld .pb{height:6px;background:#0a1230;border-radius:4px;margin-top:14px;overflow:hidden}
-.ld .pb i{display:block;height:100%;width:0;background:var(--acc);border-radius:4px;animation:fillb var(--ms) linear forwards}
-@keyframes fillb{to{width:100%}}
-.qnew{animation:pop .5s both}
-.qpair{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 10px}@media(max-width:700px){.qpair{grid-template-columns:1fr}}
+.qpair{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 10px}.qpair.one{grid-template-columns:1fr}@media(max-width:700px){.qpair{grid-template-columns:1fr}}
 .qc{position:relative;border:2px solid var(--line);border-radius:18px;padding:24px 18px 18px;text-align:center;background:linear-gradient(180deg,var(--n2),var(--n1));opacity:.7}
 .qc.mine{opacity:1;border-width:3px}
 .qc.inn label{color:#3ddc97}.qc.imp label{color:#ff8a8a}
@@ -39,8 +38,7 @@ function perguntasView(){
   const hostP=s.players.find(p=>p.id===s.hostId),vs=s.players.filter(p=>p.id!==s.hostId);
   const E=err?`<p class="err">${esc(err)}</p>`:'';
   const chip=p=>`<span class="chip">${av(p.id)}<span class="cn"><b>${esc(p.name)}</b>${tags(p)}</span></span>`;
-  const qbox=(l,t,c='')=>`<div class="card ctr ${c}"><label>${l}</label><div class="qbox">${esc(t)}</div></div>`;
-  const ld=(t,ms,q)=>`<div class="ld ${q?'q':''}" style="--ms:${ms}"><span class="dd"><i></i><i></i><i></i></span><div style="margin-top:10px">${t}</div><div class="pb"><i></i></div></div>`;
+  const qbox=(l,t,c='')=>`<div class="card ctr ${c}"><label>${l}</label><div class="qbox">${esc(t??'')}</div></div>`;
   const wait=t=>`<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">${t}</p></div>`;
   const impCard=()=>`<div class="card ctr"><label>O impostor é</label><div class="worst" style="margin:6px 0 0">${esc(pl(s.impostor).name||'?')}</div></div>`;
   let h=E;
@@ -62,20 +60,20 @@ function perguntasView(){
     const done=s.answered.length,tot=s.total;
     if(isHost)h+=qbox('Pergunta dos inocentes',s.qn)+qbox('Pergunta do impostor',s.qi)+impCard()+`<div class="card ctr"><label>Respostas enviadas</label><b style="font-family:var(--disp);font-size:1.6rem;color:var(--acc)">${done}/${tot}</b></div>`;
     else if(s.answered.includes(s.you))h+=wait(`Resposta enviada. Aguardando os outros jogadores (${done}/${tot})…`);
-    else h+=`<div class="card ctr"><label>Sua pergunta</label><div class="qbox">${esc(s.myQ)}</div>
+    else h+=`<div class="card ctr"><label>Sua pergunta</label><div class="qbox">${esc(s.myQ??'')}</div>
       <input id="ans" class="ctr" style="margin-top:16px" maxlength="120" placeholder="Digite sua resposta" value="${esc(Q.a)}" oninput="Q.a=this.value" onkeydown="if(event.key==='Enter')qAnswer()">
       <button style="width:100%;margin-top:12px" onclick="qAnswer()">Enviar</button><p class="mut" style="margin:14px 0 0">Respostas enviadas: ${done}/${tot}</p></div>`;
   }else if(ph==='reveal'){
-    const n=s.revealed.length,tot=s.count||n,ms=(s.wait||4000)+'ms',allIn=n>=tot;
-    h+=`<div class="card"><label>Respostas (${n}/${tot})</label>${s.revealed.map((a,i)=>`<div class="ans ${i===n-1?'new':''}"><b>${esc(a.name)}</b>: ${esc(a.text)}</div>`).join('')}${allIn?'':ld(`Revelando a resposta ${n+1} de ${tot}`,ms)}</div>`;
-    if(allIn&&!s.showQ)h+=ld('Revelando a pergunta dos inocentes',ms,true);
-    if(s.showQ)h+=qbox('A pergunta dos inocentes era',s.qn,'qnew')+ld('A votação começa em instantes',ms);
+    const n=s.slots.filter(Boolean).length;
+    h+=`<div class="card"><label>Respostas (${n}/${s.count})</label><div class="slots">${s.slots.map((a,i)=>a?`<div class="ans ${a.id===s.last?'new':''}"><b>${esc(a.name)}</b>: ${esc(a.text)}</div>`:`<div class="ans blur"><b>${PH[i%3].split(':')[0]}</b>:${PH[i%3].split(':')[1]}</div>`).join('')}</div></div>`;
+    h+=s.showQ?qbox('A pergunta dos inocentes era',s.qn,'qnew')+`<p class="mut"><span class="dd"><i></i><i></i><i></i></span><br>A votação começa em instantes</p>`
+      :`<div class="card ctr"><label>A pergunta dos inocentes era</label><div class="qbox blurq ${s.qReady?'glow':''}">Aqui vai aparecer a pergunta dos inocentes</div></div>`;
     if(isHost)h+=impCard()+qbox('Pergunta do impostor',s.qi);
   }else{
     const end=ph==='end',voted=s.voted.includes(s.you);
-    const mineInn=!isHost&&!s.meImp,mineImp=!isHost&&s.meImp;
-    const pair=`<div class="qpair"><div class="qc inn ${mineInn?'mine':''}">${mineInn?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta dos inocentes</label><div class="qbox">${esc(s.qn)}</div></div>
-      <div class="qc imp ${mineImp?'mine':''}">${mineImp?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta do impostor</label><div class="qbox">${esc(s.qi)}</div></div></div>`;
+    const showImp=s.me==='host'||s.me==='imp'||end;
+    const pair=`<div class="qpair ${showImp?'':'one'}"><div class="qc inn ${s.me==='inn'?'mine':''}">${s.me==='inn'?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta dos inocentes</label><div class="qbox">${esc(s.qn??'')}</div></div>
+      ${showImp?`<div class="qc imp ${s.me==='imp'?'mine':''}">${s.me==='imp'?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta do impostor</label><div class="qbox">${esc(s.qi??'')}</div></div>`:''}</div>`;
     if(end){const r=s.result;
       h+=`<div class="card ctr"><h2 style="color:var(--acc)">${r.caught?'Os jogadores venceram!':'O impostor venceu!'}</h2>
       <p>${r.caught?`<b>${esc(r.impostor)}</b> era o impostor.`:`O impostor era <b>${esc(r.impostor)}</b> e ganhou a partida.`}</p>
