@@ -19,20 +19,25 @@ exports.view = (r, p) => {
     intents: r.intents, voted: Object.keys(r.votes).map(Number), counts: counts(r), result: r.result };
   if ((ph === 'answer' || ph === 'reveal') && !isHost) v.myQ = p.id === r.impostor ? r.qi : r.qn;
   if ((isHost && ph !== 'lobby') || ph === 'end') { v.qn = r.qn; v.qi = r.qi; v.impostor = r.impostor; }
-  if (ph === 'reveal') { v.revealed = r.order.slice(0, r.revealed).map(row); v.showQ = r.showQ; if (r.showQ) v.qn = r.qn; }
-  if (ph === 'vote' || ph === 'end') { v.qn = r.qn; v.entries = r.order.filter(id => vs.includes(id)).map(row); }
+  if (ph === 'reveal') { v.revealed = r.order.slice(0, r.revealed).map(row); v.showQ = r.showQ; v.count = r.order.length; v.wait = r.wait; if (r.showQ) v.qn = r.qn; }  if (ph === 'vote' || ph === 'end') { v.qn = r.qn; v.entries = r.order.filter(id => vs.includes(id)).map(row); }
   return v;
 };
 
 function reveal(r, ctx) {
-  r.order = shuffle(Object.keys(r.answers).map(Number)); r.revealed = 0; r.showQ = false; r.phase = 'reveal'; ctx.push(r);
+  const FIRST = 2500, GAP = 4000, QWAIT = 5000, VOTE = 6000;
+  r.order = shuffle(Object.keys(r.answers).map(Number)); r.revealed = 0; r.showQ = false; r.phase = 'reveal';
+  r.wait = FIRST; ctx.push(r);
   const tick = () => {
     if (!r.players.length || r.phase !== 'reveal') return;
-    if (r.revealed < r.order.length) { r.revealed++; ctx.push(r); r.timer = setTimeout(tick, 3500); }
-    else if (!r.showQ) { r.showQ = true; ctx.push(r); r.timer = setTimeout(tick, 6000); }
-    else { r.phase = 'vote'; ctx.push(r); }
+    if (r.revealed < r.order.length) {
+      r.revealed++;
+      r.wait = r.revealed < r.order.length ? GAP : QWAIT;
+      ctx.push(r); r.timer = setTimeout(tick, r.wait);
+    } else if (!r.showQ) {
+      r.showQ = true; r.wait = VOTE; ctx.push(r); r.timer = setTimeout(tick, VOTE);
+    } else { r.phase = 'vote'; ctx.push(r); }
   };
-  r.timer = setTimeout(tick, 1500);
+  r.timer = setTimeout(tick, FIRST);
 }
 
 function check(r, ctx) {

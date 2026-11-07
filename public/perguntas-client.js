@@ -4,7 +4,19 @@ const Q={qn:'',qi:'',a:''};
 .slot{border:2px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--mut)}
 .ans{padding:14px 16px;background:#0a1230;border:2px solid var(--line);border-radius:14px;margin:10px 0;word-break:break-word}.ans b{color:var(--acc)}
 .ans.new{animation:pop .4s both}
-.qbox{font-size:1.4rem;font-weight:700;padding:16px;background:#0a1230;border-radius:14px;margin-top:6px;word-break:break-word}`;document.head.appendChild(s)})();
+.qbox{font-size:1.4rem;font-weight:700;padding:16px;background:#0a1230;border-radius:14px;margin-top:6px;word-break:break-word}.ld{position:relative;overflow:hidden;padding:18px 16px;border:2px dashed var(--line);border-radius:14px;margin:10px 0;color:var(--mut);text-align:center}
+.ld::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,194,51,.14),transparent);transform:translateX(-100%);animation:shm 1.4s infinite}
+@keyframes shm{to{transform:translateX(100%)}}
+.ld.q{border-style:solid;border-color:var(--acc);padding:30px 16px;margin:16px 0;color:var(--txt);font-weight:700;font-size:1.1rem;background:linear-gradient(180deg,var(--n2),var(--n1))}
+.dd i{display:inline-block;width:9px;height:9px;margin:0 4px;border-radius:50%;background:var(--acc);animation:bnc 1s infinite ease-in-out}
+.dd i:nth-child(2){animation-delay:.15s}.dd i:nth-child(3){animation-delay:.3s}
+@keyframes bnc{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
+.ld .pb{height:6px;background:#0a1230;border-radius:4px;margin-top:14px;overflow:hidden}
+.ld .pb i{display:block;height:100%;width:0;background:var(--acc);border-radius:4px;animation:fillb var(--ms) linear forwards}
+@keyframes fillb{to{width:100%}}
+.qnew{animation:pop .5s both}`;document.head.appendChild(s)})();
+
+
 
 function perguntasRender(){
   const e0=document.activeElement,fid=e0&&e0.id,st=e0&&e0.selectionStart;
@@ -21,7 +33,8 @@ function perguntasView(){
   const hostP=s.players.find(p=>p.id===s.hostId),vs=s.players.filter(p=>p.id!==s.hostId);
   const E=err?`<p class="err">${esc(err)}</p>`:'';
   const chip=p=>`<span class="chip">${av(p.id)}${esc(p.name)}${p.id===s.host?'<span class="tag">líder</span>':''}${p.id===s.you?'<small>(você)</small>':''}</span>`;
-  const qbox=(l,t)=>`<div class="card ctr"><label>${l}</label><div class="qbox">${esc(t)}</div></div>`;
+  const qbox=(l,t,c='')=>`<div class="card ctr ${c}"><label>${l}</label><div class="qbox">${esc(t)}</div></div>`;
+  const ld=(t,ms,q)=>`<div class="ld ${q?'q':''}" style="--ms:${ms}"><span class="dd"><i></i><i></i><i></i></span><div style="margin-top:10px">${t}</div><div class="pb"><i></i></div></div>`;
   const wait=t=>`<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">${t}</p></div>`;
   const impCard=()=>`<div class="card ctr"><label>O impostor é</label><div class="worst" style="margin:6px 0 0">${esc(pl(s.impostor).name||'?')}</div></div>`;
   let h=E;
@@ -46,9 +59,10 @@ function perguntasView(){
       <input id="ans" class="ctr" style="margin-top:16px" maxlength="120" placeholder="Digite sua resposta" value="${esc(Q.a)}" oninput="Q.a=this.value" onkeydown="if(event.key==='Enter')qAnswer()">
       <button style="width:100%;margin-top:12px" onclick="qAnswer()">Enviar</button><p class="mut" style="margin:14px 0 0">Respostas enviadas: ${done}/${tot}</p></div>`;
   }else if(ph==='reveal'){
-    const n=s.revealed.length;
-    h+=`<div class="card"><label>Respostas</label>${n?s.revealed.map((a,i)=>`<div class="ans ${i===n-1?'new':''}"><b>${esc(a.name)}</b>: ${esc(a.text)}</div>`).join(''):'<p class="mut" style="margin:0">Preparando…</p>'}</div>`;
-    if(s.showQ)h+=qbox('A pergunta dos inocentes era',s.qn);
+    const n=s.revealed.length,tot=s.count||n,ms=(s.wait||4000)+'ms',allIn=n>=tot;
+    h+=`<div class="card"><label>Respostas (${n}/${tot})</label>${s.revealed.map((a,i)=>`<div class="ans ${i===n-1?'new':''}"><b>${esc(a.name)}</b>: ${esc(a.text)}</div>`).join('')}${allIn?'':ld(`Revelando a resposta ${n+1} de ${tot}`,ms)}</div>`;
+    if(allIn&&!s.showQ)h+=ld('Revelando a pergunta dos inocentes',ms,true);
+    if(s.showQ)h+=qbox('A pergunta dos inocentes era',s.qn,'qnew')+ld('A votação começa em instantes',ms);
     if(isHost)h+=impCard()+qbox('Pergunta do impostor',s.qi);
   }else{
     const end=ph==='end',voted=s.voted.includes(s.you);
