@@ -209,7 +209,7 @@ function profileCard(){const me=pl(S.you),taken=new Set(S.players.filter(p=>p.id
   return `<div class="card"><label>Seu ícone</label><div class="emos">${EMOTES.map((e,i)=>`<button class="eb ${me.emo===i?'sel':''}" ${taken.has(i)?'disabled':''} onclick="prof(${i},${me.color})">${e}</button>`).join('')}</div>
   <label style="margin-top:16px">Sua cor</label><div class="cols">${HUES.map((h,i)=>`<button class="cb ${me.color===i?'sel':''}" style="background:hsl(${h} 55% 40%)" onclick="prof(${me.emo},${i})"></button>`).join('')}</div></div>`}
 
-function render(){try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message)}}
+function render(){try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message+' ['+String(e.stack||'').split('\n')[1]+']')}}
 function renderMain(){
   const G=GAMES.find(g=>g.id===game),A=$('app');
   const E=err?`<p class="err">${esc(err)}</p>`:'';let h='';
@@ -264,7 +264,7 @@ function renderMain(){
   A.innerHTML=h;trans(S?S.phase:mode);
 }
 function nameVal(){const v=($('name')?$('name').value:store.get('name','')).trim();store.set('name',v);return v}
-function menu(m){const n=nameVal();if(!n){err='Digite seu nome para continuar.';return render()}err='';if(m==='create')tx({type:'create',name:n,game});else{mode='join';render();$('code').focus()}}
+function menu(m){const n=nameVal();if(!n){err='Digite seu nome para continuar.';return render()}err='';if(m==='create')tx({type:'create',name:n,game});else{mode='join';render();const c=$('code');if(c)c.focus()}}
 function join(){tx({type:'join',name:nameVal(),code:$('code').value,game})}
 function strike(i){struck.has(i)?struck.delete(i):struck.add(i);render()}
 render();

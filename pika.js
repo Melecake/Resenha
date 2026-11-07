@@ -9,9 +9,10 @@ exports.init = r => { r.theme = ''; r.excluded = []; reset(r); };
 exports.view = (r, p) => ({
   type: 'state', game: 'pika', you: p.id, code: r.code, phase: r.phase, host: r.players[0].id,
   players: r.players.map(x => ({ id: x.id, name: x.name, emo: x.emo, color: x.color })),
-  letter: r.phase === 'lobby' ? null : r.letter, queue: r.queue,
-  entries: r.entries.filter(e => r.players.some(p => p.id === e.id)),
-  intents: r.intents, voted: Object.keys(r.votes).map(Number), counts: counts(r), result: r.result
+  theme: r.theme || '', excluded: r.excluded || [],
+  letter: r.phase === 'lobby' ? null : r.letter, queue: r.queue || [],
+  entries: (r.entries || []).filter(e => r.players.some(p => p.id === e.id)),
+  intents: r.intents || {}, voted: Object.keys(r.votes || {}).map(Number), counts: counts(r), result: r.result
 });
 
 function round(r, ctx) {
@@ -32,7 +33,10 @@ function after(r, ctx) {
   if (r.phase === 'write' && r.players.every(p => r.entries.some(e => e.id === p.id))) r.phase = 'vote';
   else if (r.phase === 'vote' && r.players.every(p => r.votes[p.id])) {
     const c = counts(r), max = Math.max(...Object.values(c));
-    r.result = { max, losers: Object.keys(c).filter(k => c[k] === max).map(k => { const e = r.entries.find(e => e.id == k) || {}; return { id: +k, name: e.name || '?', text: e.text || '' }; })};
+    r.result = { max, losers: Object.keys(c).filter(k => c[k] === max).map(k => {
+      const e = r.entries.find(e => e.id == k) || {};
+      return { id: +k, name: e.name || '?', text: e.text || '' };
+    }) };
     r.phase = 'end';
   }
   ctx.push(r);
