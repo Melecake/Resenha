@@ -1,6 +1,8 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const pika = require('./pika');
+const perguntas = require('./perguntas');
+const MODS = { pika, perguntas };
 const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
@@ -16,7 +18,11 @@ const server = http.createServer(async (q, s) => {
     const b = await body(q);
     if (!b || b.password !== PASS) return json(s, 401, { error: 'Senha incorreta' });
     if (u === '/api/admin/check') return json(s, 200, { ok: true });
-    if (u === '/api/admin/save') { fs.writeFileSync(LOC, JSON.stringify(b.data, null, 2)); return json(s, 200, { ok: true }); }
+    if (u === '/api/admin/save') {
+      if (!b.data || !Array.isArray(b.data.locations)) return json(s, 400, { error: 'Dados inválidos' });
+      try { fs.writeFileSync(LOC, JSON.stringify(b.data, null, 2)); return json(s, 200, { ok: true }); }
+      catch { return json(s, 500, { error: 'Erro ao salvar' }); }
+    }
     return json(s, 404, {});
   }
   let file;
@@ -56,7 +62,7 @@ function begin(r) {
   return true;
 }
 function view(r, p) {
-  if (r.game === 'pika') return pika.view(r, p);
+  if (MODS[r.game]) return MODS[r.game].view(r, p);
   const v = { type: 'state', you: p.id, code: r.code, phase: r.phase, host: r.players[0].id,
     players: r.players.map(x => ({ id: x.id, name: x.name, emo: x.emo, color: x.color })), result: r.result || null,
     ready: Object.keys(r.ready || {}).map(Number), intents: r.intents || {}, voted: Object.keys(r.votes || {}).map(Number), counts: count(r) };
@@ -90,8 +96,8 @@ wss.on('connection', ws => {
     if (!room) return;
     const r = room; room = null;
     r.players = r.players.filter(p => p !== me);
-    if (!r.players.length) return void delete rooms[r.code];
-    if (r.game === 'pika') return pika.leave(r, me, ctx);
+    if (!r.players.length) { clearTimeout(r.timer); return void delete rooms[r.code]; }
+    if (MODS[r.game]) return MODS[r.game].leave(r, me, ctx);
     if (r.phase !== 'lobby' && me.id === r.spy) r.spyGone = true;
     for (const o of [r.ready, r.intents, r.votes]) {
       if (!o) continue;
@@ -109,8 +115,8 @@ wss.on('connection', ws => {
       if (!me.name) return err(ws, 'Digite seu nome.');
       if (m.type === 'create') {
         const c = newCode();
-        room = rooms[c] = { code: c, game: m.game === 'pika' ? 'pika' : 'locais', players: [], phase: 'lobby', sel: null };
-        if (room.game === 'pika') pika.init(room);
+        room = rooms[c] = { code: c, game: MODS[m.game] ? m.game : 'locais', players: [], phase: 'lobby', sel: null };
+        if (MODS[room.game]) MODS[room.game].init(room);
       } else {
         room = rooms[String(m.code || '').toUpperCase().trim()];
         if (!room) return err(ws, 'Sala não encontrada.');
@@ -131,7 +137,7 @@ wss.on('connection', ws => {
       if (Number.isInteger(c) && c >= 0 && c < COLORS) me.color = c;
       return push(r);
     }
-    if (r.game === 'pika') return pika.handle(r, me, m, ctx);
+    if (MODS[r.game]) return MODS[r.game].handle(r, me, m, ctx);
     if (m.type === 'locs' && isHost && r.phase === 'lobby') {
       const ok = new Set(readLocs().locations.map(l => l.name));
       r.sel = (Array.isArray(m.selected) ? m.selected : []).filter(n => ok.has(n));
