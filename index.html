@@ -126,7 +126,7 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 const GAMES=[
   {id:'locais',name:'Impostor - Locais',short:'Locais',img:'',ok:true,tag:'Descubra o espião antes que ele descubra o local.'},
   {id:'pika',name:'O meu é mais Pika',short:'Pika',img:'',ok:true,tag:'Uma letra, um tema: quem disser a pior palavra perde.'},
-  {id:'perguntas',name:'Impostor - Perguntas',short:'Perguntas',img:'',ok:false,tag:'Duas perguntas, um impostor.'}];
+  {id:'perguntas',name:'Impostor - Perguntas',short:'Perguntas',img:'',ok:true,tag:'Duas perguntas, um impostor.'}];
 const EMOTES=["😎","🤠","🥸","🤓","😈","👻","🤖","👽","🦊","🐸","🐙","🦄","🐼","🦁","🐵","🐲","🐶","🐱","🦉","🐧"];
 const HUES=[0,24,45,75,130,165,190,215,245,275,305,335];
 const store={get:(k,d)=>{try{return JSON.parse(sessionStorage.getItem(k))??d}catch{return d}},set:(k,v)=>sessionStorage.setItem(k,JSON.stringify(v))};
@@ -173,14 +173,14 @@ function render(){
   const E=err?`<p class="err">${esc(err)}</p>`:'';let h='';
   document.body.classList.toggle('home',screen==='home');
   $('bk').classList.toggle('hide',screen==='home');$('hm').classList.toggle('hide',screen==='home');$('lg').style.visibility=screen==='home'?'hidden':'visible';
-  A.classList.toggle('stack',!!(S&&S.game==='pika'));A.classList.toggle('fw',!!(S&&S.game!=='pika'&&S.phase!=='lobby'));
-  if(!ready){A.innerHTML='<div class="splash"><div class="spin"></div><p>Conectando ao servidor…</p></div>';return}
+  A.classList.toggle('stack',!!(S&&S.game));A.classList.toggle('fw',!!(S&&!S.game&&S.phase!=='lobby'));  if(!ready){A.innerHTML='<div class="splash"><div class="spin"></div><p>Conectando ao servidor…</p></div>';return}
   if(screen==='home'){
     h=`<div class="hero"><div class="eyebrow">Bem-vindo à</div><div class="title">Resenha<br>da Madrugada</div><p class="sub">Escolha um jogo e marcha!</p></div>${E}
     <div class="games">${GAMES.map((g,i)=>{const im=COVERS[g.id]||g.img;return `<div class="gc ${g.ok?'':'off'}" ${g.ok?`onclick="pick('${g.id}')"`:''}><div class="art" style="${bg(g.name)}">${im?`<img src="${esc(im)}" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<i>${g.short}</i></div><span class="no">0${i+1}</span>${g.ok?'':'<span class="ribbon">Em breve</span>'}<div class="info"><b>${g.name}</b><span>${g.tag}</span></div></div>`}).join('')}</div>`;
     A.innerHTML=h;trans('home');return;
   }
   if(S&&S.game==='pika'){pikaRender('');return}
+  if(S&&S.game==='perguntas'){perguntasRender();return}  
   if(!S){
     h=`<div class="split"><div class="art-side"><div class="eyebrow">Resenha da Madrugada</div><div class="title">${G.name}</div><p class="sub">${G.tag}</p></div>`;
     if(mode==='menu')h+=`<div class="card ctr"><label>Seu nome</label><input id="name" class="ctr" maxlength="30" placeholder="Como você quer ser chamado?" value="${esc(store.get('name',''))}" onkeydown="if(event.key==='Enter')menu('create')">${E}
@@ -225,4 +225,4 @@ function menu(m){const n=nameVal();if(!n){err='Digite seu nome para continuar.';
 function join(){tx({type:'join',name:nameVal(),code:$('code').value,game})}
 function strike(i){struck.has(i)?struck.delete(i):struck.add(i);render()}
 render();
-</script><script src="/pika-client.js"></script></body></html>
+</script><script src="/pika-client.js"></script><script src="/perguntas-client.js"></script></body></html>

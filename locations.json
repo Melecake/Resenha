@@ -34,7 +34,7 @@
     {
       "name": "Circo",
       "icon": "🎪",
-      "img": "https://piracicaba.sp.gov.br/wp-content/uploads/2026/09/O-Festival-segue-ate-segunda-feira-07.11-sao-mais-de-100-atracoes-gratuitas-1024x576.jpg"
+      "img": "https://static.historiadomundo.com.br/2025/01/tenda-colorido-de-circo-uma-alusao-a-historia-do-circo.jpg"
     },
     {
       "name": "Festa de Empresa",
@@ -94,62 +94,67 @@
     {
       "name": "Estação polar",
       "icon": "🧊",
-      "img": ""
+      "img": "https://nautica.com.br/wp-content/uploads/2026/02/Estacao-Polar-Tara-1.jpg"
     },
     {
       "name": "Delegacia",
       "icon": "🚓",
-      "img": ""
+      "img": "https://senadorcanedo.go.gov.br/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-04-at-08.15.53-scaled.jpeg"
     },
     {
       "name": "Restaurante",
       "icon": "🍽️",
-      "img": ""
+      "img": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Abu_Nawas_Beach_restaurant_-_Flickr_-_Al_Jazeera_English_%281%29.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
     },
     {
       "name": "Escola",
       "icon": "🏫",
-      "img": ""
+      "img": "https://static.mundoeducacao.uol.com.br/mundoeducacao/2022/03/dia-escola.jpg"
     },
     {
       "name": "Posto de gasolina",
       "icon": "⛽",
-      "img": ""
+      "img": "https://postogalo.com.br/wp-content/uploads/2022/12/SM-2-scaled.jpg"
     },
     {
       "name": "Estação espacial",
       "icon": "🛰️",
-      "img": ""
+      "img": "https://t.ctcdn.com.br/qpR4uGE4RRkitfcUQ2A4amNJdZM=/640x360/smart/i466731.png"
     },
     {
       "name": "Submarino",
       "icon": "🌊",
-      "img": ""
+      "img": "https://upload.wikimedia.org/wikipedia/commons/b/bb/US_Navy_040730-N-1234E-002_PCU_Virginia_%28SSN_774%29_returns_to_the_General_Dynamics_Electric_Boat_shipyard.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
     },
     {
       "name": "Supermercado",
       "icon": "🛒",
-      "img": ""
+      "img": "https://blog.ciss.com.br/wp-content/uploads/2020/06/blog-cisslive-layout-de-supermercado.jpg"
     },
     {
       "name": "Universidade",
       "icon": "🎓",
-      "img": ""
+      "img": "https://www.estudarfora.org.br/wp-content/uploads/2020/11/howard.jpg"
     },
     {
       "name": "Zoológico",
       "icon": "🦁",
-      "img": ""
+      "img": "https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/zoo-sp-mapa-2.jpg"
     },
     {
       "name": "Biblioteca",
       "icon": "📚",
-      "img": ""
+      "img": "https://assets.ischolar.com.br/estante_biblioteca_escolar_digital_107f8753ac_adab4784e6.jpg"
     },
     {
       "name": "Padaria",
       "icon": "🥖",
-      "img": ""
+      "img": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cc/02/4d/photo1jpg.jpg?w=1200&h=1200&s=1"
     }
-  ]
+  ],
+  "covers": {
+    "locais": "https://m.media-amazon.com/images/M/MV5BMDM3YWEyNDYtODA5Zi00NTQ0LWI4ZTEtODBlZGJjZmZjOTI0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "pika": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcTJvFKIHsVQnfEjOqXjb2DcTMwNBMzL4DSiE-CxtkTgLNQ_PI42KFvro&s=10",
+    "perguntas": "https://i.pinimg.com/736x/cd/5f/38/cd5f38bd5bfa01971c92c424eef7df9e.jpg"
+  }
 }

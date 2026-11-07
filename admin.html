@@ -44,10 +44,15 @@ function draw(){
     <input type="text" value="${esc(l.name)}" oninput="D.locations[${i}].name=this.value">${imgField({k:'loc',i})}
     <button class="bad" onclick="D.locations.splice(${i},1);draw()">Excluir</button></div>`).join('')}
     <button class="sec" onclick="D.locations.push({name:'Nova localidade',icon:'',img:''});draw()">+ Adicionar localidade</button></div>
-  <button onclick="save()" style="padding:14px 28px">Salvar alterações</button>
-  ${M?`<div class="modal"><div class="box"><h3 style="margin:0;color:var(--acc)">${M.nv?'Usar esta imagem '+who(M.t)+'?':'Remover a imagem '+who(M.t)+'?'}</h3>
+    <div class="r"><button class="sec" style="padding:14px 28px" onclick="copyJson(this)">Copiar JSON</button><button onclick="save()" style="padding:14px 28px">Salvar alterações</button></div>  ${M?`<div class="modal"><div class="box"><h3 style="margin:0;color:var(--acc)">${M.nv?'Usar esta imagem '+who(M.t)+'?':'Remover a imagem '+who(M.t)+'?'}</h3>
     ${M.nv?`<img src="${esc(M.nv)}" onerror="this.replaceWith(Object.assign(document.createElement('p'),{textContent:'Não foi possível carregar essa imagem. Confira o link.'}))">`:''}
     <div class="r" style="justify-content:center"><button class="sec" onclick="noImg()">Cancelar</button><button onclick="okImg()">Confirmar</button></div></div></div>`:''}`}
+async function copyJson(btn){
+  const t=JSON.stringify(D,null,2);
+  try{await navigator.clipboard.writeText(t)}
+  catch{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}
+  btn.textContent='JSON copiado!';setTimeout(()=>btn.textContent='Copiar JSON',1800)
+}
 async function save(){const r=await api('save',{data:D});alert(r.ok?'Salvo!':'Erro ao salvar')}
 login();
 </script></body></html>
