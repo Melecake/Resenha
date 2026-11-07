@@ -40,6 +40,8 @@ const cleanLoc = l => {
   const img = /^(https?:\/\/|\/)\S{1,500}$/.test((l && l.img) || '') ? l.img : '';
   return { name, img, icon: String((l && l.icon) || '').slice(0, 8) };
 };
+const count = r => { const c = {}; Object.values(r.votes || {}).forEach(t => c[t] = (c[t] || 0) + 1); return c; };
+const valid = (r, me, t) => (t !== me.id || r.players.length === 1) && r.players.some(p => p.id === t);
 
 function begin(r) {
   const d = readLocs(), seen = new Set();
@@ -47,18 +49,31 @@ function begin(r) {
   r.spyImg = d.spyImage || '';
   r.loc = r.locs[Math.random() * r.locs.length | 0];
   r.spy = r.players[Math.random() * r.players.length | 0].id;
-  r.phase = 'play'; r.acc = null; r.result = null;
+  r.phase = 'play'; r.ready = {}; r.intents = {}; r.votes = {}; r.result = null;
 }
 function view(r, p) {
   if (r.game === 'pika') return pika.view(r, p);
   const v = { type: 'state', you: p.id, code: r.code, phase: r.phase, host: r.players[0].id,
-    players: r.players.map(x => ({ id: x.id, name: x.name })), accusation: r.acc || null, result: r.result || null };
+    players: r.players.map(x => ({ id: x.id, name: x.name })), result: r.result || null,
+    ready: Object.keys(r.ready || {}).map(Number), intents: r.intents || {}, voted: Object.keys(r.votes || {}).map(Number), counts: count(r) };
   if (r.phase !== 'lobby') v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };
   return v;
 }
 const push = r => r.players.forEach(p => send(p.ws, view(r, p)));
 const err = (w, msg) => send(w, { type: 'error', msg });
 const ctx = { push, err };
+
+function step(r) {
+  if (r.phase === 'play' && r.players.every(p => r.ready[p.id])) { r.phase = 'vote'; r.intents = {}; r.votes = {}; }
+  else if (r.phase === 'vote' && r.players.every(p => r.votes[p.id])) {
+    const c = count(r), max = Math.max(...Object.values(c));
+    const top = Object.keys(c).filter(k => c[k] === max).map(Number);
+    const name = id => (r.players.find(p => p.id === id) || {}).name || '?';
+    r.result = { caught: top.length === 1 && top[0] === r.spy, top: top.map(name), max, spy: name(r.spy), loc: r.loc };
+    r.phase = 'end';
+  }
+  push(r);
+}
 
 wss.on('connection', ws => {
   const me = { id: nextId++, ws, name: '' };
@@ -69,9 +84,13 @@ wss.on('connection', ws => {
     r.players = r.players.filter(p => p !== me);
     if (!r.players.length) return void delete rooms[r.code];
     if (r.game === 'pika') return pika.leave(r, me, ctx);
-    if (r.phase === 'accuse') { r.phase = 'play'; r.acc = null; }
-    if (r.phase !== 'lobby' && me.id === r.spy) { r.phase = 'lobby'; r.acc = r.result = null; }
-    push(r);
+    if (r.phase !== 'lobby' && me.id === r.spy) { r.phase = 'lobby'; r.result = null; return push(r); }
+    for (const o of [r.ready, r.intents, r.votes]) {
+      if (!o) continue;
+      delete o[me.id];
+      for (const k in o) if (o[k] === me.id) delete o[k];
+    }
+    step(r);
   };
   ws.on('message', raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
@@ -101,21 +120,13 @@ wss.on('connection', ws => {
       begin(r); return push(r);
     }
     if (m.type === 'again' && isHost && r.phase === 'end') { begin(r); return push(r); }
-    if (m.type === 'accuse' && r.phase === 'play') {
-      const t = r.players.find(p => p.id === m.target);
-      if (!t || t === me) return;
-      r.acc = { by: me.id, target: t.id, votes: { [me.id]: true } }; r.phase = 'accuse'; return push(r);
+    if (m.type === 'ready' && r.phase === 'play') {
+      if (m.ready) r.ready[me.id] = true; else delete r.ready[me.id];
+      return step(r);
     }
-    if (m.type === 'vote' && r.phase === 'accuse' && me.id !== r.acc.target) {
-      if (!m.yes) { r.acc = null; r.phase = 'play'; return push(r); }
-      r.acc.votes[me.id] = true;
-      const need = r.players.filter(p => p.id !== r.acc.target);
-      if (need.every(p => r.acc.votes[p.id])) {
-        const name = id => r.players.find(p => p.id === id).name;
-        r.result = { caught: r.acc.target === r.spy, target: name(r.acc.target), spy: name(r.spy), loc: r.loc };
-        r.phase = 'end';
-      }
-      return push(r);
+    if (r.phase === 'vote' && !r.votes[me.id] && valid(r, me, m.target)) {
+      if (m.type === 'intent') { r.intents[me.id] = m.target; return push(r); }
+      if (m.type === 'vote') { r.votes[me.id] = m.target; r.intents[me.id] = m.target; return step(r); }
     }
   });
   ws.on('close', leave);
