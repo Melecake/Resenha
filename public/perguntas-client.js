@@ -66,7 +66,7 @@ function perguntasView(){
   }else if(ph==='reveal'){
     const n=s.slots.filter(Boolean).length;
     h+=`<div class="card"><label>Respostas (${n}/${s.count})</label><div class="slots">${s.slots.map((a,i)=>a?`<div class="ans ${a.id===s.last?'new':''}"><b>${esc(a.name)}</b>: ${esc(a.text)}</div>`:`<div class="ans blur"><b>${PH[i%3].split(':')[0]}</b>:${PH[i%3].split(':')[1]}</div>`).join('')}</div></div>`;
-    h+=s.showQ?qbox('A pergunta dos inocentes era',s.qn,'qnew')+`<p class="mut"><span class="dd"><i></i><i></i><i></i></span><br>A votação começa em instantes</p>`
+    h+=s.showQ?qbox('A pergunta dos inocentes era:',s.qn,'qnew')+`<p class="mut"><span class="dd"><i></i><i></i><i></i></span><br>A votação começa em instantes</p>`
       :`<div class="card ctr"><label>A pergunta dos inocentes era</label><div class="qbox blurq ${s.qReady?'glow':''}">Aqui vai aparecer a pergunta dos inocentes</div></div>`;
     if(isHost)h+=impCard()+qbox('Pergunta do impostor',s.qi);
   }else{
