@@ -2,6 +2,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const pika = require('./pika');
 const perguntas = require('./perguntas');
+process.on('uncaughtException', e => console.error('Erro não tratado:', e));
 const MODS = { pika, perguntas };
 const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
@@ -157,5 +158,6 @@ wss.on('connection', ws => {
     }
   });
   ws.on('close', leave);
+  ws.on('error', () => {});
 });
 server.listen(process.env.PORT || 3000, () => console.log('Rodando em http://localhost:' + (process.env.PORT || 3000)));

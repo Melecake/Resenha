@@ -43,8 +43,11 @@ label{display:block;font:700 .72rem Rubik;letter-spacing:3px;text-transform:uppe
 .card::before{content:"";position:absolute;top:-2px;left:22px;width:70px;height:4px;background:var(--acc);border-radius:0 0 4px 4px}
 .row{display:flex;gap:10px;margin:10px 0}.row>*{flex:1;min-width:0}.err{color:#ff7b7b;text-align:center;font-weight:500}.ctr{text-align:center}input.ctr{text-align:center}
 .hero{text-align:center;padding:20px 0 6px}.eyebrow{font:700 .78rem Rubik;letter-spacing:6px;text-transform:uppercase;color:var(--mut)}
+.hero.rel{position:relative;max-width:1280px;margin-left:auto;margin-right:auto;width:100%}.hero.rel .ibtn{position:absolute;top:6px;right:0}
 .title{font-family:var(--disp);font-size:clamp(2.4rem,8vw,6.5rem);line-height:.95;color:var(--acc);text-shadow:0 5px 0 var(--acc2),0 0 40px rgba(255,194,51,.35);margin:10px 0 14px;transform:skew(-4deg)}
 .sub{color:var(--mut);font-size:1.1rem}.mut{text-align:center;color:var(--mut)}
+.ibtn{width:34px;height:34px;padding:0;border-radius:50%;background:var(--n2);color:var(--acc);border:2px solid var(--acc);box-shadow:0 3px 0 #0a1230;font:italic 700 1.15rem Georgia,serif;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.ibtn:hover{filter:none;transform:translateY(-2px);background:var(--acc);color:var(--ink)}.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 #0a1230}
 .games{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(16px,2.5vw,32px);max-width:1280px;margin:34px auto 0}
 .gc{position:relative;height:min(56vh,480px);min-height:340px;border-radius:24px;overflow:hidden;border:3px solid var(--line);cursor:pointer;transition:.25s cubic-bezier(.2,.8,.2,1);display:flex;align-items:flex-end;isolation:isolate}
 .gc:hover{transform:translateY(-10px) rotate(-1deg);border-color:var(--acc);box-shadow:0 24px 50px rgba(0,0,0,.5),0 0 40px rgba(255,194,51,.25)}
@@ -52,6 +55,7 @@ label{display:block;font:700 .72rem Rubik;letter-spacing:3px;text-transform:uppe
 .gc .art i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:normal 400 clamp(3rem,9vw,6rem) Bungee,Impact,sans-serif;color:rgba(255,255,255,.14);transform:rotate(-8deg)}
 .gc::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(transparent 35%,rgba(7,11,23,.95))}
 .gc .no{position:absolute;top:14px;left:18px;font-family:var(--disp);font-size:3.2rem;color:rgba(255,255,255,.2)}
+.gc .ibtn{position:absolute;top:14px;right:14px;z-index:3}
 .gc .info{padding:22px;width:100%;min-height:8.6rem;text-align:left}
 .gc .info b{display:block;font-family:var(--disp);font-weight:400;font-size:1.45rem;line-height:1.2;min-height:2.4em;color:#fff;margin-bottom:6px}.gc .info span{display:block;color:var(--mut);font-size:.92rem}
 .gc.off{filter:grayscale(.7) brightness(.7);cursor:default}.gc.off:hover{transform:none;border-color:var(--line);box-shadow:none}
@@ -70,8 +74,9 @@ body.home .games{flex:1;min-height:0;margin:3vh auto 0;width:100%}body.home .gc{
 .code{font-family:var(--disp);font-size:clamp(3rem,9vw,6rem);color:var(--acc);text-align:center;letter-spacing:12px;text-shadow:0 5px 0 var(--acc2),0 0 40px rgba(255,194,51,.3)}
 ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-between;align-items:center;padding:6px 0;gap:8px}li .nm{flex:1;display:flex;align-items:center;gap:10px}
 .chips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:18px}
-.chip{display:inline-flex;align-items:center;gap:10px;background:#0a1230;border:2px solid var(--line);border-radius:14px;padding:6px 16px 6px 6px;font-weight:700}
-.tag{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;background:var(--acc);color:var(--ink);padding:3px 7px;border-radius:6px;margin-left:4px;vertical-align:middle;font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:10px;background:#0a1230;border:2px solid var(--line);border-radius:14px;padding:6px 16px 6px 6px;font-weight:700;text-align:left}
+.cn{display:flex;flex-direction:column;align-items:flex-start;gap:3px;line-height:1.15;min-width:0}.cn b{word-break:break-word}.sb{display:flex;align-items:center;gap:6px}
+.tag{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;background:var(--acc);color:var(--ink);padding:3px 7px;border-radius:6px;vertical-align:middle;font-weight:700}
 .av{width:44px;height:44px;flex:0 0 44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
 .emos{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}@media(max-width:560px){.emos{grid-template-columns:repeat(5,1fr)}}
 .eb,.cb{padding:0;box-shadow:none;background:var(--n1);border:2px solid var(--line)}.eb:hover,.cb:hover{transform:none;filter:brightness(1.2)}.eb:active,.cb:active{transform:none;box-shadow:none}
@@ -82,7 +87,11 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.tile img+i{display:none}
 .tile i{font-size:1.7rem;font-style:normal}.tile span{position:relative;font-size:.74rem;font-weight:700;padding:3px 7px;margin-top:3px;border-radius:6px;background:rgba(0,0,0,.55)}
 .tile.x{opacity:.3}.tile.x span{text-decoration:line-through}
-.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}.pick .tile{cursor:default}
+.pick,.box.info{scrollbar-width:thin;scrollbar-color:var(--acc) #0a1230}
+.pick::-webkit-scrollbar,.box.info::-webkit-scrollbar{width:10px}
+.pick::-webkit-scrollbar-track,.box.info::-webkit-scrollbar-track{background:#0a1230;border-radius:8px}
+.pick::-webkit-scrollbar-thumb,.box.info::-webkit-scrollbar-thumb{background:linear-gradient(var(--acc),var(--acc2));border-radius:8px;border:2px solid #0a1230}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;max-height:min(62vh,560px);overflow-y:auto;padding:4px 8px 4px 2px}.pick .tile{cursor:default}
 .pick .tile i{font-size:1.3rem}.pick .tile span{font-size:.62rem;padding:2px 5px}
 .tile.on{border-color:var(--acc)}.tile.off{opacity:.3;filter:grayscale(.6)}.pick .tile.on:hover,.pick .tile.off:hover{transform:none}
 .grid6{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
@@ -107,6 +116,10 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 .worst{font-family:var(--disp);font-size:clamp(1.6rem,4vw,2.6rem);color:var(--acc);margin:10px 0;word-break:break-word}.worst span{font:500 .5em Rubik;color:var(--txt)}
 .modal{position:fixed;inset:0;background:transparent;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:70;padding:20px;animation:fade .2s}
 .modal .box{background:linear-gradient(180deg,var(--n2),var(--n1));border:2px solid var(--acc);padding:26px;border-radius:20px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .25s both}
+.box.info{max-width:660px;max-height:82vh;overflow-y:auto;text-align:left}
+.box.info h4{font:400 1rem var(--disp);color:var(--acc);margin:18px 0 6px;letter-spacing:1px}
+.box.info p,.box.info li{color:#cfd8f5;line-height:1.55;font-size:.95rem;margin:6px 0}
+.box.info ul{list-style:disc;padding-left:22px;margin:6px 0}.box.info li{display:list-item;padding:2px 0}.box.info b{color:#fff}
 @keyframes fade{from{opacity:0}}@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
 .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin-top:20px}
 .vc{position:relative;display:flex;flex-direction:column;gap:16px;padding:22px;border-radius:20px;border:2px solid var(--line);background:linear-gradient(180deg,var(--n2),var(--n1));box-shadow:0 8px 0 #0a1230}
@@ -127,6 +140,27 @@ const GAMES=[
   {id:'locais',name:'Impostor - Locais',short:'Locais',img:'',ok:true,tag:'Descubra o espião antes que ele descubra o local.'},
   {id:'pika',name:'O meu é mais Pika',short:'Pika',img:'',ok:true,tag:'Uma letra, um tema: quem disser a pior palavra perde.'},
   {id:'perguntas',name:'Impostor - Perguntas',short:'Perguntas',img:'',ok:true,tag:'Duas perguntas, um impostor.'}];
+const INFO={
+locais:{brief:'Todos recebem o mesmo local, menos o espião. Façam perguntas uns aos outros, descubram quem não sabe onde está e votem. O espião tenta descobrir o local sem ser pego.',
+full:`<h4>Objetivo</h4><p>Todos os jogadores recebem o mesmo <b>local</b>, menos um: o <b>espião</b>, que não sabe onde está. Os jogadores tentam descobrir quem é o espião. O espião tenta descobrir o local e não ser pego.</p>
+<h4>Antes de começar</h4><ul><li><b>Ícone e cor:</b> cada jogador escolhe um emoji e uma cor. Dois jogadores não podem ter o mesmo emoji, mas as cores podem se repetir.</li><li><b>Localidades:</b> o líder (quem criou a sala) marca quais localidades entram na partida, e todos veem a seleção.</li><li><b>Iniciar:</b> só o líder inicia a partida.</li></ul>
+<h4>Durante a partida</h4><ul><li><b>Seu cartão:</b> mostra o local, ou "Espião" se você for o espião.</li><li><b>Conversa:</b> façam perguntas uns aos outros sobre o local, sem entregar demais. Quem desconfiar de alguém pode apertar o cérebro e investigar com mais perguntas.</li><li><b>Quadro de suspeitos:</b> só você vê. Clique em um jogador para alternar entre Na dúvida, Suspeito e Inocente. É só uma anotação sua. O espião não tem esse quadro.</li><li><b>Possíveis localidades:</b> toque em uma localidade para riscá-la e lembrar o que já descartou.</li></ul>
+<h4>Votação</h4><ul><li><b>Pronto para votar:</b> quando achar que já deu, clique no botão. Se mudar de ideia, clique em Cancelar. A votação só abre quando todos estiverem prontos.</li><li><b>Declarar intenção:</b> seu emoji aparece no card da pessoa escolhida, para a turma ver em quem a maioria quer votar. Você pode mudar de alvo quantas vezes quiser.</li><li><b>Votar:</b> confirma o voto de forma definitiva. Quando todos votarem, o mais votado é revelado.</li></ul>
+<h4>Quem vence</h4><ul><li>Se o espião for o único mais votado, <b>os jogadores vencem</b>.</li><li>Se outra pessoa for a mais votada, ou houver empate, <b>o espião vence</b>.</li></ul>
+<h4>Outras regras</h4><ul><li>Se alguém sair, a partida continua.</li><li>Não é possível entrar em uma partida em andamento.</li><li>No fim, o líder pode clicar em <b>Jogar novamente</b> para sortear novo espião e novo local.</li></ul>`},
+pika:{brief:'O líder escolhe um tema e uma letra é sorteada. Cada jogador diz uma palavra do tema que comece com a letra, e todos votam na pior resposta.',
+full:`<h4>Objetivo</h4><p>Uma letra é sorteada e existe um tema. Cada jogador diz uma palavra do tema que comece com essa letra. No fim, a turma vota na <b>pior palavra</b>, e quem a escreveu perde.</p>
+<h4>Sala de espera</h4><ul><li><b>Ícone e cor:</b> cada jogador escolhe um emoji (único na sala) e uma cor.</li><li><b>Tema:</b> o líder (quem criou a sala) digita o tema, e todos veem.</li><li><b>Letras:</b> o líder pode excluir letras do sorteio tocando nelas. Letras riscadas não entram.</li><li><b>Iniciar:</b> só o líder inicia a partida.</li></ul>
+<h4>Rodada</h4><ul><li><b>Roleta:</b> uma animação sorteia a letra entre as que não foram excluídas.</li><li><b>Tema e letra:</b> aparecem na tela, seguidos de uma contagem de 3 segundos.</li><li><b>Eu tenho!:</b> quando você pensar em uma palavra, clique no botão. Você entra na fila pela ordem dos cliques, e a fila fica visível para todos.</li><li><b>Escrever:</b> só a pessoa que está na frente da fila escreve por vez, para ninguém repetir a mesma palavra. Quando ela envia, o nome e a palavra aparecem para todos, e o próximo da fila é liberado.</li></ul>
+<h4>Votação</h4><ul><li>Começa quando todos enviaram suas palavras, sem limite de tempo.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação, e o voto é definitivo. O contador de votos aparece no card assim que alguém recebe um voto.</li><li>Quando todos votarem, o mais votado é o perdedor. Em caso de empate, todos os empatados perdem.</li></ul>
+<h4>Depois da rodada</h4><ul><li><b>Nova partida:</b> volta à sala de espera para trocar o tema e as letras.</li><li><b>Jogar novamente o mesmo tema:</b> sorteia uma nova letra e começa outra rodada. Os dois botões são do líder e pedem confirmação.</li></ul>`},
+perguntas:{brief:'Um host escreve duas perguntas parecidas: uma para os inocentes e outra para o impostor. Todos respondem, as respostas são reveladas e vocês votam em quem recebeu a pergunta diferente.',
+full:`<h4>Objetivo</h4><p>O <b>host</b> escreve duas perguntas parecidas: uma para os <b>inocentes</b> e outra para o <b>impostor</b>. Todos respondem sem saber que existem duas perguntas. Os jogadores tentam descobrir quem respondeu à pergunta diferente. O impostor tenta passar despercebido.</p>
+<h4>Sala de espera</h4><ul><li><b>Áreas:</b> a sala tem duas áreas, <b>Host</b> e <b>Jogadores</b>. A área Host começa vazia e comporta só uma pessoa. Para trocar o host, quem está nela clica em "Sair do host" e outra pessoa clica em "Ser o host".</li><li><b>Iniciar:</b> só o líder (quem criou a sala) inicia, e apenas se houver alguém como host e ao menos um jogador.</li><li><b>Ícone e cor:</b> cada jogador escolhe um emoji (único na sala) e uma cor.</li></ul>
+<h4>Rodada</h4><ul><li><b>Host escreve:</b> os jogadores veem "Esperando o Host escrever as perguntas". O host escreve a pergunta dos inocentes e a do impostor.</li><li><b>Sorteio:</b> uma pessoa aleatória, entre os jogadores, recebe a pergunta do impostor. Todos os outros recebem a pergunta dos inocentes.</li><li><b>Respostas:</b> cada jogador vê só a sua pergunta, escreve a resposta e clica em Enviar.</li><li><b>Host espectador:</b> o host não joga. Ele acompanha a partida, vê quem é o impostor e as duas perguntas, mas não pode votar.</li></ul>
+<h4>Revelação</h4><ul><li>Quando todos enviarem, as respostas aparecem <b>uma por vez</b>, com os nomes.</li><li>Só depois da última resposta a <b>pergunta dos inocentes</b> é revelada. É nesse momento que o impostor descobre que era o impostor.</li></ul>
+<h4>Votação</h4><ul><li>Na votação, a tela mostra as duas perguntas e destaca qual foi a <b>sua</b>.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação, e o voto é definitivo.</li></ul>
+<h4>Resultado</h4><ul><li>Se o mais votado for o impostor, <b>os jogadores vencem</b>.</li><li>Se não, aparece o nome do impostor e que <b>ele ganhou a partida</b>. Empate também dá vitória ao impostor.</li><li>No fim, o líder escolhe <b>Nova partida</b> (volta à sala de espera, para trocar o host) ou <b>Jogar novamente</b> (mesmo host, perguntas novas).</li></ul>`}};
 const EMOTES=["😎","🤠","🥸","🤓","😈","👻","🤖","👽","🦊","🐸","🐙","🦄","🐼","🦁","🐵","🐲","🐶","🐱","🦉","🐧"];
 const HUES=[0,24,45,75,130,165,190,215,245,275,305,335];
 const store={get:(k,d)=>{try{return JSON.parse(sessionStorage.getItem(k))??d}catch{return d}},set:(k,v)=>sessionStorage.setItem(k,JSON.stringify(v))};
@@ -142,9 +176,15 @@ ws.onmessage=e=>{busy(false);const m=JSON.parse(e.data);
     if(S&&S.phase!=='play'&&m.phase==='play'){struck=new Set();marks={}}S=m;err=''}
   render()};
 ws.onclose=()=>{err='Conexão perdida. Recarregue a página.';render()};
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.closest('.emos,.cols')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.closest('.emos,.cols')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
+window.addEventListener('error',e=>{if(e.message)notify('Erro na página: '+e.message)});
+window.addEventListener('unhandledrejection',e=>notify('Erro: '+((e.reason&&e.reason.message)||e.reason)));
 function trans(k){if(k===lastKey)return;lastKey=k;const a=$('app');a.classList.remove('enter');void a.offsetWidth;a.classList.add('enter');setTimeout(()=>a.classList.remove('enter'),900)}
-function notify(m){$('ntc').innerHTML=`<div class="modal"><div class="box"><h3 style="margin:0 0 10px">Aviso</h3><p style="margin:0 0 18px">${esc(m)}</p><button onclick="$('ntc').innerHTML=''">Entendi</button></div></div>`}
+function notify(m){$('ntc').innerHTML=`<div class="modal"><div class="box"><h3 style="margin:0 0 10px">Aviso</h3><p style="margin:0 0 18px">${esc(m)}</p><button onclick="closeNote()">Entendi</button></div></div>`}
+const closeNote=()=>{$('ntc').innerHTML=''};
+function showInfo(id,full){const g=GAMES.find(x=>x.id===id),t=INFO[id];
+  $('ntc').innerHTML=`<div class="modal" onclick="if(event.target===this)closeNote()"><div class="box ${full?'info':''}" style="${full?'':'text-align:center'}"><h3 style="margin:0 0 6px">${g.name}</h3>${full?t.full:`<p style="color:#cfd8f5;line-height:1.55">${t.brief}</p>`}<div style="text-align:center"><button style="margin-top:18px" onclick="closeNote()">Entendi</button></div></div></div>`}
+const infoBtn=id=>`<button class="ibtn" title="Como jogar" onclick="event.stopPropagation();showInfo('${id}',true)">i</button>`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=id=>document.getElementById(id);
 const pl=id=>S.players.find(p=>p.id===id)||{};
@@ -163,24 +203,27 @@ function leaveRoom(){if(S){tx({type:'leave'});S=null}err=''}
 function pick(id){game=id;screen='game';mode='menu';err='';render()}
 function goHome(){leaveRoom();screen='home';mode='menu';render()}
 function back(){if(S){leaveRoom();mode='menu'}else if(mode==='join')mode='menu';else screen='home';err='';render()}
-const players=()=>`<div class="chips">${S.players.map(p=>`<span class="chip">${av(p.id)}${esc(p.name)}${p.id===S.host?'<span class="tag">líder</span>':''}${p.id===S.you?'<small>(você)</small>':''}</span>`).join('')}</div>`;
+const tags=p=>(p.id===S.host||p.id===S.you)?`<span class="sb">${p.id===S.host?'<span class="tag">líder</span>':''}${p.id===S.you?'<small>(você)</small>':''}</span>`:'';
+const players=()=>`<div class="chips">${S.players.map(p=>`<span class="chip">${av(p.id)}<span class="cn"><b>${esc(p.name)}</b>${tags(p)}</span></span>`).join('')}</div>`;
 function profileCard(){const me=pl(S.you),taken=new Set(S.players.filter(p=>p.id!==S.you).map(p=>p.emo));
   return `<div class="card"><label>Seu ícone</label><div class="emos">${EMOTES.map((e,i)=>`<button class="eb ${me.emo===i?'sel':''}" ${taken.has(i)?'disabled':''} onclick="prof(${i},${me.color})">${e}</button>`).join('')}</div>
   <label style="margin-top:16px">Sua cor</label><div class="cols">${HUES.map((h,i)=>`<button class="cb ${me.color===i?'sel':''}" style="background:hsl(${h} 55% 40%)" onclick="prof(${me.emo},${i})"></button>`).join('')}</div></div>`}
 
-function render(){
+function render(){try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message)}}
+function renderMain(){
   const G=GAMES.find(g=>g.id===game),A=$('app');
   const E=err?`<p class="err">${esc(err)}</p>`:'';let h='';
   document.body.classList.toggle('home',screen==='home');
   $('bk').classList.toggle('hide',screen==='home');$('hm').classList.toggle('hide',screen==='home');$('lg').style.visibility=screen==='home'?'hidden':'visible';
-  A.classList.toggle('stack',!!(S&&S.game));A.classList.toggle('fw',!!(S&&!S.game&&S.phase!=='lobby'));  if(!ready){A.innerHTML='<div class="splash"><div class="spin"></div><p>Conectando ao servidor…</p></div>';return}
+  A.classList.toggle('stack',!!(S&&S.game));A.classList.toggle('fw',!!(S&&!S.game&&S.phase!=='lobby'));
+  if(!ready){A.innerHTML='<div class="splash"><div class="spin"></div><p>Conectando ao servidor…</p></div>';return}
   if(screen==='home'){
     h=`<div class="hero"><div class="eyebrow">Bem-vindo à</div><div class="title">Resenha<br>da Madrugada</div><p class="sub">Escolha um jogo e marcha!</p></div>${E}
-    <div class="games">${GAMES.map((g,i)=>{const im=COVERS[g.id]||g.img;return `<div class="gc ${g.ok?'':'off'}" ${g.ok?`onclick="pick('${g.id}')"`:''}><div class="art" style="${bg(g.name)}">${im?`<img src="${esc(im)}" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<i>${g.short}</i></div><span class="no">0${i+1}</span>${g.ok?'':'<span class="ribbon">Em breve</span>'}<div class="info"><b>${g.name}</b><span>${g.tag}</span></div></div>`}).join('')}</div>`;
+    <div class="games">${GAMES.map((g,i)=>{const im=COVERS[g.id]||g.img;return `<div class="gc ${g.ok?'':'off'}" ${g.ok?`onclick="pick('${g.id}')"`:''}><div class="art" style="${bg(g.name)}">${im?`<img src="${esc(im)}" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<i>${g.short}</i></div><span class="no">0${i+1}</span><button class="ibtn" title="Sobre o jogo" onclick="event.stopPropagation();showInfo('${g.id}',false)">i</button>${g.ok?'':'<span class="ribbon">Em breve</span>'}<div class="info"><b>${g.name}</b><span>${g.tag}</span></div></div>`}).join('')}</div>`;
     A.innerHTML=h;trans('home');return;
   }
   if(S&&S.game==='pika'){pikaRender('');return}
-  if(S&&S.game==='perguntas'){perguntasRender();return}  
+  if(S&&S.game==='perguntas'){perguntasRender();return}
   if(!S){
     h=`<div class="split"><div class="art-side"><div class="eyebrow">Resenha da Madrugada</div><div class="title">${G.name}</div><p class="sub">${G.tag}</p></div>`;
     if(mode==='menu')h+=`<div class="card ctr"><label>Seu nome</label><input id="name" class="ctr" maxlength="30" placeholder="Como você quer ser chamado?" value="${esc(store.get('name',''))}" onkeydown="if(event.key==='Enter')menu('create')">${E}
@@ -189,12 +232,12 @@ function render(){
       <div class="row"><button onclick="join()">Entrar</button></div></div></div>`;
   }else if(S.phase==='lobby'){
     const host=S.you===S.host,sel=new Set(S.selected);
-    h=`${E}<div class="hero" style="padding:0 0 6px"><div class="eyebrow">Sala de espera</div><h1>${G.name}</h1></div>
-    <div class="split" style="align-items:start"><div><div class="card ctr"><label>Código da sala</label><div class="code">${S.code}</div><p class="mut">Compartilhe o código com os amigos</p>${players()}</div>${profileCard()}</div>
+    h=`${E}<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>${G.name}</h1>${infoBtn(game)}</div>
+    <div class="split" style="align-items:start"><div><div class="card ctr"><label>Código da sala</label><div class="code">${S.code}</div><p class="mut">Compartilhe o código com os amigos</p>${players()}</div>${profileCard()}
+    ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="start()">Iniciar partida</button>':'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
     <div><div class="card"><label>Localidades da partida (${sel.size} de ${S.all.length})</label>
     ${host?`<div class="row"><button class="sec" onclick="selAll(true)">Marcar todas</button><button class="sec" onclick="selAll(false)">Desmarcar todas</button></div>`:'<p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">Só o líder escolhe as localidades.</p>'}
-    <div class="pick">${S.all.map((l,i)=>tile(l,sel.has(l.name)?'on':'off',host?`onclick="togLoc(${i})" style="cursor:pointer"`:'')).join('')}</div></div>
-    ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="start()">Iniciar partida</button>':'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div></div>`;
+    <div class="pick">${S.all.map((l,i)=>tile(l,sel.has(l.name)?'on':'off',host?`onclick="togLoc(${i})" style="cursor:pointer"`:'')).join('')}</div></div></div></div>`;
   }else{
     const R=S.role,me=pl(S.you),host=S.you===S.host;
     h=`<div class="top"><h1>Partida em andamento</h1><div class="me">${av(S.you)}<div><b>${esc(me.name)}</b><small>Sala ${S.code}</small></div></div></div>${E}`;
@@ -213,7 +256,7 @@ function render(){
         <button style="width:100%;margin:12px 0 10px" class="${mine?'sec':''}" onclick="setReady(${!mine})">${mine?'Cancelar':'Pronto para votar'}</button>
         <ul class="rl">${S.players.map(p=>`<li><span class="nm">${av(p.id)}${esc(p.name)}</span>${rdy.includes(p.id)?'<span class="tag">pronto</span>':''}</li>`).join('')}</ul></div></div><div>`;
       if(!R.spy)h+=`<h3>Quadro de suspeitos</h3><p style="color:var(--mut);margin:0 0 14px">Clique em um jogador para alternar: <b style="color:var(--txt)">Na dúvida</b> → <b style="color:#ef4444">Suspeito</b> → <b style="color:#3ddc97">Inocente</b></p>
-        <div class="sus">${S.players.map(p=>{const m=marks[p.id]||0;return `<div class="pc s${m}" onclick="mark(${p.id})">${av(p.id)}<div><b>${esc(p.name)}</b>${p.id===S.you?' (você)':''}<small>${['Na dúvida','Suspeito','Inocente'][m]}</small></div></div>`}).join('')}</div>
+        <div class="sus">${S.players.map(p=>{const m=marks[p.id]||0;return `<div class="pc s${m}" onclick="mark(${p.id})">${av(p.id)}<div class="cn"><b>${esc(p.name)}</b>${p.id===S.you?'<small>(você)</small>':''}<small>${['Na dúvida','Suspeito','Inocente'][m]}</small></div></div>`}).join('')}</div>
         <hr style="border:0;border-top:2px solid var(--line);margin:28px 0">`;
       h+=`<h3>Possíveis localidades <small style="font-weight:400">(toque para riscar)</small></h3><div class="grid6">${R.locs.map((l,i)=>tile(l,struck.has(i)?'x':'',`onclick="strike(${i})"`)).join('')}</div></div></div>`;
     }

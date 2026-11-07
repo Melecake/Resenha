@@ -1,10 +1,11 @@
 const Q={qn:'',qi:'',a:''};
 (()=>{const s=document.createElement('style');s.textContent=`
-.areas{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:700px){.areas{grid-template-columns:1fr}}
+.areas{display:grid;gap:0}
 .slot{border:2px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--mut)}
 .ans{padding:14px 16px;background:#0a1230;border:2px solid var(--line);border-radius:14px;margin:10px 0;word-break:break-word}.ans b{color:var(--acc)}
 .ans.new{animation:pop .4s both}
-.qbox{font-size:1.4rem;font-weight:700;padding:16px;background:#0a1230;border-radius:14px;margin-top:6px;word-break:break-word}.ld{position:relative;overflow:hidden;padding:18px 16px;border:2px dashed var(--line);border-radius:14px;margin:10px 0;color:var(--mut);text-align:center}
+.qbox{font-size:1.4rem;font-weight:700;padding:16px;background:#0a1230;border-radius:14px;margin-top:6px;word-break:break-word}
+.ld{position:relative;overflow:hidden;padding:18px 16px;border:2px dashed var(--line);border-radius:14px;margin:10px 0;color:var(--mut);text-align:center}
 .ld::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,194,51,.14),transparent);transform:translateX(-100%);animation:shm 1.4s infinite}
 @keyframes shm{to{transform:translateX(100%)}}
 .ld.q{border-style:solid;border-color:var(--acc);padding:30px 16px;margin:16px 0;color:var(--txt);font-weight:700;font-size:1.1rem;background:linear-gradient(180deg,var(--n2),var(--n1))}
@@ -14,14 +15,19 @@ const Q={qn:'',qi:'',a:''};
 .ld .pb{height:6px;background:#0a1230;border-radius:4px;margin-top:14px;overflow:hidden}
 .ld .pb i{display:block;height:100%;width:0;background:var(--acc);border-radius:4px;animation:fillb var(--ms) linear forwards}
 @keyframes fillb{to{width:100%}}
-.qnew{animation:pop .5s both}`;document.head.appendChild(s)})();
-
-
+.qnew{animation:pop .5s both}
+.qpair{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 10px}@media(max-width:700px){.qpair{grid-template-columns:1fr}}
+.qc{position:relative;border:2px solid var(--line);border-radius:18px;padding:24px 18px 18px;text-align:center;background:linear-gradient(180deg,var(--n2),var(--n1));opacity:.7}
+.qc.mine{opacity:1;border-width:3px}
+.qc.inn label{color:#3ddc97}.qc.imp label{color:#ff8a8a}
+.qc.inn.mine{border-color:#2dbd78;box-shadow:0 0 0 5px rgba(45,189,120,.18)}.qc.imp.mine{border-color:#ef4444;box-shadow:0 0 0 5px rgba(239,68,68,.18)}
+.qc .mt{position:absolute;top:-13px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 12px;font-size:.7rem}
+.qc.inn .mt{background:#2dbd78;color:#04210f}.qc.imp .mt{background:#ef4444;color:#fff}`;document.head.appendChild(s)})();
 
 function perguntasRender(){
   const e0=document.activeElement,fid=e0&&e0.id,st=e0&&e0.selectionStart;
   if(S.phase==='answer')Q.qn=Q.qi='';
-  $('app').classList.toggle('wide',S.phase==='vote'||S.phase==='end');
+  $('app').classList.toggle('wide',['lobby','vote','end'].includes(S.phase));
   $('app').innerHTML=perguntasView()+modalHtml();trans('q|'+S.phase);
   if(fid&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
 }
@@ -32,20 +38,21 @@ function perguntasView(){
   const s=S,ph=s.phase,leader=s.you===s.host,isHost=s.you===s.hostId;
   const hostP=s.players.find(p=>p.id===s.hostId),vs=s.players.filter(p=>p.id!==s.hostId);
   const E=err?`<p class="err">${esc(err)}</p>`:'';
-  const chip=p=>`<span class="chip">${av(p.id)}${esc(p.name)}${p.id===s.host?'<span class="tag">líder</span>':''}${p.id===s.you?'<small>(você)</small>':''}</span>`;
+  const chip=p=>`<span class="chip">${av(p.id)}<span class="cn"><b>${esc(p.name)}</b>${tags(p)}</span></span>`;
   const qbox=(l,t,c='')=>`<div class="card ctr ${c}"><label>${l}</label><div class="qbox">${esc(t)}</div></div>`;
   const ld=(t,ms,q)=>`<div class="ld ${q?'q':''}" style="--ms:${ms}"><span class="dd"><i></i><i></i><i></i></span><div style="margin-top:10px">${t}</div><div class="pb"><i></i></div></div>`;
   const wait=t=>`<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">${t}</p></div>`;
   const impCard=()=>`<div class="card ctr"><label>O impostor é</label><div class="worst" style="margin:6px 0 0">${esc(pl(s.impostor).name||'?')}</div></div>`;
   let h=E;
   if(ph==='lobby'){
-    h+=`<div class="hero" style="padding:0 0 6px"><div class="eyebrow">Sala de espera</div><h1>Impostor - Perguntas</h1></div>
-    <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p></div>${profileCard()}
+    h+=`<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>Impostor - Perguntas</h1>${infoBtn('perguntas')}</div>
+    <div class="split" style="align-items:start"><div>
+      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p></div>${profileCard()}
+      ${leader?`<button style="width:100%;padding:18px;font-size:1.1rem" ${hostP&&vs.length?'':'disabled'} onclick="tx({type:'start'})">Iniciar partida</button>${hostP?'':'<p class="mut">Escolha um host para poder começar.</p>'}`:'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
     <div class="areas"><div class="card ctr"><label>Host</label>${hostP?`<div class="chips" style="margin:0">${chip(hostP)}</div>`:'<div class="slot">Área vazia</div>'}
-      ${isHost?`<button class="sec" style="margin-top:16px" onclick="tx({type:'toPlayers'})">Sair do host</button>`:!hostP?`<button style="margin-top:16px" onclick="tx({type:'toHost'})">Ser o host</button>`:''}</div>
-      <div class="card ctr"><label>Jogadores</label><div class="chips" style="margin:0">${vs.map(chip).join('')||'<div class="slot" style="width:100%">Ninguém aqui</div>'}</div></div></div>
-    <p class="mut" style="font-size:.85rem">O host escreve as perguntas e acompanha a partida como espectador.</p>
-    ${leader?`<button style="width:100%;padding:18px;font-size:1.1rem" ${hostP&&vs.length?'':'disabled'} onclick="tx({type:'start'})">Iniciar partida</button>${hostP?'':'<p class="mut">Escolha um host para poder começar.</p>'}`:'<p class="mut">Aguardando o líder iniciar…</p>'}`;
+        ${isHost?`<button class="sec" style="margin-top:16px" onclick="tx({type:'toPlayers'})">Sair do host</button>`:!hostP?`<button style="margin-top:16px" onclick="tx({type:'toHost'})">Ser o host</button>`:''}
+        <p class="mut" style="font-size:.85rem;margin:14px 0 0">O host escreve as perguntas e acompanha a partida como espectador.</p></div>
+      <div class="card ctr"><label>Jogadores</label><div class="chips" style="margin:0">${vs.map(chip).join('')||'<div class="slot" style="width:100%">Ninguém aqui</div>'}</div></div></div></div>`;
   }else if(ph==='write_q'){
     h+=isHost?`<div class="card"><label>Pergunta para os inocentes</label><input id="qn" maxlength="200" placeholder="Ex.: Qual é a sua comida favorita?" value="${esc(Q.qn)}" oninput="Q.qn=this.value">
       <label style="margin-top:18px">Pergunta para o impostor</label><input id="qi" maxlength="200" placeholder="Ex.: Qual é a sua sobremesa favorita?" value="${esc(Q.qi)}" oninput="Q.qi=this.value">
@@ -66,13 +73,16 @@ function perguntasView(){
     if(isHost)h+=impCard()+qbox('Pergunta do impostor',s.qi);
   }else{
     const end=ph==='end',voted=s.voted.includes(s.you);
-    h+=qbox('A pergunta dos inocentes era',s.qn);
+    const mineInn=!isHost&&!s.meImp,mineImp=!isHost&&s.meImp;
+    const pair=`<div class="qpair"><div class="qc inn ${mineInn?'mine':''}">${mineInn?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta dos inocentes</label><div class="qbox">${esc(s.qn)}</div></div>
+      <div class="qc imp ${mineImp?'mine':''}">${mineImp?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta do impostor</label><div class="qbox">${esc(s.qi)}</div></div></div>`;
     if(end){const r=s.result;
       h+=`<div class="card ctr"><h2 style="color:var(--acc)">${r.caught?'Os jogadores venceram!':'O impostor venceu!'}</h2>
       <p>${r.caught?`<b>${esc(r.impostor)}</b> era o impostor.`:`O impostor era <b>${esc(r.impostor)}</b> e ganhou a partida.`}</p>
-      <p class="mut">Mais votado: ${r.top.map(esc).join(' e ')} (${r.max} voto${r.max>1?'s':''})</p></div>`+qbox('Pergunta do impostor',s.qi)
-      +(leader?`<div class="row" style="max-width:560px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera? Você poderá trocar o host.',{type:'lobby'})">Nova partida</button><button onclick="pikaAsk('Jogar de novo com o mesmo host? Ele escreve novas perguntas.',{type:'again'})">Jogar novamente</button></div>`:'<p class="mut">Aguardando o líder…</p>');
+      <p class="mut">Mais votado: ${r.top.map(esc).join(' e ')} (${r.max} voto${r.max>1?'s':''})</p>
+      ${leader?`<div class="row" style="max-width:560px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera? Você poderá trocar o host.',{type:'lobby'})">Nova partida</button><button onclick="pikaAsk('Jogar de novo com o mesmo host? Ele escreve novas perguntas.',{type:'again'})">Jogar novamente</button></div>`:'<p class="mut">Aguardando o líder…</p>'}</div>`+pair;
     }else{
+      h+=pair;
       if(isHost)h+=impCard();
       h+=`<p class="mut">${isHost?'Você é o host: acompanhe a votação.':'Quem é o impostor? Declare sua intenção e vote.'} ${voted?'Você já votou.':''}</p>`;
     }

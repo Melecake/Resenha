@@ -3,7 +3,7 @@ const P={ph:'',theme:undefined,text:'',cur:'?',n:3,confirm:null,t:null};
 
 function pikaRender(nav){
   const e0=document.activeElement,fid=e0&&e0.id,st=e0&&e0.selectionStart;
-  $('app').classList.toggle('wide',S.phase==='vote'||S.phase==='end');
+  $('app').classList.toggle('wide',['lobby','vote','end'].includes(S.phase));
   $('app').innerHTML=nav+pikaView();pikaAfter();trans('pika|'+S.phase);
   if(fid&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
 }
@@ -31,7 +31,7 @@ function pikaAsk(text,msg){P.confirm={text,msg};render()}
 function pikaVote(id){const p=S.players.find(x=>x.id===id);pikaAsk('Votar em '+(p?p.name:'?')+'? Não dá para desfazer.',{type:'vote',target:id})}
 function pikaOk(){tx(P.confirm.msg);P.confirm=null;render()}
 
-// Componentes compartilhados com o Impostor - Locais
+// Componentes compartilhados com o Impostor - Locais e o Impostor - Perguntas
 function modalHtml(){return P.confirm?`<div class="modal"><div class="box"><p style="font-size:1.1rem;margin:0 0 18px">${esc(P.confirm.text)}</p><div class="row"><button class="sec" onclick="P.confirm=null;render()">Cancelar</button><button onclick="pikaOk()">Confirmar</button></div></div></div>`:''}
 function board(s,items,end){
   const voted=s.voted.includes(s.you);
@@ -40,7 +40,7 @@ function board(s,items,end){
     const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
     const can=!end&&(!me||s.players.length===1)&&!voted;
     return `<div class="vc">${c?`<span class="vcnt">${c} voto${c>1?'s':''}</span>`:''}
-      <div class="vh">${av(e.id)}<b>${esc(e.name)}${me?' <small>(você)</small>':''}</b></div>
+      <div class="vh">${av(e.id)}<span class="cn"><b>${esc(e.name)}</b>${me?'<small>(você)</small>':''}</span></div>
       ${e.text!=null?`<div class="vt">${esc(e.text)}</div>`:''}
       <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*6+16}px">${who.map(k=>av(+k)).join('')}</div>
       ${can?`<div class="vb"><button class="sec" onclick="tx({type:'intent',target:${e.id}})">Declarar intenção</button><button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`}).join('')}</div>`;
@@ -52,12 +52,13 @@ function pikaView(){
   const head=`<div class="card ctr"><label>Tema</label><h2 style="margin:4px 0 14px">${esc(s.theme)}</h2><label>Letra</label><div class="big" style="font-size:3.4rem">${s.letter||''}</div></div>`;
   let h=E;
   if(ph==='lobby'){
-    h+=`<div class="hero" style="padding:0 0 6px"><div class="eyebrow">Sala de espera</div><h1>O meu é mais Pika</h1></div>
-    <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${players()}</div>${profileCard()}
-    <div class="card"><label>Tema</label>${host?`<input id="theme" maxlength="60" placeholder="Ex.: Comidas, Animais, Filmes…" value="${esc(P.theme??s.theme)}" oninput="P.theme=this.value;pikaCfg()">`:`<p style="font-size:1.4rem;margin:8px 0">${s.theme?esc(s.theme):'<span class="mut">Aguardando o líder escolher…</span>'}</p>`}
-    <label style="margin-top:18px">Letras</label><p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">${host?'Toque em uma letra para excluí-la do sorteio.':'Letras riscadas foram excluídas.'}</p>
-    <div class="letters">${ALPHA.map(l=>`<div class="lt ${s.excluded.includes(l)?'off':''}" ${host?`onclick="pikaLetter('${l}')"`:''}>${l}</div>`).join('')}</div></div>
-    ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="pikaStart()">Iniciar partida</button>':'<p class="mut">Aguardando o líder iniciar…</p>'}`;
+    h+=`<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>O meu é mais Pika</h1>${infoBtn('pika')}</div>
+    <div class="split" style="align-items:start"><div>
+      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${players()}</div>${profileCard()}
+      ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="pikaStart()">Iniciar partida</button>':'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
+    <div><div class="card"><label>Tema</label>${host?`<input id="theme" maxlength="60" placeholder="Ex.: Comidas, Animais, Filmes…" value="${esc(P.theme??s.theme)}" oninput="P.theme=this.value;pikaCfg()">`:`<p style="font-size:1.4rem;margin:8px 0">${s.theme?esc(s.theme):'<span class="mut">Aguardando o líder escolher…</span>'}</p>`}
+      <label style="margin-top:18px">Letras</label><p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">${host?'Toque em uma letra para excluí-la do sorteio.':'Letras riscadas foram excluídas.'}</p>
+      <div class="letters">${ALPHA.map(l=>`<div class="lt ${s.excluded.includes(l)?'off':''}" ${host?`onclick="pikaLetter('${l}')"`:''}>${l}</div>`).join('')}</div></div></div></div>`;
   }else if(ph==='roulette'){
     h+=`<div class="card ctr"><p class="mut">Sorteando a letra…</p><label>Letra</label><div id="spin" class="big">${P.cur}</div></div>`;
   }else if(ph==='countdown'){
