@@ -5,7 +5,7 @@ function pikaRender(nav){
   const e0=document.activeElement,fid=e0&&e0.id,st=e0&&e0.selectionStart;
   $('app').classList.toggle('wide',['lobby','vote','end'].includes(S.phase));
   $('app').innerHTML=nav+pikaView();pikaAfter();trans('pika|'+S.phase);
-  if(fid&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
+  if(fid&&fid!=='vsel'&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
 }
 function pikaAfter(){
   const ph=S.phase;if(ph===P.ph)return;P.ph=ph;P.confirm=null;
@@ -33,9 +33,15 @@ function pikaOk(){tx(P.confirm.msg);P.confirm=null;render()}
 
 // Componentes compartilhados com o Impostor - Locais e o Impostor - Perguntas
 function modalHtml(){return P.confirm?`<div class="modal"><div class="box"><p style="font-size:1.1rem;margin:0 0 18px">${esc(P.confirm.text)}</p><div class="row"><button class="sec" onclick="P.confirm=null;render()">Cancelar</button><button onclick="pikaOk()">Confirmar</button></div></div></div>`:''}
+let VSEL=null;
 function board(s,items,end){
   const voted=s.voted.includes(s.you);
-  return `<div class="vgrid">${items.map(e=>{
+  const cand=items.filter(e=>e.id!==s.you||s.players.length===1);
+  const canVote=!end&&!voted&&cand.length>0;
+  if(!cand.some(e=>e.id===VSEL))VSEL=cand.length?cand[0].id:null;
+  const sel=canVote?`<div class="vsel card"><label>Escolha o jogador</label><select id="vsel" onchange="VSEL=+this.value;this.blur()">${cand.map(e=>`<option value="${e.id}" ${e.id===VSEL?'selected':''}>${esc(e.name)}${e.text!=null?' — '+esc(e.text):''}</option>`).join('')}</select>
+    <div class="vb"><button class="sec" onclick="tx({type:'intent',target:VSEL})">Declarar intenção</button><button onclick="pikaVote(VSEL)">Votar</button></div></div>`:'';
+  return sel+`<div class="vgrid">${items.map(e=>{
     const me=e.id===s.you,c=s.counts[e.id]||0,who=Object.keys(s.intents).filter(k=>s.intents[k]===e.id);
     const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
     const can=!end&&(!me||s.players.length===1)&&!voted;

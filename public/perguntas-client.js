@@ -3,7 +3,7 @@ const PH=['Fulano: resposta escondida','Ciclano: uma resposta bem curtinha','Bel
 (()=>{const s=document.createElement('style');s.textContent=`
 .areas{display:grid;gap:0}
 .slot{border:2px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--mut)}
-.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:8px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:12px;margin-top:8px}
 .ans{padding:14px 16px;background:#0a1230;border:2px solid var(--line);border-radius:14px;word-break:break-word}.ans b{color:var(--acc)}
 .ans.new{animation:unb .9s both}
 .ans.blur{filter:blur(7px);opacity:.55;user-select:none;pointer-events:none;animation:flt 2.4s ease-in-out infinite alternate}
@@ -28,7 +28,7 @@ function perguntasRender(){
   if(S.phase==='answer')Q.qn=Q.qi='';
   $('app').classList.toggle('wide',['lobby','vote','end'].includes(S.phase));
   $('app').innerHTML=perguntasView()+modalHtml();trans('q|'+S.phase);
-  if(fid&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
+  if(fid&&fid!=='vsel'&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
 }
 const qSend=()=>tx({type:'questions',qn:Q.qn,qi:Q.qi});
 function qAnswer(){const t=Q.a.trim();if(!t)return;tx({type:'answer',text:t});Q.a=''}
@@ -66,7 +66,7 @@ function perguntasView(){
   }else if(ph==='reveal'){
     const n=s.slots.filter(Boolean).length;
     h+=`<div class="card"><label>Respostas (${n}/${s.count})</label><div class="slots">${s.slots.map((a,i)=>a?`<div class="ans ${a.id===s.last?'new':''}"><b>${esc(a.name)}</b>: ${esc(a.text)}</div>`:`<div class="ans blur"><b>${PH[i%3].split(':')[0]}</b>:${PH[i%3].split(':')[1]}</div>`).join('')}</div></div>`;
-    h+=s.showQ?qbox('A pergunta dos inocentes era:',s.qn,'qnew')+`<p class="mut"><span class="dd"><i></i><i></i><i></i></span><br>A votação começa em instantes</p>`
+    h+=s.showQ?qbox('A pergunta dos inocentes era',s.qn,'qnew')+`<p class="mut"><span class="dd"><i></i><i></i><i></i></span><br>A votação começa em instantes</p>`
       :`<div class="card ctr"><label>A pergunta dos inocentes era</label><div class="qbox blurq ${s.qReady?'glow':''}">Aqui vai aparecer a pergunta dos inocentes</div></div>`;
     if(isHost)h+=impCard()+qbox('Pergunta do impostor',s.qi);
   }else{
@@ -84,7 +84,7 @@ function perguntasView(){
       if(isHost)h+=impCard();
       h+=`<p class="mut">${isHost?'Você é o host: acompanhe a votação.':'Quem é o impostor? Declare sua intenção e vote.'} ${voted?'Você já votou.':''}</p>`;
     }
-    h+=board({...s,players:vs,voted:isHost?s.voted.concat(s.you):s.voted},s.entries,end);
+    if(!end)h+=board({...s,players:vs,voted:isHost?s.voted.concat(s.you):s.voted},s.entries,false);
   }
   return h;
 }

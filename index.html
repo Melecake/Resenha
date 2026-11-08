@@ -48,7 +48,7 @@ label{display:block;font:700 .72rem Rubik;letter-spacing:3px;text-transform:uppe
 .sub{color:var(--mut);font-size:1.1rem}.mut{text-align:center;color:var(--mut)}
 .ibtn{width:34px;height:34px;padding:0;border-radius:50%;background:var(--n2);color:var(--acc);border:2px solid var(--acc);box-shadow:0 3px 0 #0a1230;font:italic 700 1.15rem Georgia,serif;line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .ibtn:hover{filter:none;transform:translateY(-2px);background:var(--acc);color:var(--ink)}.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 #0a1230}
-.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(16px,2.5vw,32px);max-width:1280px;margin:34px auto 0}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:clamp(16px,2.5vw,32px);max-width:1280px;margin:34px auto 0}
 .gc{position:relative;height:min(56vh,480px);min-height:340px;border-radius:24px;overflow:hidden;border:3px solid var(--line);cursor:pointer;transition:.25s cubic-bezier(.2,.8,.2,1);display:flex;align-items:flex-end;isolation:isolate}
 .gc:hover{transform:translateY(-10px) rotate(-1deg);border-color:var(--acc);box-shadow:0 24px 50px rgba(0,0,0,.5),0 0 40px rgba(255,194,51,.25)}
 .gc .art{position:absolute;inset:0;z-index:-2}.gc .art img{width:100%;height:100%;object-fit:cover}.gc .art img+i{display:none}
@@ -104,7 +104,7 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 .loc .ov{position:relative;padding:16px;text-shadow:0 1px 4px #000}.loc small{color:#ff8a8a;letter-spacing:3px;font-weight:700;text-transform:uppercase}
 .loc h2{margin:8px 0 12px;font-size:1.9rem;color:#fff}.loc p{font-size:.88rem;opacity:.85;margin:0}
 .rl li{padding:4px 0;font-size:.88rem}.rl .nm{gap:8px}.rl .av{width:26px;height:26px;flex-basis:26px;font-size:.95rem;border-radius:8px}
-.sus{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.sus{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(190px,100%),1fr));gap:14px}
 .pc{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--n1);box-shadow:0 4px 0 #0a1230;cursor:pointer;user-select:none;transition:.15s}
 .pc:hover{transform:translateY(-2px)}.pc small{display:block;font-size:.75rem}
 .pc.s1{background:rgba(214,69,69,.25);border-color:#e04848}.pc.s2{background:rgba(34,170,90,.25);border-color:#2dbd78}
@@ -121,7 +121,7 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 .box.info p,.box.info li{color:#cfd8f5;line-height:1.55;font-size:.95rem;margin:6px 0}
 .box.info ul{list-style:disc;padding-left:22px;margin:6px 0}.box.info li{display:list-item;padding:2px 0}.box.info b{color:#fff}
 @keyframes fade{from{opacity:0}}@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
-.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin-top:20px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:24px;margin-top:20px}
 .vc{position:relative;display:flex;flex-direction:column;gap:16px;padding:22px;border-radius:20px;border:2px solid var(--line);background:linear-gradient(180deg,var(--n2),var(--n1));box-shadow:0 8px 0 #0a1230}
 .vh{display:flex;align-items:center;gap:14px}.vh b{font-size:1.15rem;word-break:break-word}
 .vcnt{position:absolute;top:-14px;right:-8px;background:var(--acc);color:var(--ink);font:400 .95rem Bungee,Impact,sans-serif;padding:6px 14px;border-radius:12px;border:2px solid #7a5200;box-shadow:0 3px 0 var(--acc2);animation:pop .3s both}
@@ -130,9 +130,25 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 .mv .av{width:34px;height:34px;flex:none;font-size:1.05rem;border-radius:9px}
 .vb{display:grid;grid-template-columns:1fr 1fr;gap:12px}.vb button{padding:13px 8px;font-size:.9rem;line-height:1.15}
 @media(max-width:900px){.game{grid-template-columns:1fr}}@media(max-width:560px){.grid6{grid-template-columns:repeat(3,1fr)}.logo{font-size:.8rem}}
+select{font:500 1rem Rubik,sans-serif;padding:14px 44px 14px 16px;border-radius:12px;border:2px solid var(--line);background-color:#0a1230;color:var(--txt);width:100%;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--acc) 50%),linear-gradient(135deg,var(--acc) 50%,transparent 50%);background-position:calc(100% - 22px) 52%,calc(100% - 16px) 52%;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px rgba(255,194,51,.18)}
+html{-webkit-text-size-adjust:100%}
+button,.tile,.gc,.pc,.lt{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.vsel{display:none}.vsel .vb{display:grid;margin-top:14px}
+@media(max-width:900px){.loc{max-width:300px;margin-left:auto;margin-right:auto}}
+@media(max-width:700px){.vsel{display:block}.vc .vb{display:none}.vgrid{gap:18px}.vc{padding:18px}}
+@media(max-width:560px){
+  .lgt{display:none}.bar{padding:10px 14px}.nbtn{padding:9px 14px 9px 10px;font-size:.7rem;letter-spacing:1px}
+  main{padding-left:14px;padding-right:14px}.card{padding:18px;border-radius:16px}
+  h1{font-size:1.7rem}.title{font-size:clamp(2rem,11vw,3.2rem)}
+  .code{letter-spacing:8px}.codein{letter-spacing:6px;font-size:1.6rem}
+  .choices{grid-template-columns:1fr}.modal{padding:14px}.modal .box{padding:20px}.box.info{max-height:86vh}
+  .chip{padding-right:12px}.av{width:40px;height:40px;flex-basis:40px;font-size:1.3rem}
+  .top{flex-direction:column;align-items:flex-start}.hero.rel .ibtn{top:0}.hero.rel h1{padding:0 40px}.worst{font-size:1.5rem}
+}
 </style></head><body><div id="lb"></div>
 <header class="bar"><button class="nbtn l" id="bk" onclick="back()"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Voltar</button>
-<div class="logo" id="lg"><span class="moon"></span>Resenha da Madrugada</div>
+<div class="logo" id="lg"><span class="moon"></span><span class="lgt">Resenha da Madrugada</span></div>
 <button class="nbtn r" id="hm" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7M6 10v10h12V10"/></svg>Início</button></header>
 <main><div id="app"></div></main><div id="ntc"></div><script>
 // As capas dos jogos também podem ser alteradas pelo painel admin (/gerenciar-locais). "img" é o valor padrão.
@@ -144,7 +160,7 @@ const INFO={
 locais:{brief:'Todos recebem o mesmo local, menos o espião. Façam perguntas uns aos outros, descubram quem não sabe onde está e votem. O espião tenta descobrir o local sem ser pego.',
 full:`<h4>Objetivo</h4><p>Todos os jogadores recebem o mesmo <b>local</b>, menos um: o <b>espião</b>, que não sabe onde está. Os jogadores tentam descobrir quem é o espião. O espião tenta descobrir o local e não ser pego.</p>
 <h4>Antes de começar</h4><ul><li><b>Ícone e cor:</b> cada jogador escolhe um emoji e uma cor. Dois jogadores não podem ter o mesmo emoji, mas as cores podem se repetir.</li><li><b>Localidades:</b> o líder (quem criou a sala) marca quais localidades entram na partida, e todos veem a seleção.</li><li><b>Iniciar:</b> só o líder inicia a partida.</li></ul>
-<h4>Durante a partida</h4><ul><li><b>Seu cartão:</b> mostra o local, ou "Espião" se você for o espião.</li><li><b>Conversa:</b> façam perguntas uns aos outros sobre o local, sem entregar demais. Quem desconfiar de alguém pode apertar o cérebro e investigar com mais perguntas.</li><li><b>Quadro de suspeitos:</b> só você vê. Clique em um jogador para alternar entre Na dúvida, Suspeito e Inocente. É só uma anotação sua. O espião não tem esse quadro.</li><li><b>Possíveis localidades:</b> toque em uma localidade para riscá-la e lembrar o que já descartou.</li></ul>
+<h4>Durante a partida</h4><ul><li><b>Seu cartão:</b> mostra o local, ou "Espião" se você for o espião.</li><li><b>Conversa:</b> façam perguntas uns aos outros sobre o local, sem entregar demais.</li><li><b>Quadro de suspeitos:</b> só você vê. Clique em um jogador para alternar entre Na dúvida, Suspeito e Inocente. É só uma anotação sua. O espião não tem esse quadro.</li><li><b>Possíveis localidades:</b> toque em uma localidade para riscá-la e lembrar o que já descartou.</li></ul>
 <h4>Votação</h4><ul><li><b>Pronto para votar:</b> quando achar que já deu, clique no botão. Se mudar de ideia, clique em Cancelar. A votação só abre quando todos estiverem prontos.</li><li><b>Declarar intenção:</b> seu emoji aparece no card da pessoa escolhida, para a turma ver em quem a maioria quer votar. Você pode mudar de alvo quantas vezes quiser.</li><li><b>Votar:</b> confirma o voto de forma definitiva. Quando todos votarem, o mais votado é revelado.</li></ul>
 <h4>Quem vence</h4><ul><li>Se o espião for o único mais votado, <b>os jogadores vencem</b>.</li><li>Se outra pessoa for a mais votada, ou houver empate, <b>o espião vence</b>.</li></ul>
 <h4>Outras regras</h4><ul><li>Se alguém sair, a partida continua.</li><li>Não é possível entrar em uma partida em andamento.</li><li>No fim, o líder pode clicar em <b>Jogar novamente</b> para sortear novo espião e novo local.</li></ul>`},
@@ -158,9 +174,9 @@ perguntas:{brief:'Um host escreve duas perguntas parecidas: uma para os inocente
 full:`<h4>Objetivo</h4><p>O <b>host</b> escreve duas perguntas parecidas: uma para os <b>inocentes</b> e outra para o <b>impostor</b>. Todos respondem sem saber que existem duas perguntas. Os jogadores tentam descobrir quem respondeu à pergunta diferente. O impostor tenta passar despercebido.</p>
 <h4>Sala de espera</h4><ul><li><b>Áreas:</b> a sala tem duas áreas, <b>Host</b> e <b>Jogadores</b>. A área Host começa vazia e comporta só uma pessoa. Para trocar o host, quem está nela clica em "Sair do host" e outra pessoa clica em "Ser o host".</li><li><b>Iniciar:</b> só o líder (quem criou a sala) inicia, e apenas se houver alguém como host e ao menos um jogador.</li><li><b>Ícone e cor:</b> cada jogador escolhe um emoji (único na sala) e uma cor.</li></ul>
 <h4>Rodada</h4><ul><li><b>Host escreve:</b> os jogadores veem "Esperando o Host escrever as perguntas". O host escreve a pergunta dos inocentes e a do impostor.</li><li><b>Sorteio:</b> uma pessoa aleatória, entre os jogadores, recebe a pergunta do impostor. Todos os outros recebem a pergunta dos inocentes.</li><li><b>Respostas:</b> cada jogador vê só a sua pergunta, escreve a resposta e clica em Enviar.</li><li><b>Host espectador:</b> o host não joga. Ele acompanha a partida, vê quem é o impostor e as duas perguntas, mas não pode votar.</li></ul>
-<h4>Revelação</h4><ul><li>Quando todos enviarem, as respostas aparecem <b>uma por vez</b>, com os nomes.</li><li>Só depois da última resposta a <b>pergunta dos inocentes</b> é revelada. É nesse momento que o impostor descobre que era o impostor.</li></ul>
-<h4>Votação</h4><ul><li>Na votação, a tela mostra as duas perguntas e destaca qual foi a <b>sua</b>.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação, e o voto é definitivo.</li></ul>
-<h4>Resultado</h4><ul><li>Se o mais votado for o impostor, <b>os jogadores vencem</b>.</li><li>Se não, aparece o nome do impostor e que <b>ele ganhou a partida</b>. Empate também dá vitória ao impostor.</li><li>No fim, o líder escolhe <b>Nova partida</b> (volta à sala de espera, para trocar o host) ou <b>Jogar novamente</b> (mesmo host, perguntas novas).</li></ul>`}};
+<h4>Revelação</h4><ul><li>Quando todos enviarem, as respostas aparecem embaçadas e são reveladas <b>uma por vez</b>, em ordem aleatória, com os nomes.</li><li>Só depois da última resposta a <b>pergunta dos inocentes</b> é revelada. É nesse momento que o impostor descobre que era o impostor.</li></ul>
+<h4>Votação</h4><ul><li>Os inocentes veem só a pergunta dos inocentes. O impostor e o host veem as duas, e para o impostor a pergunta dele fica destacada.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação, e o voto é definitivo.</li></ul>
+<h4>Resultado</h4><ul><li>Se o mais votado for o impostor, <b>os jogadores vencem</b>.</li><li>Se não, aparece o nome do impostor e que <b>ele ganhou a partida</b>. Empate também dá vitória ao impostor.</li><li>No fim, aparecem o resultado e as duas perguntas. O líder escolhe <b>Nova partida</b> (volta à sala de espera, para trocar o host) ou <b>Jogar novamente</b> (mesmo host, perguntas novas).</li></ul>`}};
 const EMOTES=["😎","🤠","🥸","🤓","😈","👻","🤖","👽","🦊","🐸","🐙","🦄","🐼","🦁","🐵","🐲","🐶","🐱","🦉","🐧"];
 const HUES=[0,24,45,75,130,165,190,215,245,275,305,335];
 const store={get:(k,d)=>{try{return JSON.parse(sessionStorage.getItem(k))??d}catch{return d}},set:(k,v)=>sessionStorage.setItem(k,JSON.stringify(v))};
@@ -209,7 +225,13 @@ function profileCard(){const me=pl(S.you),taken=new Set(S.players.filter(p=>p.id
   return `<div class="card"><label>Seu ícone</label><div class="emos">${EMOTES.map((e,i)=>`<button class="eb ${me.emo===i?'sel':''}" ${taken.has(i)?'disabled':''} onclick="prof(${i},${me.color})">${e}</button>`).join('')}</div>
   <label style="margin-top:16px">Sua cor</label><div class="cols">${HUES.map((h,i)=>`<button class="cb ${me.color===i?'sel':''}" style="background:hsl(${h} 55% 40%)" onclick="prof(${me.emo},${i})"></button>`).join('')}</div></div>`}
 
-function render(){try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message+' ['+String(e.stack||'').split('\n')[1]+']')}}
+let rDefer=0,rTimer;
+function render(){
+  const a=document.activeElement;
+  if(a&&a.id==='vsel'&&rDefer<6){rDefer++;clearTimeout(rTimer);rTimer=setTimeout(render,500);return}
+  rDefer=0;
+  try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message+' ['+String(e.stack||'').split('\n')[1]+']')}
+}
 function renderMain(){
   const G=GAMES.find(g=>g.id===game),A=$('app');
   const E=err?`<p class="err">${esc(err)}</p>`:'';let h='';
