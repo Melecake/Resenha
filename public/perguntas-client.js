@@ -45,7 +45,7 @@ function perguntasView(){
   if(ph==='lobby'){
     h+=`<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>Impostor - Perguntas</h1>${infoBtn('perguntas')}</div>
     <div class="split" style="align-items:start"><div>
-      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p></div>${profileCard()}
+      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}</div>${profileCard()}
       ${leader?`<button style="width:100%;padding:18px;font-size:1.1rem" ${hostP&&vs.length?'':'disabled'} onclick="tx({type:'start'})">Iniciar partida</button>${hostP?'':'<p class="mut">Escolha um host para poder começar.</p>'}`:'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
     <div class="areas"><div class="card ctr"><label>Host</label>${hostP?`<div class="chips" style="margin:0">${chip(hostP)}</div>`:'<div class="slot">Área vazia</div>'}
         ${isHost?`<button class="sec" style="margin-top:16px" onclick="tx({type:'toPlayers'})">Sair do host</button>`:!hostP?`<button style="margin-top:16px" onclick="tx({type:'toHost'})">Ser o host</button>`:''}

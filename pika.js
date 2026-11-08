@@ -62,6 +62,7 @@ exports.handle = (r, me, m, ctx) => {
   }
   if (r.phase === 'write') {
     if (m.type === 'have' && !r.queue.includes(me.id) && !r.entries.some(e => e.id === me.id)) { r.queue.push(me.id); return ctx.push(r); }
+    if (m.type === 'skip' && r.queue.length && (r.queue[0] === me.id || host)) { r.queue.shift(); return ctx.push(r); }
     if (m.type === 'submit' && r.queue[0] === me.id) {
       const t = cl(m.text); if (!t) return;
       r.entries.push({ id: me.id, name: me.name, text: t }); r.queue.shift(); return after(r, ctx);

@@ -60,7 +60,7 @@ function pikaView(){
   if(ph==='lobby'){
     h+=`<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>O meu é mais Pika</h1>${infoBtn('pika')}</div>
     <div class="split" style="align-items:start"><div>
-      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${players()}</div>${profileCard()}
+      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}${players()}</div>${profileCard()}
       ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="pikaStart()">Iniciar partida</button>':'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
     <div><div class="card"><label>Tema</label>${host?`<input id="theme" maxlength="60" placeholder="Ex.: Comidas, Animais, Filmes…" value="${esc(P.theme??s.theme)}" oninput="P.theme=this.value;pikaCfg()">`:`<p style="font-size:1.4rem;margin:8px 0">${s.theme?esc(s.theme):'<span class="mut">Aguardando o líder escolher…</span>'}</p>`}
       <label style="margin-top:18px">Letras</label><p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">${host?'Toque em uma letra para excluí-la do sorteio.':'Letras riscadas foram excluídas.'}</p>
@@ -73,10 +73,11 @@ function pikaView(){
     const done=s.entries.some(e=>e.id===s.you),inq=s.queue.includes(s.you),first=s.queue[0]===s.you;
     const ctl=done?'<p class="mut" style="margin:0">Você já enviou sua palavra.</p>'
       :!inq?`<button style="width:100%;padding:18px;font-size:1.2rem" onclick="tx({type:'have'})">Eu tenho!</button>`
-      :first?`<input id="txt" class="ctr" maxlength="60" placeholder="Digite sua palavra" value="${esc(P.text)}" oninput="P.text=this.value" onkeydown="if(event.key==='Enter')pikaSend()"><button style="width:100%;margin-top:12px" onclick="pikaSend()">Enviar</button>`
+      :first?`<input id="txt" class="ctr" maxlength="60" placeholder="Digite sua palavra" value="${esc(P.text)}" oninput="P.text=this.value" onkeydown="if(event.key==='Enter')pikaSend()"><button style="width:100%;margin-top:12px" onclick="pikaSend()">Enviar</button><button class="sec" style="width:100%;margin-top:10px" onclick="tx({type:'skip'})">Passar a vez</button>`
       :`<p class="mut" style="margin:0">Aguardando ${nm(s.queue[0])} escrever… (você é o ${s.queue.indexOf(s.you)+1}º da fila)</p>`;
     h+=head+`<div class="card">${ctl}</div>
-    <div class="card"><label>Fila</label>${s.queue.length?`<ul>${s.queue.map((id,i)=>`<li><span class="nm">${i+1}. ${av(id)} ${nm(id)}</span></li>`).join('')}</ul>`:'<p class="mut" style="margin:6px 0 0">Ninguém na fila ainda.</p>'}</div>
+    <div class="card"><label>Fila</label>${s.queue.length?`<ul>${s.queue.map((id,i)=>`<li><span class="nm">${i+1}. ${av(id)} ${nm(id)}</span></li>`).join('')}</ul>`:'<p class="mut" style="margin:6px 0 0">Ninguém na fila ainda.</p>'}
+    ${host&&s.queue.length&&s.queue[0]!==s.you?`<button class="sec" style="width:100%;margin-top:12px" onclick="tx({type:'skip'})">Pular ${nm(s.queue[0])}</button>`:''}</div>
     <div class="card"><label>Palavras enviadas</label><ul>${s.entries.map(e=>`<li><span class="nm">${av(e.id)} <b>${esc(e.name)}</b>: ${esc(e.text)}</span></li>`).join('')}</ul></div>`;
   }else{
     const end=ph==='end',voted=s.voted.includes(s.you);

@@ -7,7 +7,7 @@ const MODS = { pika, perguntas };
 const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
-const EMOJIS = 20, COLORS = 12;
+const EMOJIS = 20, COLORS = 12, GRACE = 60000;
 const readLocs = () => JSON.parse(fs.readFileSync(LOC, 'utf8'));
 const body = q => new Promise(r => { let b = ''; q.on('data', c => { b += c; if (b.length > 2e6) q.destroy(); }); q.on('end', () => { try { r(JSON.parse(b)); } catch { r(null); } }); });
 const json = (s, c, o) => { s.writeHead(c, { 'Content-Type': 'application/json' }); s.end(JSON.stringify(o)); };
@@ -41,7 +41,7 @@ const rooms = {};
 let nextId = 1;
 const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => L[Math.random() * L.length | 0]).join(''); } while (rooms[c]); return c; };
-const send = (w, m) => w.readyState === 1 && w.send(JSON.stringify(m));
+const send = (w, m) => w && w.readyState === 1 && w.send(JSON.stringify(m));
 const clean = s => String(s || '').trim().slice(0, 30);
 const cleanLoc = l => {
   const name = clean(l && l.name); if (!name) return null;
@@ -73,7 +73,12 @@ function view(r, p) {
   } else v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };
   return v;
 }
-const push = r => r.players.forEach(p => send(p.ws, view(r, p)));
+const push = r => r.players.forEach(p => {
+  const v = view(r, p);
+  v.gid = r.game;
+  if (v.players) v.players = v.players.map(x => ({ ...x, away: !!(r.players.find(q => q.id === x.id) || {}).away }));
+  send(p.ws, v);
+});
 const err = (w, msg, alert) => send(w, { type: 'error', msg, alert: !!alert });
 const ctx = { push, err };
 
@@ -90,30 +95,56 @@ function step(r) {
   push(r);
 }
 
+function removePlayer(r, p) {
+  clearTimeout(p.grace);
+  r.players = r.players.filter(x => x !== p);
+  if (!r.players.length) { clearTimeout(r.timer); delete rooms[r.code]; return; }
+  if (MODS[r.game]) return MODS[r.game].leave(r, p, ctx);
+  if (r.phase !== 'lobby' && p.id === r.spy) r.spyGone = true;
+  for (const o of [r.ready, r.intents, r.votes]) {
+    if (!o) continue;
+    delete o[p.id];
+    for (const k in o) if (o[k] === p.id) delete o[k];
+  }
+  step(r);
+}
+
 wss.on('connection', ws => {
-  const me = { id: nextId++, ws, name: '', emo: 0, color: 0 };
+  ws.isAlive = true;
+  ws.on('pong', () => { ws.isAlive = true; });
+  let me = { id: nextId++, ws, name: '', emo: 0, color: 0, token: '', away: false };
   let room = null;
-  const leave = () => {
-    if (!room) return;
-    const r = room; room = null;
-    r.players = r.players.filter(p => p !== me);
-    if (!r.players.length) { clearTimeout(r.timer); return void delete rooms[r.code]; }
-    if (MODS[r.game]) return MODS[r.game].leave(r, me, ctx);
-    if (r.phase !== 'lobby' && me.id === r.spy) r.spyGone = true;
-    for (const o of [r.ready, r.intents, r.votes]) {
-      if (!o) continue;
-      delete o[me.id];
-      for (const k in o) if (o[k] === me.id) delete o[k];
-    }
-    step(r);
-  };
+  const leave = () => { if (!room) return; const r = room; room = null; removePlayer(r, me); };
+
   ws.on('message', raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
+    ws.isAlive = true;
+    if (m.type === 'ping') return send(ws, { type: 'pong' });
+    if (room && !room.players.includes(me)) room = null;
+
+    if (m.type === 'resume') {
+      if (room) return;
+      const tk = String(m.token || '');
+      let found = null;
+      if (tk.length >= 8) for (const r of Object.values(rooms)) { const p = r.players.find(x => x.token === tk); if (p) { found = [r, p]; break; } }
+      if (!found) return send(ws, { type: 'resume_failed' });
+      const [r, p] = found;
+      clearTimeout(p.grace); p.away = false;
+      const old = p.ws;
+      if (old !== ws) { send(old, { type: 'kicked', msg: 'Sua sessão foi aberta em outra aba ou aparelho.' }); try { old.close(); } catch {} }
+      p.ws = ws; me = p; room = r;
+      send(ws, { type: 'resumed', gid: r.game });
+      return push(r);
+    }
     if (m.type === 'leave') return leave();
+
     if (m.type === 'create' || m.type === 'join') {
       if (room) return;
       me.name = clean(m.name);
       if (!me.name) return err(ws, 'Digite seu nome.');
+      const tk = String(m.token || '').slice(0, 64);
+      me.token = tk.length >= 8 ? tk : Math.random().toString(36).slice(2) + Date.now().toString(36);
+      for (const r0 of Object.values(rooms)) { const p0 = r0.players.find(x => x.token === me.token && x !== me); if (p0) removePlayer(r0, p0); }
       if (m.type === 'create') {
         const c = newCode();
         room = rooms[c] = { code: c, game: MODS[m.game] ? m.game : 'locais', players: [], phase: 'lobby', sel: null };
@@ -138,6 +169,12 @@ wss.on('connection', ws => {
       if (Number.isInteger(c) && c >= 0 && c < COLORS) me.color = c;
       return push(r);
     }
+    if (m.type === 'kick' && isHost) {
+      const t = r.players.find(p => p.id === m.target);
+      if (!t || t === me) return;
+      send(t.ws, { type: 'kicked', msg: 'Você foi removido da sala pelo líder.' });
+      removePlayer(r, t); return;
+    }
     if (MODS[r.game]) return MODS[r.game].handle(r, me, m, ctx);
     if (m.type === 'locs' && isHost && r.phase === 'lobby') {
       const ok = new Set(readLocs().locations.map(l => l.name));
@@ -157,7 +194,18 @@ wss.on('connection', ws => {
       if (m.type === 'vote') { r.votes[me.id] = m.target; r.intents[me.id] = m.target; return step(r); }
     }
   });
-  ws.on('close', leave);
+
+  ws.on('close', () => {
+    if (!room || !room.players.includes(me) || me.ws !== ws) return;
+    const r = room;
+    me.away = true; push(r);
+    me.grace = setTimeout(() => { if (me.away && r.players.includes(me)) removePlayer(r, me); }, GRACE);
+  });
   ws.on('error', () => {});
 });
+
+setInterval(() => {
+  wss.clients.forEach(c => { if (!c.isAlive) return c.terminate(); c.isAlive = false; try { c.ping(); } catch {} });
+}, 25000);
+
 server.listen(process.env.PORT || 3000, () => console.log('Rodando em http://localhost:' + (process.env.PORT || 3000)));
