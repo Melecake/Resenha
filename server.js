@@ -51,6 +51,18 @@ const cleanLoc = l => {
 const count = r => { const c = {}; Object.values(r.votes || {}).forEach(t => c[t] = (c[t] || 0) + 1); return c; };
 const valid = (r, me, t) => (t !== me.id || r.players.length === 1) && r.players.some(p => p.id === t);
 
+// Ranking da sala: guardado por token do jogador enquanto a sala existir
+function award(r, list) {
+  r.scores = r.scores || {};
+  for (const [p, n] of list) {
+    const k = p.token || ('id' + p.id);
+    const s = r.scores[k] || (r.scores[k] = { name: p.name, pts: 0 });
+    s.name = p.name; s.pts += n;
+  }
+  r.rounds = (r.rounds || 0) + 1;
+}
+const rank = r => !r.rounds ? [] : r.players.map(p => ({ id: p.id, pts: ((r.scores || {})[p.token] || {}).pts || 0 })).sort((a, b) => b.pts - a.pts);
+
 function begin(r) {
   const d = readLocs(), pick = new Set(r.sel || d.locations.map(l => l.name));
   const locs = d.locations.filter(l => pick.has(l.name)).map(cleanLoc).filter(Boolean).slice(0, 150);
@@ -75,12 +87,12 @@ function view(r, p) {
 }
 const push = r => r.players.forEach(p => {
   const v = view(r, p);
-  v.gid = r.game;
+  v.gid = r.game; v.rank = rank(r); v.rounds = r.rounds || 0;
   if (v.players) v.players = v.players.map(x => ({ ...x, away: !!(r.players.find(q => q.id === x.id) || {}).away }));
   send(p.ws, v);
 });
 const err = (w, msg, alert) => send(w, { type: 'error', msg, alert: !!alert });
-const ctx = { push, err };
+const ctx = { push, err, award };
 
 function step(r) {
   if (r.phase === 'play' && r.players.every(p => r.ready[p.id])) { r.phase = 'vote'; r.intents = {}; r.votes = {}; }
@@ -93,6 +105,12 @@ function step(r) {
       r.result = { caught: !r.spyGone && top.length === 1 && top[0] === r.spy, top: top.map(name), max, early: !all,
         spy: r.spyName + (r.spyGone ? ' (saiu da partida)' : ''), loc: r.loc };
       r.phase = 'end';
+      const pts = [];
+      if (!r.spyGone) {
+        if (r.result.caught) r.players.filter(p => p.id !== r.spy).forEach(p => pts.push([p, 1]));
+        else { const sp = r.players.find(p => p.id === r.spy); if (sp) pts.push([sp, 2]); }
+      }
+      award(r, pts);
     }
   }
   push(r);
@@ -101,7 +119,7 @@ function step(r) {
 function removePlayer(r, p) {
   clearTimeout(p.grace);
   r.players = r.players.filter(x => x !== p);
-  if (!r.players.length) { clearTimeout(r.timer); clearTimeout(r.qt); delete rooms[r.code]; return; }
+  if (!r.players.length) { clearTimeout(r.timer); clearTimeout(r.qt); clearTimeout(r.lt); delete rooms[r.code]; return; }
   if (MODS[r.game]) return MODS[r.game].leave(r, p, ctx);
   if (r.phase !== 'lobby' && p.id === r.spy) r.spyGone = true;
   for (const o of [r.ready, r.intents, r.votes]) {
@@ -150,7 +168,7 @@ wss.on('connection', ws => {
       for (const r0 of Object.values(rooms)) { const p0 = r0.players.find(x => x.token === me.token && x !== me); if (p0) removePlayer(r0, p0); }
       if (m.type === 'create') {
         const c = newCode();
-        room = rooms[c] = { code: c, game: MODS[m.game] ? m.game : 'locais', players: [], phase: 'lobby', sel: null };
+        room = rooms[c] = { code: c, game: MODS[m.game] ? m.game : 'locais', players: [], phase: 'lobby', sel: null, scores: {}, rounds: 0 };
         if (MODS[room.game]) MODS[room.game].init(room);
       } else {
         room = rooms[String(m.code || '').toUpperCase().trim()];
@@ -192,6 +210,7 @@ wss.on('connection', ws => {
       if (m.ready) r.ready[me.id] = true; else delete r.ready[me.id];
       return step(r);
     }
+    if (m.type === 'unintent' && r.phase === 'vote' && !r.votes[me.id]) { delete r.intents[me.id]; return push(r); }
     if (r.phase === 'vote' && !r.votes[me.id] && valid(r, me, m.target)) {
       if (m.type === 'intent') { r.intents[me.id] = m.target; return push(r); }
       if (m.type === 'vote') { r.votes[me.id] = m.target; r.intents[me.id] = m.target; return step(r); }

@@ -21,7 +21,11 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 body.loading #lb{opacity:1;animation:slide 1s linear infinite}@keyframes slide{to{transform:translateX(100%)}}
 .rc{position:fixed;top:0;left:0;right:0;z-index:90;background:#e04848;color:#fff;text-align:center;font:700 .85rem Rubik,sans-serif;padding:8px;transform:translateY(-100%);transition:transform .25s}.rc.on{transform:none}
 #toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,20px);background:var(--acc);color:var(--ink);font:700 .9rem Rubik,sans-serif;padding:10px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:95}#toast.on{opacity:1;transform:translate(-50%,0)}
-.fab{position:fixed;right:16px;bottom:16px;z-index:30;display:none;align-items:center;padding:12px 18px;border-radius:999px;font-size:.85rem;box-shadow:0 5px 0 var(--acc2),0 8px 20px rgba(0,0,0,.4)}
+.fab{position:fixed;right:16px;bottom:16px;z-index:30;display:inline-flex;align-items:center;padding:12px 18px;border-radius:999px;font-size:.85rem;box-shadow:0 5px 0 var(--acc2),0 8px 20px rgba(0,0,0,.4)}
+.pp{position:fixed;right:16px;bottom:16px;z-index:30;width:min(300px,calc(100vw - 32px));background:linear-gradient(180deg,var(--n2),var(--n1));border:2px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.pph{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.mini{padding:6px 12px;font-size:.75rem;background:var(--n2);color:var(--txt);border-color:var(--line);box-shadow:0 3px 0 #0a1230}
+.ppl{max-height:min(40vh,320px);overflow-y:auto;padding-right:6px}.ppl li{padding:4px 0}.pp .av{width:34px;height:34px;flex-basis:34px;font-size:1.1rem}
 body.inroom main{padding-bottom:96px}
 .bar{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:14px clamp(16px,4vw,56px);background:linear-gradient(#070b17ee,#070b1700);backdrop-filter:blur(6px)}
 .bar .l{justify-self:start}.bar .r{justify-self:end}
@@ -86,20 +90,25 @@ body.home .games{flex:1;min-height:0;margin:3vh auto 0;width:100%}body.home .gc{
 .codein{text-align:center;font-size:1.9rem;letter-spacing:10px;text-transform:uppercase;font-family:var(--disp)}
 .code{font-family:var(--disp);font-size:clamp(3rem,9vw,6rem);color:var(--acc);text-align:center;letter-spacing:12px;text-shadow:0 5px 0 var(--acc2),0 0 40px rgba(255,194,51,.3)}
 ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-between;align-items:center;padding:6px 0;gap:8px}li .nm{flex:1;display:flex;align-items:center;gap:10px}
+.rk{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07)}.rk:last-child{border:0}
+.rp{font:400 1.1rem Bungee,Impact,sans-serif;color:var(--acc);width:44px}.rpt{font-weight:700;white-space:nowrap}
 .chips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:18px}
 .chip{display:inline-flex;align-items:center;gap:10px;background:#0a1230;border:2px solid var(--line);border-radius:14px;padding:6px 16px 6px 6px;font-weight:700;text-align:left}
 .chip.sm{padding:3px 12px 3px 3px;font-size:.85rem;gap:8px}.chip.sm .av{width:30px;height:30px;flex-basis:30px;font-size:1rem;border-radius:9px}
 .cn{display:flex;flex-direction:column;align-items:flex-start;gap:3px;line-height:1.15;min-width:0}.cn b{word-break:break-word}.sb{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.tag{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;background:var(--acc);color:var(--ink);padding:3px 7px;border-radius:6px;vertical-align:middle;font-weight:700}
+.tag{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;background:var(--acc);color:var(--ink);padding:3px 7px;border-radius:6px;vertical-align:middle;font-weight:700;white-space:nowrap}
 .tag.off2{background:#e04848;color:#fff}
 .av{width:44px;height:44px;flex:0 0 44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);position:relative}
 .av.iv{opacity:.6;outline:2px dashed var(--mut);outline-offset:1px;filter:grayscale(.35)}
 .av.cv{outline:3px solid var(--acc);outline-offset:1px;box-shadow:0 0 12px rgba(255,194,51,.6)}
 .av.cv::after{content:"✓";position:absolute;right:-6px;bottom:-6px;width:15px;height:15px;border-radius:50%;background:var(--acc);color:var(--ink);font:700 .6rem Rubik,sans-serif;display:flex;align-items:center;justify-content:center}
-.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:.8rem;color:var(--mut)}.legend span{display:flex;align-items:center;gap:8px}
+.legend{display:flex;flex-direction:column;gap:8px;margin-top:14px;font-size:.8rem;color:var(--mut)}.legend span{display:flex;align-items:center;gap:8px}
 .lg{width:16px;height:16px;border-radius:5px;display:inline-block;background:var(--n1)}.lg.iv{border:2px dashed var(--mut)}.lg.cv{border:2px solid var(--acc);box-shadow:0 0 8px rgba(255,194,51,.6)}
-.vstat .vsh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
-.tm{font-family:var(--disp);color:var(--acc);font-size:.85rem}.tm.late{color:#ff7b7b}.tmb{font-size:2rem;text-align:center;margin:4px 0 14px}.tmb.tm{font-size:1.6rem}
+.vlay{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:24px;align-items:start;margin-top:20px}.vlay.end{grid-template-columns:1fr}
+.vside{position:sticky;top:90px}.vside .card{margin:0}
+.vl{display:flex;flex-direction:column;gap:8px;margin-top:10px}.vl .chip{width:100%}
+@media(max-width:900px){.vlay{grid-template-columns:1fr}.vside{position:static;order:-1}}
+.tm,.tmL{font-family:var(--disp);color:var(--acc);font-size:.85rem}.tm.late,.tmL.late{color:#ff7b7b}.tmb{font-size:1.6rem;text-align:center;margin:4px 0 14px}
 .emos{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}@media(max-width:560px){.emos{grid-template-columns:repeat(5,1fr)}}
 .eb,.cb{padding:0;box-shadow:none;background:var(--n1);border:2px solid var(--line)}.eb:hover,.cb:hover{transform:none;filter:brightness(1.2)}.eb:active,.cb:active{transform:none;box-shadow:none}
 .eb{width:100%;aspect-ratio:1;font-size:1.4rem}.eb.sel,.cb.sel{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,194,51,.35)}.eb:disabled{opacity:.2}
@@ -133,6 +142,17 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 .big{font-family:var(--disp);font-size:clamp(5rem,16vw,9rem);color:var(--acc);text-align:center;line-height:1.1;text-shadow:0 5px 0 var(--acc2),0 0 50px rgba(255,194,51,.4)}
 #spin{background:#0a1230;border:3px solid var(--acc);border-radius:24px;width:min(60vw,240px);margin:6px auto 0;padding:10px}
 .worst{font-family:var(--disp);font-size:clamp(1.6rem,4vw,2.6rem);color:var(--acc);margin:10px 0;word-break:break-word}.worst span{font:500 .5em Rubik;color:var(--txt)}
+.worstcard{border-color:#ef4444;background:linear-gradient(180deg,#3a1220,#1c0f1a)}.worstcard::before{background:#ef4444}
+.fx{position:fixed;inset:0;z-index:85;display:flex;align-items:center;justify-content:center;background:rgba(7,11,23,.96);animation:fade .2s}
+.fxbox{text-align:center;padding:20px}
+.fxt{font-family:var(--disp);font-size:clamp(2.2rem,9vw,5.5rem);color:var(--acc);text-shadow:0 6px 0 var(--acc2),0 0 60px rgba(255,194,51,.5);animation:stamp .7s cubic-bezier(.2,1.5,.4,1) both}
+.fxs{margin-top:18px;font:700 1rem Rubik,sans-serif;letter-spacing:6px;text-transform:uppercase;color:var(--txt);animation:rise .6s .5s both}
+@keyframes stamp{0%{transform:scale(3.2) rotate(-10deg);opacity:0}55%{transform:scale(.92) rotate(-4deg);opacity:1}100%{transform:scale(1) rotate(-3deg)}}
+.wmodal{z-index:86;background:rgba(7,11,23,.55)}
+.wbox{max-width:560px;width:100%;text-align:center;padding:34px 26px;border-radius:26px;border:3px solid #ef4444;background:radial-gradient(circle at 50% 0%,#5a1a2a,#1a0f1c 70%);box-shadow:0 0 0 6px rgba(239,68,68,.15),0 30px 80px rgba(0,0,0,.7);animation:pop .4s both}
+.wlab{font:700 .8rem Rubik,sans-serif;letter-spacing:5px;text-transform:uppercase;color:#ff9b9b}
+.wtxt{font-family:var(--disp);font-size:clamp(2rem,7vw,3.6rem);color:#fff;line-height:1.1;margin:18px 0 8px;word-break:break-word;text-shadow:0 4px 0 #7a1a2a;animation:stamp .6s .2s both}
+.wnm{font:700 1.2rem Rubik,sans-serif;color:var(--acc)}.wv{margin:14px 0 22px;color:var(--mut)}
 .modal{position:fixed;inset:0;background:transparent;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:70;padding:20px;animation:fade .2s}
 .modal .box{background:linear-gradient(180deg,var(--n2),var(--n1));border:2px solid var(--acc);padding:26px;border-radius:20px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .25s both}
 .box.info{max-width:660px;max-height:82vh;overflow-y:auto;text-align:left}
@@ -140,7 +160,7 @@ ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-betw
 .box.info p,.box.info li{color:#cfd8f5;line-height:1.55;font-size:.95rem;margin:6px 0}
 .box.info ul{list-style:disc;padding-left:22px;margin:6px 0}.box.info li{display:list-item;padding:2px 0}.box.info b{color:#fff}
 @keyframes fade{from{opacity:0}}@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
-.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:24px;margin-top:20px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:24px}
 .vc{position:relative;display:flex;flex-direction:column;gap:16px;padding:22px;border-radius:20px;border:2px solid var(--line);background:linear-gradient(180deg,var(--n2),var(--n1));box-shadow:0 8px 0 #0a1230}
 .vh{display:flex;align-items:center;gap:14px}.vh b{font-size:1.15rem;word-break:break-word}
 .vcnt{position:absolute;top:-14px;right:-8px;background:var(--acc);color:var(--ink);font:400 .95rem Bungee,Impact,sans-serif;padding:6px 14px;border-radius:12px;border:2px solid #7a5200;box-shadow:0 3px 0 var(--acc2);animation:pop .3s both}
@@ -153,7 +173,7 @@ select{font:500 1rem Rubik,sans-serif;padding:14px 44px 14px 16px;border-radius:
 select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px rgba(255,194,51,.18)}
 html{-webkit-text-size-adjust:100%}
 button,.tile,.gc,.pc,.lt{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.vsel{display:none}.vsel .vb{display:grid;margin-top:14px}
+.vsel{display:none}.vsel .vb{display:grid;margin-top:14px}.vsel.card{margin-top:0}
 @media(max-width:900px){.loc{max-width:300px;margin-left:auto;margin-right:auto}.hero.rel .iw{position:static;justify-content:center;margin-top:8px}}
 @media(max-width:700px){.vsel{display:block}.vc .vb{display:none}.vgrid{gap:18px}.vc{padding:18px}}
 @media(max-width:560px){
@@ -169,39 +189,40 @@ button,.tile,.gc,.pc,.lt{touch-action:manipulation;-webkit-tap-highlight-color:t
 <header class="bar"><button class="nbtn l" id="bk" onclick="back()"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Voltar</button>
 <div class="logo" id="lg"><span class="moon"></span><span class="lgt">Resenha da Madrugada</span></div>
 <button class="nbtn r" id="hm" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7M6 10v10h12V10"/></svg>Início</button></header>
-<main><div id="app"></div></main><div id="ntc"></div><div id="cfm"></div><div id="toast"></div><button class="fab" id="fab" onclick="showPlayers()">Jogadores</button><script>
+<main><div id="app"></div></main><div id="ntc"></div><div id="cfm"></div><div id="fx"></div><div id="toast"></div><div id="pp"></div><script>
 // As capas dos jogos também podem ser alteradas pelo painel admin (/gerenciar-locais). "img" é o valor padrão.
 const GAMES=[
   {id:'locais',name:'Impostor - Locais',short:'Locais',img:'',ok:true,tag:'Descubra o espião antes que ele descubra o local.'},
   {id:'pika',name:'O meu é mais Pika',short:'Pika',img:'',ok:true,tag:'Uma letra, um tema: quem disser a pior palavra perde.'},
   {id:'perguntas',name:'Impostor - Perguntas',short:'Perguntas',img:'',ok:true,tag:'Duas perguntas, um impostor.'}];
-const VOTEINFO=`<li><b>Quem falta votar:</b> aparece no topo da votação.</li><li><b>Intenção e voto:</b> a intenção aparece com borda tracejada e esmaecida. O voto confirmado aparece com borda dourada e um ✓.</li><li><b>Maioria:</b> se alguém receber mais da metade dos votos (metade + 1), a votação termina na hora, mesmo que falte gente votar.</li>`;
+const VOTEINFO=`<li><b>Quem falta votar:</b> aparece em uma lista vertical na lateral da votação (no celular, acima dos cards).</li><li><b>Intenção e voto:</b> a intenção aparece com borda tracejada e esmaecida. O voto confirmado aparece com borda dourada e um ✓. Para desistir de uma intenção sem escolher outro jogador, use <b>Remover minha intenção</b>.</li><li><b>Maioria:</b> se alguém receber mais da metade dos votos (metade + 1), a votação termina na hora, mesmo que falte gente votar, e uma animação avisa que a votação foi encerrada.</li>`;
 const INFO={
 locais:{brief:'Todos recebem o mesmo local, menos o espião. Façam perguntas uns aos outros, descubram quem não sabe onde está e votem. O espião tenta descobrir o local sem ser pego.',
 full:`<h4>Objetivo</h4><p>Todos os jogadores recebem o mesmo <b>local</b>, menos um: o <b>espião</b>, que não sabe onde está. Os jogadores tentam descobrir quem é o espião. O espião tenta descobrir o local e não ser pego.</p>
 <h4>Antes de começar</h4><ul><li><b>Ícone e cor:</b> cada jogador escolhe um emoji e uma cor. Dois jogadores não podem ter o mesmo emoji, mas as cores podem se repetir.</li><li><b>Localidades:</b> o líder (quem criou a sala) marca quais localidades entram na partida, e todos veem a seleção.</li><li><b>Convite:</b> o botão "Copiar convite" gera um link que leva os amigos direto para a entrada da sala.</li><li><b>Iniciar:</b> só o líder inicia a partida.</li></ul>
 <h4>Durante a partida</h4><ul><li><b>Seu cartão:</b> mostra o local, ou "Espião" se você for o espião.</li><li><b>Conversa:</b> façam perguntas uns aos outros sobre o local, sem entregar demais.</li><li><b>Quadro de suspeitos:</b> só você vê. Clique em um jogador para alternar entre Na dúvida, Suspeito e Inocente. É só uma anotação sua, e o seu próprio card não muda. O espião não tem esse quadro.</li><li><b>Possíveis localidades:</b> toque em uma localidade para riscá-la e lembrar o que já descartou.</li></ul>
-<h4>Votação</h4><ul><li><b>Pronto para votar:</b> quando achar que já deu, clique no botão. Se mudar de ideia, clique em Cancelar. A votação só abre quando todos estiverem prontos.</li><li><b>Declarar intenção:</b> seu emoji aparece no card da pessoa escolhida, para a turma ver em quem a maioria quer votar. Você pode mudar de alvo quantas vezes quiser.</li><li><b>Votar:</b> confirma o voto de forma definitiva. Quando todos votarem, o mais votado é revelado.</li>${VOTEINFO}</ul>
-<h4>Quem vence</h4><ul><li>Se o espião for o único mais votado, <b>os jogadores vencem</b>.</li><li>Se outra pessoa for a mais votada, ou houver empate, <b>o espião vence</b>.</li></ul>
-<h4>Outras regras</h4><ul><li>Se alguém sair, a partida continua. Se a sua conexão cair, você tem 60 segundos para voltar sozinho à partida.</li><li>Se alguém ficar parado, o líder pode removê-lo pelo botão <b>Jogadores</b>.</li><li>Não é possível entrar em uma partida em andamento.</li><li>No fim, o líder pode clicar em <b>Jogar novamente</b> para sortear novo espião e novo local.</li></ul>`},
+<h4>Votação</h4><ul><li><b>Pronto para votar:</b> quando achar que já deu, clique no botão. Se mudar de ideia, clique em Cancelar. A votação só abre quando todos estiverem prontos.</li><li><b>Declarar intenção:</b> seu emoji aparece no card da pessoa escolhida, para a turma ver em quem a maioria quer votar. Você pode mudar de alvo quantas vezes quiser.</li><li><b>Votar:</b> abre uma confirmação só para você, e o voto é definitivo. Quando a votação termina, o mais votado é revelado.</li>${VOTEINFO}</ul>
+<h4>Quem vence e pontos</h4><ul><li>Se o espião for o único mais votado, <b>os jogadores vencem</b> e cada inocente ganha 1 ponto.</li><li>Se outra pessoa for a mais votada, ou houver empate, <b>o espião vence</b> e ganha 2 pontos.</li><li><b>Ranking:</b> os pontos só contam quando a partida termina, ficam guardados enquanto a sala existir e aparecem na tela final e na sala de espera.</li></ul>
+<h4>Outras regras</h4><ul><li>Se alguém sair, a partida continua. Se a sua conexão cair, você tem 60 segundos para voltar sozinho à partida.</li><li>O painel <b>Jogadores</b>, no canto da tela, mostra quem está na sala. O líder o vê aberto e pode remover quem estiver parado, ou minimizá-lo.</li><li>Não é possível entrar em uma partida em andamento.</li><li>No fim, o líder pode clicar em <b>Jogar novamente</b> para sortear novo espião e novo local.</li></ul>`},
 pika:{brief:'O líder escolhe um tema e uma letra é sorteada. Cada jogador diz uma palavra do tema que comece com a letra, e todos votam na pior resposta.',
 full:`<h4>Objetivo</h4><p>Uma letra é sorteada e existe um tema. Cada jogador diz uma palavra do tema que comece com essa letra. No fim, a turma vota na <b>pior palavra</b>, e quem a escreveu perde.</p>
-<h4>Sala de espera</h4><ul><li><b>Ícone e cor:</b> cada jogador escolhe um emoji (único na sala) e uma cor.</li><li><b>Tema:</b> o líder (quem criou a sala) digita o tema, e todos veem.</li><li><b>Letras:</b> o líder pode excluir letras do sorteio tocando nelas. Letras riscadas não entram.</li><li><b>Convite:</b> o botão "Copiar convite" gera um link que leva os amigos direto para a entrada da sala.</li><li><b>Iniciar:</b> só o líder inicia a partida.</li></ul>
-<h4>Rodada</h4><ul><li><b>Roleta:</b> uma animação sorteia a letra entre as que não foram excluídas.</li><li><b>Tema e letra:</b> aparecem na tela, seguidos de uma contagem de 3 segundos.</li><li><b>Eu tenho!:</b> quando você pensar em uma palavra, clique no botão. Você entra na fila pela ordem dos cliques, e a fila fica visível para todos.</li><li><b>Escrever:</b> só a pessoa que está na frente da fila escreve por vez, para ninguém repetir a mesma palavra. Quando ela envia, o nome e a palavra aparecem para todos, e o próximo da fila é liberado.</li><li><b>Tempo:</b> quando chega a sua vez, você tem 10 segundos. Depois disso aparece "Tempo esgotado", e aos 15 segundos sem enviar você vai para o fim da fila.</li><li><b>Passar a vez:</b> se você travar, desista da vez e entre na fila de novo quando tiver uma ideia. O líder também pode pular quem estiver na frente.</li></ul>
-<h4>Votação</h4><ul><li>Começa quando todos enviaram suas palavras, sem limite de tempo.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação, e o voto é definitivo. O contador de votos aparece no card assim que alguém recebe um voto.</li>${VOTEINFO}<li>Quando a votação termina, o mais votado é o perdedor. Em caso de empate, todos os empatados perdem.</li></ul>
-<h4>Depois da rodada</h4><ul><li><b>Nova partida:</b> volta à sala de espera para trocar o tema e as letras.</li><li><b>Jogar novamente o mesmo tema:</b> sorteia uma nova letra e começa outra rodada. Os dois botões são do líder e pedem confirmação.</li><li>Se a sua conexão cair, você tem 60 segundos para voltar sozinho. O líder pode remover jogadores parados pelo botão <b>Jogadores</b>.</li></ul>`},
+<h4>Sala de espera</h4><ul><li><b>Ícone e cor:</b> cada jogador escolhe um emoji (único na sala) e uma cor.</li><li><b>Tema:</b> o líder (quem criou a sala) digita o tema ou escolhe uma <b>sugestão</b> na lista, e todos veem.</li><li><b>Letras:</b> o líder pode excluir letras do sorteio tocando nelas. Letras riscadas não entram.</li><li><b>Convite:</b> o botão "Copiar convite" gera um link que leva os amigos direto para a entrada da sala.</li><li><b>Iniciar:</b> só o líder inicia a partida.</li></ul>
+<h4>Rodada</h4><ul><li><b>Roleta:</b> uma animação sorteia a letra entre as que não foram excluídas. Uma letra só volta a ser sorteada depois que todas as outras já saíram.</li><li><b>Tema e letra:</b> aparecem na tela, seguidos de uma contagem de 3 segundos.</li><li><b>Eu tenho!:</b> quando você pensar em uma palavra, clique no botão. Você entra na fila pela ordem dos cliques, e a fila fica visível para todos. Quem quiser pode clicar em <b>Sair da fila</b>.</li><li><b>Escrever:</b> só a pessoa que está na frente da fila escreve por vez, para ninguém repetir a mesma palavra. Quando ela envia, o nome e a palavra aparecem para todos, e o próximo da fila é liberado.</li><li><b>Tempo:</b> quando chega a sua vez, você tem 10 segundos. Depois disso aparece "Tempo esgotado", e aos 15 segundos sem enviar você vai para o fim da fila.</li><li><b>Último a escrever:</b> quando só falta uma pessoa, ela tem 20 segundos. Se não enviar a palavra, fica fora da rodada: não vota e não pontua.</li></ul>
+<h4>Votação</h4><ul><li>Começa quando todos enviaram suas palavras (ou ficaram de fora), sem limite de tempo.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação só para você, e o voto é definitivo. O contador de votos aparece no card assim que alguém recebe um voto.</li>${VOTEINFO}<li>Quando a votação termina, o mais votado é o perdedor, e uma janela destaca a pior escolha. Em caso de empate, todos os empatados perdem.</li></ul>
+<h4>Pontos e ranking</h4><ul><li>Quem não teve a pior escolha ganha 1 ponto. Quem ficou de fora da rodada não pontua.</li><li>Os pontos ficam guardados enquanto a sala existir e aparecem na tela final e na sala de espera.</li></ul>
+<h4>Depois da rodada</h4><ul><li><b>Nova partida:</b> volta à sala de espera para trocar o tema e as letras.</li><li><b>Jogar novamente o mesmo tema:</b> sorteia uma nova letra e começa outra rodada. Os dois botões são do líder e pedem confirmação.</li><li>Se a sua conexão cair, você tem 60 segundos para voltar sozinho. O líder vê o painel <b>Jogadores</b> aberto e pode remover quem estiver parado.</li></ul>`},
 perguntas:{brief:'Um host escreve duas perguntas parecidas: uma para os inocentes e outra para o impostor. Todos respondem, as respostas são reveladas e vocês votam em quem recebeu a pergunta diferente.',
 full:`<h4>Objetivo</h4><p>O <b>host</b> escreve duas perguntas parecidas: uma para os <b>inocentes</b> e outra para o <b>impostor</b>. Todos respondem sem saber que existem duas perguntas. Os jogadores tentam descobrir quem respondeu à pergunta diferente. O impostor tenta passar despercebido.</p>
 <h4>Sala de espera</h4><ul><li><b>Áreas:</b> a sala tem duas áreas, <b>Host</b> e <b>Jogadores</b>. A área Host começa vazia e comporta só uma pessoa. Para trocar o host, quem está nela clica em "Sair do host" e outra pessoa clica em "Ser o host".</li><li><b>Convite:</b> o botão "Copiar convite" gera um link que leva os amigos direto para a entrada da sala.</li><li><b>Iniciar:</b> só o líder (quem criou a sala) inicia, e apenas se houver alguém como host e ao menos um jogador.</li><li><b>Ícone e cor:</b> cada jogador escolhe um emoji (único na sala) e uma cor.</li></ul>
-<h4>Rodada</h4><ul><li><b>Host escreve:</b> os jogadores veem "Esperando o Host escrever as perguntas". O host escreve a pergunta dos inocentes e a do impostor.</li><li><b>Sorteio:</b> uma pessoa aleatória, entre os jogadores, recebe a pergunta do impostor. Todos os outros recebem a pergunta dos inocentes.</li><li><b>Respostas:</b> cada jogador vê só a sua pergunta, escreve a resposta e clica em Enviar.</li><li><b>Host espectador:</b> o host não joga. Ele acompanha a partida, vê quem é o impostor e as duas perguntas, mas não pode votar.</li></ul>
+<h4>Rodada</h4><ul><li><b>Host escreve:</b> os jogadores veem "Esperando o Host escrever as perguntas". O host escreve a pergunta dos inocentes e a do impostor.</li><li><b>Sorteio:</b> uma pessoa aleatória, entre os jogadores, recebe a pergunta do impostor. Todos os outros recebem a pergunta dos inocentes.</li><li><b>Respostas:</b> cada jogador vê só a sua pergunta, escreve a resposta e clica em Enviar.</li><li><b>Host espectador:</b> o host não joga. Ele acompanha a partida, vê quem é o impostor e as duas perguntas, e vê quem já respondeu e quem falta responder, mas não pode votar.</li></ul>
 <h4>Revelação</h4><ul><li>Quando todos enviarem, as respostas aparecem embaçadas e são reveladas <b>uma por vez</b>, em ordem aleatória, com os nomes.</li><li>Só depois da última resposta a <b>pergunta dos inocentes</b> é revelada. É nesse momento que o impostor descobre que era o impostor.</li></ul>
-<h4>Votação</h4><ul><li>Os inocentes veem só a pergunta dos inocentes. O impostor e o host veem as duas, e para o impostor a pergunta dele fica destacada.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação, e o voto é definitivo. O host não vota, e a maioria é calculada só entre os jogadores.</li>${VOTEINFO}</ul>
-<h4>Resultado</h4><ul><li>Se o mais votado for o impostor, <b>os jogadores vencem</b>.</li><li>Se não, aparece o nome do impostor e que <b>ele ganhou a partida</b>. Empate também dá vitória ao impostor.</li><li>No fim, aparecem o resultado e as duas perguntas. O líder escolhe <b>Nova partida</b> (volta à sala de espera, para trocar o host) ou <b>Jogar novamente</b> (mesmo host, perguntas novas).</li><li>Se a sua conexão cair, você tem 60 segundos para voltar sozinho. O líder pode remover jogadores parados pelo botão <b>Jogadores</b>.</li></ul>`}};
+<h4>Votação</h4><ul><li>Os inocentes veem só a pergunta dos inocentes. O impostor e o host veem as duas, e para o impostor a pergunta dele fica destacada.</li><li><b>Declarar intenção:</b> seu emoji aparece no card escolhido, para a turma ver em quem a maioria quer votar.</li><li><b>Votar:</b> abre uma confirmação só para você, e o voto é definitivo. O host não vota, mas vê quem já votou e quem falta. A maioria é calculada só entre os jogadores.</li>${VOTEINFO}</ul>
+<h4>Resultado e pontos</h4><ul><li>Se o mais votado for o impostor, <b>os jogadores vencem</b> e cada inocente ganha 1 ponto.</li><li>Se não, aparece o nome do impostor e que <b>ele ganhou a partida</b>, e ele ganha 2 pontos. Empate também dá vitória ao impostor. O host não pontua.</li><li>No fim, aparecem o resultado, o ranking da sala e as duas perguntas. O líder escolhe <b>Nova partida</b> (volta à sala de espera, para trocar o host) ou <b>Jogar novamente</b> (mesmo host, perguntas novas).</li><li>Os pontos ficam guardados enquanto a sala existir.</li><li>Se a sua conexão cair, você tem 60 segundos para voltar sozinho. O líder vê o painel <b>Jogadores</b> aberto e pode remover quem estiver parado.</li></ul>`}};
 const EMOTES=["😎","🤠","🥸","🤓","😈","👻","🤖","👽","🦊","🐸","🐙","🦄","🐼","🦁","🐵","🐲","🐶","🐱","🦉","🐧"];
 const HUES=[0,24,45,75,130,165,190,215,245,275,305,335];
 const store={get:(k,d)=>{try{return JSON.parse(sessionStorage.getItem(k))??d}catch{return d}},set:(k,v)=>sessionStorage.setItem(k,JSON.stringify(v))};
 const TOKEN=(()=>{let t=sessionStorage.getItem('tk');if(!t){t=((window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Math.random()).slice(2)+Date.now())+'';sessionStorage.setItem('tk',t)}return t})();
-let COVERS={},S=null,err='',struck=new Set(),marks={},mode='menu',screen='home',game='locais',ready=false,lastKey='',lt,invCode='',plOpen=false;
+let COVERS={},S=null,err='',struck=new Set(),marks={},mode='menu',screen='home',game='locais',ready=false,lastKey='',lt,invCode='',ppOpen=null;
 (()=>{const q=new URLSearchParams(location.search),c=(q.get('sala')||'').toUpperCase().slice(0,4),g=q.get('jogo');
   if(c){if(GAMES.some(x=>x.id===g&&x.ok))game=g;invCode=c;if(!store.get('inroom',false)){screen='game';mode='join'}history.replaceState(null,'',location.pathname)}})();
 fetch('/api/locations').then(r=>r.json()).then(d=>{COVERS=d.covers||{};render()});
@@ -221,30 +242,37 @@ function connect(){
 }
 function reopen(){try{ws.onclose=null;ws.close()}catch(e){}ws=null;$('rc').classList.add('on');connect()}
 const tx=o=>{if(!ws||ws.readyState!==1){toast('Sem conexão. Reconectando…');return}ws.send(JSON.stringify(o));busy(true);clearTimeout(lt);lt=setTimeout(()=>busy(false),4000)};
-function onMsg(e){busy(false);const m=JSON.parse(e.data);
+function onMsg(e){busy(false);const m=JSON.parse(e.data);let closing=false;
   if(m.type==='pong'){lastPong=Date.now();return}
   if(m.type==='resumed'){screen='game';if(m.gid)game=m.gid;return}
   if(m.type==='resume_failed'){store.set('inroom',false);S=null;notify('A sala em que você estava não existe mais, ou o tempo para reconectar acabou.');render();return}
-  if(m.type==='kicked'){store.set('inroom',false);S=null;screen='home';mode='menu';if(typeof closeConfirm==='function')closeConfirm();notify(m.msg||'Você saiu da sala.');render();return}
+  if(m.type==='kicked'){store.set('inroom',false);S=null;screen='home';mode='menu';if(typeof closeConfirm==='function')closeConfirm();$('fx').innerHTML='';notify(m.msg||'Você saiu da sala.');render();return}
   if(m.type==='error'){if(m.alert)notify(m.msg);else err=m.msg}
   else{if(m.gid)game=m.gid;
+    closing=!!S&&S.phase==='vote'&&m.phase==='end';
     if(typeof closeConfirm==='function'&&(!S||S.phase!==m.phase||(P.confirm&&P.confirm.msg&&P.confirm.msg.type==='vote'&&m.voted&&m.voted.includes(m.you))))closeConfirm();
     if(S&&S.phase!=='play'&&m.phase==='play'){struck=new Set();marks={}}
     S=m;err='';invCode='';if(screen==='game'||S)store.set('inroom',true)}
-  render()}
+  render();
+  if(closing)closingFx(m)}
+// Animação quando a votação termina (antes de mostrar o resultado)
+function closingFx(m){const early=m.result&&m.result.early;
+  $('fx').innerHTML=`<div class="fx"><div class="fxbox"><div class="fxt">Votação encerrada!</div><div class="fxs">${early?'Maioria atingida':'Todos votaram'}</div></div></div>`;
+  clearTimeout(window._fx);
+  window._fx=setTimeout(()=>{$('fx').innerHTML='';if(m.game==='pika'&&typeof showWorst==='function')showWorst(m)},2300)}
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden)return;
   if(!ws||ws.readyState>1){retry=0;connect();return}
   if(ws.readyState===1){const t=Date.now();ws.send(JSON.stringify({type:'ping'}));setTimeout(()=>{if(lastPong<t)reopen()},3000)}});
 window.addEventListener('online',()=>{if(!ws||ws.readyState>1){retry=0;connect()}});
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.classList.contains('fab')&&!b.closest('.emos,.cols')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.classList.contains('fab')&&!b.classList.contains('mini')&&!b.closest('.emos,.cols')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
 window.addEventListener('error',e=>{if(e.message)notify('Erro na página: '+e.message)});
 window.addEventListener('unhandledrejection',e=>notify('Erro: '+((e.reason&&e.reason.message)||e.reason)));
 function trans(k){if(k===lastKey)return;lastKey=k;const a=$('app');a.classList.remove('enter');void a.offsetWidth;a.classList.add('enter');setTimeout(()=>a.classList.remove('enter'),900)}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200)}
-function notify(m){const n=$('ntc');if(n.dataset.m===m&&n.innerHTML)return;plOpen=false;n.dataset.m=m;n.innerHTML=`<div class="modal"><div class="box"><h3 style="margin:0 0 10px">Aviso</h3><p style="margin:0 0 18px">${esc(m)}</p><button onclick="closeNote()">Entendi</button></div></div>`}
-const closeNote=()=>{plOpen=false;const n=$('ntc');n.dataset.m='';n.innerHTML=''};
-function showInfo(id,full){plOpen=false;const g=GAMES.find(x=>x.id===id),t=INFO[id];
+function notify(m){const n=$('ntc');if(n.dataset.m===m&&n.innerHTML)return;n.dataset.m=m;n.innerHTML=`<div class="modal"><div class="box"><h3 style="margin:0 0 10px">Aviso</h3><p style="margin:0 0 18px">${esc(m)}</p><button onclick="closeNote()">Entendi</button></div></div>`}
+const closeNote=()=>{const n=$('ntc');n.dataset.m='';n.innerHTML=''};
+function showInfo(id,full){const g=GAMES.find(x=>x.id===id),t=INFO[id];
   $('ntc').innerHTML=`<div class="modal" onclick="if(event.target===this)closeNote()"><div class="box ${full?'info':''}" style="${full?'':'text-align:center'}"><h3 style="margin:0 0 6px">${g.name}</h3>${full?t.full:`<p style="color:#cfd8f5;line-height:1.55">${t.brief}</p>`}<div style="text-align:center"><button style="margin-top:18px" onclick="closeNote()">Entendi</button></div></div></div>`}
 const infoBtn=id=>`<span class="iw"><span class="ihint">Explicação do jogo</span><button class="ibtn" title="Como jogar" onclick="event.stopPropagation();showInfo('${id}',true)">i</button></span>`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -262,6 +290,11 @@ const mark=id=>{marks[id]=((marks[id]||0)+1)%3;render()};
 function togLoc(i){const n=S.all[i].name,s=new Set(S.selected);s.has(n)?s.delete(n):s.add(n);tx({type:'locs',selected:[...s]})}
 const selAll=v=>tx({type:'locs',selected:v?S.all.map(l=>l.name):[]});
 
+// Ranking da sala
+function rankCard(){if(!S||!S.rank||!S.rank.length)return '';let pos=0,last=null;
+  const rows=S.rank.map((x,i)=>{if(x.pts!==last){pos=i+1;last=x.pts}return `<li class="rk"><span class="rp">${pos}º</span><span class="nm">${av(x.id)}<b>${nm(x.id)}</b></span><span class="rpt">${x.pts} ponto${x.pts===1?'':'s'}</span></li>`}).join('');
+  return `<div class="card"><label>Ranking da sala (${S.rounds} partida${S.rounds>1?'s':''})</label><ul>${rows}</ul></div>`}
+
 // Convite
 const inviteUrl=()=>location.origin+'/?sala='+S.code+'&jogo='+(S.gid||'locais');
 async function copyInvite(){const u=inviteUrl();
@@ -269,21 +302,27 @@ async function copyInvite(){const u=inviteUrl();
   toast('Link copiado!')}
 const inviteBtn=()=>`<button class="sec" style="margin-top:14px" onclick="copyInvite()">Copiar convite</button>`;
 
-// Sair e remover jogadores
-function askLeave(fn){window._lv=fn;plOpen=false;
+// Sair da sala
+function askLeave(fn){window._lv=fn;
   $('ntc').innerHTML=`<div class="modal"><div class="box"><h3 style="margin:0 0 10px">Sair da sala?</h3><p style="margin:0 0 18px;color:#cfd8f5">${S&&S.phase!=='lobby'?'A partida continua sem você e você não poderá voltar a ela.':'Você deixará a sala de espera.'}</p><div class="row"><button class="sec" onclick="closeNote()">Ficar</button><button class="bad" style="padding:13px 22px;font-size:1rem" onclick="doLeave()">Sair</button></div></div></div>`}
 function doLeave(){const f=window._lv;closeNote();if(f)f()}
-function leaveRoom(){if(S){tx({type:'leave'});S=null}store.set('inroom',false);err='';if(typeof closeConfirm==='function')closeConfirm()}
+function leaveRoom(){if(S){tx({type:'leave'});S=null}store.set('inroom',false);err='';$('fx').innerHTML='';if(typeof closeConfirm==='function')closeConfirm()}
 function goHome(){if(S)return askLeave(()=>{leaveRoom();screen='home';mode='menu';render()});screen='home';mode='menu';invCode='';err='';render()}
 function back(){if(S)return askLeave(()=>{leaveRoom();mode='menu';err='';render()});if(mode==='join')mode='menu';else screen='home';err='';invCode='';render()}
-function showPlayers(){plOpen=true;drawPlayers()}
-function drawPlayers(){if(!S){closeNote();return}const lead=S.you===S.host;
-  $('ntc').innerHTML=`<div class="modal" onclick="if(event.target===this)closeNote()"><div class="box" style="max-width:480px;text-align:left;max-height:80vh;overflow-y:auto"><h3 style="margin:0 0 10px">Jogadores (${S.players.length})</h3>
-  <ul>${S.players.map(p=>`<li><span class="nm">${av(p.id)}<span class="cn"><b>${esc(p.name)}</b>${tags(p)}</span></span>${lead&&p.id!==S.you?`<button class="bad" onclick="askKick(${p.id})">Remover</button>`:''}</li>`).join('')}</ul>
-  <div style="text-align:center">${inviteBtn()}<br><button class="sec" style="margin-top:14px" onclick="closeNote()">Fechar</button></div></div></div>`}
-function askKick(id){plOpen=false;const p=pl(id);
-  $('ntc').innerHTML=`<div class="modal"><div class="box"><h3 style="margin:0 0 10px">Remover jogador?</h3><p style="margin:0 0 18px;color:#cfd8f5">${esc(p.name||'?')} será removido(a) da sala.</p><div class="row"><button class="sec" onclick="showPlayers()">Cancelar</button><button class="bad" style="padding:13px 22px;font-size:1rem" onclick="doKick(${id})">Remover</button></div></div></div>`}
-function doKick(id){tx({type:'kick',target:id});showPlayers()}
+
+// Painel de jogadores (começa aberto para o líder em telas grandes; pode ser minimizado)
+const ppIsOpen=()=>ppOpen===null?(!!S&&S.you===S.host&&!window.matchMedia('(max-width:700px)').matches):ppOpen;
+function togPanel(){ppOpen=!ppIsOpen();drawPanel()}
+function drawPanel(){const el=$('pp');if(!el)return;
+  if(!S||screen==='home'){el.innerHTML='';return}
+  const lead=S.you===S.host;
+  el.innerHTML=ppIsOpen()?`<div class="pp"><div class="pph"><b>Jogadores (${S.players.length})</b><button class="mini" onclick="togPanel()">Minimizar</button></div>
+    <ul class="ppl">${S.players.map(p=>`<li><span class="nm">${av(p.id)}<span class="cn"><b>${esc(p.name)}</b>${tags(p)}</span></span>${lead&&p.id!==S.you?`<button class="bad" onclick="askKick(${p.id})">Remover</button>`:''}</li>`).join('')}</ul>
+    <div style="text-align:center">${inviteBtn()}</div></div>`
+   :`<button class="fab" onclick="togPanel()">Jogadores (${S.players.length})</button>`}
+function askKick(id){const p=pl(id);
+  $('ntc').innerHTML=`<div class="modal"><div class="box"><h3 style="margin:0 0 10px">Remover jogador?</h3><p style="margin:0 0 18px;color:#cfd8f5">${esc(p.name||'?')} será removido(a) da sala.</p><div class="row"><button class="sec" onclick="closeNote()">Cancelar</button><button class="bad" style="padding:13px 22px;font-size:1rem" onclick="doKick(${id})">Remover</button></div></div></div>`}
+function doKick(id){tx({type:'kick',target:id});closeNote()}
 
 function pick(id){game=id;screen='game';mode='menu';err='';render()}
 const tags=p=>(p.id===S.host||p.id===S.you||p.away)?`<span class="sb">${p.id===S.host?'<span class="tag">líder</span>':''}${p.id===S.you?'<small>(você)</small>':''}${p.away?'<span class="tag off2">offline</span>':''}</span>`:'';
@@ -298,13 +337,12 @@ function render(){
   if(a&&a.id==='vsel'&&rDefer<6){rDefer++;clearTimeout(rTimer);rTimer=setTimeout(render,500);return}
   rDefer=0;
   try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message+' ['+String(e.stack||'').split('\n')[1]+']')}
-  if(plOpen)drawPlayers();
 }
 function renderMain(){
   const G=GAMES.find(g=>g.id===game),A=$('app');
   const E=err?`<p class="err">${esc(err)}</p>`:'';let h='';
   const inr=!!S&&screen!=='home';
-  $('fab').style.display=inr?'inline-flex':'none';document.body.classList.toggle('inroom',inr);
+  drawPanel();document.body.classList.toggle('inroom',inr);
   document.body.classList.toggle('home',screen==='home');
   $('bk').classList.toggle('hide',screen==='home');$('hm').classList.toggle('hide',screen==='home');$('lg').style.visibility=screen==='home'?'hidden':'visible';
   A.classList.toggle('stack',!!(S&&S.game));A.classList.toggle('fw',!!(S&&!S.game&&S.phase!=='lobby'));
@@ -326,7 +364,7 @@ function renderMain(){
   }else if(S.phase==='lobby'){
     const host=S.you===S.host,sel=new Set(S.selected);
     h=`${E}<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>${G.name}</h1>${infoBtn(game)}</div>
-    <div class="split" style="align-items:start"><div><div class="card ctr"><label>Código da sala</label><div class="code">${S.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}${players()}</div>${profileCard()}
+    <div class="split" style="align-items:start"><div><div class="card ctr"><label>Código da sala</label><div class="code">${S.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}${players()}</div>${rankCard()}${profileCard()}
     ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="start()">Iniciar partida</button>':'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
     <div><div class="card"><label>Localidades da partida (${sel.size} de ${S.all.length})</label>
     ${host?`<div class="row"><button class="sec" onclick="selAll(true)">Marcar todas</button><button class="sec" onclick="selAll(false)">Desmarcar todas</button></div>`:'<p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">Só o líder escolhe as localidades.</p>'}
@@ -337,7 +375,7 @@ function renderMain(){
     if(S.phase==='vote'||S.phase==='end'){
       if(S.phase==='end'){const r=S.result;
         h+=`<div class="card ctr"><h2 style="color:var(--acc)">${r.caught?'Os jogadores venceram!':'O espião venceu!'}</h2><p>Mais votado: <b>${r.top.map(esc).join(' e ')}</b> (${r.max} voto${r.max>1?'s':''}). O espião era <b>${esc(r.spy)}</b>.</p><p>Local: <b>${esc(r.loc.name)}</b></p>${r.early?'<p class="mut">Votação encerrada por maioria.</p>':''}
-        ${host?'<button onclick="again()">Jogar novamente</button>':'<p class="mut">Aguardando o líder…</p>'}</div>`;
+        ${host?'<button onclick="again()">Jogar novamente</button>':'<p class="mut">Aguardando o líder…</p>'}</div>${rankCard()}`;
       }else h+=`<div class="card ctr"><label>Votação</label><h2>Quem é o espião?</h2><p class="mut" style="margin:0">Declare sua intenção para a turma ver e depois vote.${S.voted.includes(S.you)?' Você já votou.':''}</p></div>`;
       h+=board(S,S.players.map(p=>({id:p.id,name:p.name})),S.phase==='end');
     }else{

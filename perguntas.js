@@ -64,9 +64,16 @@ function check(r, ctx) {
     if (all || max >= need) {
       const top = Object.keys(c).filter(k => c[k] === max).map(Number);
       const nm = id => (r.players.find(p => p.id === id) || {}).name || r.names[id] || '?';
-      r.result = { caught: !r.impGone && top.length === 1 && top[0] === r.impostor, top: top.map(nm), max, early: !all,
+      const caught = !r.impGone && top.length === 1 && top[0] === r.impostor;
+      r.result = { caught, top: top.map(nm), max, early: !all,
         impostor: r.impName + (r.impGone ? ' (saiu da partida)' : '') };
       r.phase = 'end';
+      const pts = [];
+      if (!r.impGone) {
+        if (caught) vs.filter(p => p.id !== r.impostor).forEach(p => pts.push([p, 1]));
+        else { const ip = r.players.find(p => p.id === r.impostor); if (ip) pts.push([ip, 2]); }
+      }
+      ctx.award(r, pts);
     }
   }
   ctx.push(r);
@@ -95,6 +102,7 @@ exports.handle = (r, me, m, ctx) => {
     const t = cl(m.text, 120); if (!t) return;
     r.answers[me.id] = t; r.names[me.id] = me.name; return check(r, ctx);
   }
+  if (ph === 'vote' && !isHost && m.type === 'unintent' && !r.votes[me.id]) { delete r.intents[me.id]; return ctx.push(r); }
   if (ph === 'vote' && !isHost && !r.votes[me.id] && okTarget(r, me, m.target)) {
     if (m.type === 'intent') { r.intents[me.id] = m.target; return ctx.push(r); }
     if (m.type === 'vote') { r.votes[me.id] = m.target; r.intents[me.id] = m.target; return check(r, ctx); }

@@ -45,7 +45,7 @@ function perguntasView(){
   if(ph==='lobby'){
     h+=`<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>Impostor - Perguntas</h1>${infoBtn('perguntas')}</div>
     <div class="split" style="align-items:start"><div>
-      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}</div>${profileCard()}
+      <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}</div>${rankCard()}${profileCard()}
       ${leader?`<button style="width:100%;padding:18px;font-size:1.1rem" ${hostP&&vs.length?'':'disabled'} onclick="tx({type:'start'})">Iniciar partida</button>${hostP?'':'<p class="mut">Escolha um host para poder começar.</p>'}`:'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
     <div class="areas"><div class="card ctr"><label>Host</label>${hostP?`<div class="chips" style="margin:0">${chip(hostP)}</div>`:'<div class="slot">Área vazia</div>'}
         ${isHost?`<button class="sec" style="margin-top:16px" onclick="tx({type:'toPlayers'})">Sair do host</button>`:!hostP?`<button style="margin-top:16px" onclick="tx({type:'toHost'})">Ser o host</button>`:''}
@@ -58,7 +58,8 @@ function perguntasView(){
       :wait('Esperando o Host escrever as perguntas');
   }else if(ph==='answer'){
     const done=s.answered.length,tot=s.total;
-    if(isHost)h+=qbox('Pergunta dos inocentes',s.qn)+qbox('Pergunta do impostor',s.qi)+impCard()+`<div class="card ctr"><label>Respostas enviadas</label><b style="font-family:var(--disp);font-size:1.6rem;color:var(--acc)">${done}/${tot}</b></div>`;
+    if(isHost)h+=qbox('Pergunta dos inocentes',s.qn)+qbox('Pergunta do impostor',s.qi)+impCard()
+      +`<div class="card"><label>Respostas enviadas (${done}/${tot})</label><ul>${vs.map(p=>`<li><span class="nm">${av(p.id)}<span class="cn"><b>${esc(p.name)}</b>${p.away?'<span class="tag off2">offline</span>':''}</span></span>${s.answered.includes(p.id)?'<span class="tag">respondeu</span>':'<span class="tag off2">falta responder</span>'}</li>`).join('')}</ul></div>`;
     else if(s.answered.includes(s.you))h+=wait(`Resposta enviada. Aguardando os outros jogadores (${done}/${tot})…`);
     else h+=`<div class="card ctr"><label>Sua pergunta</label><div class="qbox">${esc(s.myQ??'')}</div>
       <input id="ans" class="ctr" style="margin-top:16px" maxlength="120" placeholder="Digite sua resposta" value="${esc(Q.a)}" oninput="Q.a=this.value" onkeydown="if(event.key==='Enter')qAnswer()">
@@ -78,7 +79,7 @@ function perguntasView(){
       h+=`<div class="card ctr"><h2 style="color:var(--acc)">${r.caught?'Os jogadores venceram!':'O impostor venceu!'}</h2>
       <p>${r.caught?`<b>${esc(r.impostor)}</b> era o impostor.`:`O impostor era <b>${esc(r.impostor)}</b> e ganhou a partida.`}</p>
       <p class="mut">Mais votado: ${r.top.map(esc).join(' e ')} (${r.max} voto${r.max>1?'s':''})${r.early?' · Votação encerrada por maioria':''}</p>
-      ${leader?`<div class="row" style="max-width:560px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera? Você poderá trocar o host.',{type:'lobby'})">Nova partida</button><button onclick="pikaAsk('Jogar de novo com o mesmo host? Ele escreve novas perguntas.',{type:'again'})">Jogar novamente</button></div>`:'<p class="mut">Aguardando o líder…</p>'}</div>`+pair;
+      ${leader?`<div class="row" style="max-width:560px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera? Você poderá trocar o host.',{type:'lobby'})">Nova partida</button><button onclick="pikaAsk('Jogar de novo com o mesmo host? Ele escreve novas perguntas.',{type:'again'})">Jogar novamente</button></div>`:'<p class="mut">Aguardando o líder…</p>'}</div>`+rankCard()+pair;
     }else{
       h+=pair;
       if(isHost)h+=impCard();
