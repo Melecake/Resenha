@@ -84,13 +84,16 @@ const ctx = { push, err };
 
 function step(r) {
   if (r.phase === 'play' && r.players.every(p => r.ready[p.id])) { r.phase = 'vote'; r.intents = {}; r.votes = {}; }
-  else if (r.phase === 'vote' && r.players.every(p => r.votes[p.id])) {
-    const c = count(r), max = Math.max(...Object.values(c));
-    const top = Object.keys(c).filter(k => c[k] === max).map(Number);
-    const name = id => (r.players.find(p => p.id === id) || {}).name || '?';
-    r.result = { caught: !r.spyGone && top.length === 1 && top[0] === r.spy, top: top.map(name), max,
-      spy: r.spyName + (r.spyGone ? ' (saiu da partida)' : ''), loc: r.loc };
-    r.phase = 'end';
+  else if (r.phase === 'vote') {
+    const c = count(r), max = Math.max(0, ...Object.values(c));
+    const need = Math.floor(r.players.length / 2) + 1, all = r.players.every(p => r.votes[p.id]);
+    if (all || max >= need) {
+      const top = Object.keys(c).filter(k => c[k] === max).map(Number);
+      const name = id => (r.players.find(p => p.id === id) || {}).name || '?';
+      r.result = { caught: !r.spyGone && top.length === 1 && top[0] === r.spy, top: top.map(name), max, early: !all,
+        spy: r.spyName + (r.spyGone ? ' (saiu da partida)' : ''), loc: r.loc };
+      r.phase = 'end';
+    }
   }
   push(r);
 }
@@ -98,7 +101,7 @@ function step(r) {
 function removePlayer(r, p) {
   clearTimeout(p.grace);
   r.players = r.players.filter(x => x !== p);
-  if (!r.players.length) { clearTimeout(r.timer); delete rooms[r.code]; return; }
+  if (!r.players.length) { clearTimeout(r.timer); clearTimeout(r.qt); delete rooms[r.code]; return; }
   if (MODS[r.game]) return MODS[r.game].leave(r, p, ctx);
   if (r.phase !== 'lobby' && p.id === r.spy) r.spyGone = true;
   for (const o of [r.ready, r.intents, r.votes]) {

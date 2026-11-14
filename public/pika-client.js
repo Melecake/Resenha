@@ -1,14 +1,15 @@
 const ALPHA='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-const P={ph:'',theme:undefined,text:'',cur:'?',n:3,confirm:null,t:null};
+const P={ph:'',theme:undefined,text:'',cur:'?',n:3,confirm:null,t:null,e1:0,e2:0};
 
 function pikaRender(nav){
   const e0=document.activeElement,fid=e0&&e0.id,st=e0&&e0.selectionStart;
   $('app').classList.toggle('wide',['lobby','vote','end'].includes(S.phase));
   $('app').innerHTML=nav+pikaView();pikaAfter();trans('pika|'+S.phase);
+  if(S.phase==='write'&&S.tid!=null){P.e1=Date.now()+S.tl1;P.e2=Date.now()+S.tl2;tick()}
   if(fid&&fid!=='vsel'&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
 }
 function pikaAfter(){
-  const ph=S.phase;if(ph===P.ph)return;P.ph=ph;P.confirm=null;
+  const ph=S.phase;if(ph===P.ph)return;P.ph=ph;
   if(ph==='lobby')P.theme=undefined;
   if(ph==='roulette')spin();else if(ph==='countdown')cd();
 }
@@ -22,33 +23,50 @@ function cd(){
   P.n=3;const t=setInterval(()=>{if(!S||S.phase!=='countdown'){clearInterval(t);return}
     P.n--;if(P.n<1){clearInterval(t);return}const el=$('cd');if(el)el.textContent=P.n},1000);
 }
+// Relógio da vez de escrever (10 s de tempo; aos 15 s a pessoa vai para o fim da fila)
+function tick(){
+  if(!S||S.game!=='pika'||S.phase!=='write'||S.tid==null)return;
+  const now=Date.now(),a=Math.ceil((P.e1-now)/1000),b=Math.max(0,Math.ceil((P.e2-now)/1000));
+  document.querySelectorAll('.tm').forEach(el=>{el.textContent=a>0?a+'s':'Tempo esgotado: '+b+'s para ir ao fim da fila';el.classList.toggle('late',a<=0)});
+}
+setInterval(tick,250);
+
 const pikaSend0=()=>tx({type:'cfg',theme:P.theme??S.theme,excluded:S.excluded});
 function pikaCfg(){clearTimeout(P.t);P.t=setTimeout(pikaSend0,300)}
 function pikaLetter(l){const ex=S.excluded;tx({type:'cfg',theme:P.theme??S.theme,excluded:ex.includes(l)?ex.filter(x=>x!==l):[...ex,l]})}
 function pikaStart(){clearTimeout(P.t);pikaSend0();tx({type:'start'})}
 function pikaSend(){const t=P.text.trim();if(!t)return;tx({type:'submit',text:t});P.text=''}
-function pikaAsk(text,msg){P.confirm={text,msg};render()}
-function pikaVote(id){const p=S.players.find(x=>x.id===id);pikaAsk('Votar em '+(p?p.name:'?')+'? Não dá para desfazer.',{type:'vote',target:id})}
-function pikaOk(){tx(P.confirm.msg);P.confirm=null;render()}
 
-// Componentes compartilhados com o Impostor - Locais e o Impostor - Perguntas
-function modalHtml(){return P.confirm?`<div class="modal"><div class="box"><p style="font-size:1.1rem;margin:0 0 18px">${esc(P.confirm.text)}</p><div class="row"><button class="sec" onclick="P.confirm=null;render()">Cancelar</button><button onclick="pikaOk()">Confirmar</button></div></div></div>`:''}
+// Confirmação: contêiner próprio (#cfm), criado só pelo clique de quem a abriu
+function drawConfirm(){const c=$('cfm');if(!c)return;
+  c.innerHTML=P.confirm?`<div class="modal"><div class="box"><p style="font-size:1.1rem;margin:0 0 18px">${esc(P.confirm.text)}</p><div class="row"><button class="sec" onclick="closeConfirm()">Cancelar</button><button onclick="pikaOk()">Confirmar</button></div></div></div>`:''}
+function closeConfirm(){P.confirm=null;drawConfirm()}
+function pikaAsk(text,msg){P.confirm={text,msg};drawConfirm()}
+function pikaOk(){const m=P.confirm&&P.confirm.msg;closeConfirm();if(m)tx(m)}
+function pikaVote(id){const p=S.players.find(x=>x.id===id);pikaAsk('Votar em '+(p?p.name:'?')+'? Não dá para desfazer.',{type:'vote',target:id})}
+function modalHtml(){return ''}
+
+// Votação compartilhada com o Impostor - Locais e o Impostor - Perguntas
 let VSEL=null;
 function board(s,items,end){
   const voted=s.voted.includes(s.you);
   const cand=items.filter(e=>e.id!==s.you||s.players.length===1);
   const canVote=!end&&!voted&&cand.length>0;
   if(!cand.some(e=>e.id===VSEL))VSEL=cand.length?cand[0].id:null;
+  const need=Math.floor(s.players.length/2)+1,waiting=s.players.filter(p=>!s.voted.includes(p.id));
+  const status=end?'':`<div class="card vstat"><div class="vsh"><label style="margin:0">Faltam votar (${waiting.length})</label><small>Maioria (${need} voto${need>1?'s':''}) encerra a votação</small></div>
+    <div class="chips" style="margin:12px 0 0;justify-content:flex-start">${waiting.length?waiting.map(p=>`<span class="chip sm">${av(p.id)}<b>${esc(p.name)}</b></span>`).join(''):'<span class="mut">Todos já votaram</span>'}</div>
+    <div class="legend"><span><i class="lg iv"></i>Intenção de voto</span><span><i class="lg cv"></i>Voto confirmado</span></div></div>`;
   const sel=canVote?`<div class="vsel card"><label>Escolha o jogador</label><select id="vsel" onchange="VSEL=+this.value;this.blur()">${cand.map(e=>`<option value="${e.id}" ${e.id===VSEL?'selected':''}>${esc(e.name)}${e.text!=null?' — '+esc(e.text):''}</option>`).join('')}</select>
     <div class="vb"><button class="sec" onclick="tx({type:'intent',target:VSEL})">Declarar intenção</button><button onclick="pikaVote(VSEL)">Votar</button></div></div>`:'';
-  return sel+`<div class="vgrid">${items.map(e=>{
+  return status+sel+`<div class="vgrid">${items.map(e=>{
     const me=e.id===s.you,c=s.counts[e.id]||0,who=Object.keys(s.intents).filter(k=>s.intents[k]===e.id);
     const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
     const can=!end&&(!me||s.players.length===1)&&!voted;
     return `<div class="vc">${c?`<span class="vcnt">${c} voto${c>1?'s':''}</span>`:''}
       <div class="vh">${av(e.id)}<span class="cn"><b>${esc(e.name)}</b>${me?'<small>(você)</small>':''}</span></div>
       ${e.text!=null?`<div class="vt">${esc(e.text)}</div>`:''}
-      <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*6+16}px">${who.map(k=>av(+k)).join('')}</div>
+      <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*6+16}px">${who.map(k=>av(+k,s.voted.includes(+k)?'cv':'iv')).join('')}</div>
       ${can?`<div class="vb"><button class="sec" onclick="tx({type:'intent',target:${e.id}})">Declarar intenção</button><button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`}).join('')}</div>`;
 }
 
@@ -73,20 +91,20 @@ function pikaView(){
     const done=s.entries.some(e=>e.id===s.you),inq=s.queue.includes(s.you),first=s.queue[0]===s.you;
     const ctl=done?'<p class="mut" style="margin:0">Você já enviou sua palavra.</p>'
       :!inq?`<button style="width:100%;padding:18px;font-size:1.2rem" onclick="tx({type:'have'})">Eu tenho!</button>`
-      :first?`<input id="txt" class="ctr" maxlength="60" placeholder="Digite sua palavra" value="${esc(P.text)}" oninput="P.text=this.value" onkeydown="if(event.key==='Enter')pikaSend()"><button style="width:100%;margin-top:12px" onclick="pikaSend()">Enviar</button><button class="sec" style="width:100%;margin-top:10px" onclick="tx({type:'skip'})">Passar a vez</button>`
+      :first?`<label>Sua vez</label><div class="tm tmb"></div><input id="txt" class="ctr" maxlength="60" placeholder="Digite sua palavra" value="${esc(P.text)}" oninput="P.text=this.value" onkeydown="if(event.key==='Enter')pikaSend()"><button style="width:100%;margin-top:12px" onclick="pikaSend()">Enviar</button><button class="sec" style="width:100%;margin-top:10px" onclick="tx({type:'skip'})">Passar a vez</button>`
       :`<p class="mut" style="margin:0">Aguardando ${nm(s.queue[0])} escrever… (você é o ${s.queue.indexOf(s.you)+1}º da fila)</p>`;
     h+=head+`<div class="card">${ctl}</div>
-    <div class="card"><label>Fila</label>${s.queue.length?`<ul>${s.queue.map((id,i)=>`<li><span class="nm">${i+1}. ${av(id)} ${nm(id)}</span></li>`).join('')}</ul>`:'<p class="mut" style="margin:6px 0 0">Ninguém na fila ainda.</p>'}
+    <div class="card"><label>Fila</label>${s.queue.length?`<ul>${s.queue.map((id,i)=>`<li><span class="nm">${i+1}. ${av(id)} ${nm(id)}</span>${i===0?'<span class="tm"></span>':''}</li>`).join('')}</ul>`:'<p class="mut" style="margin:6px 0 0">Ninguém na fila ainda.</p>'}
     ${host&&s.queue.length&&s.queue[0]!==s.you?`<button class="sec" style="width:100%;margin-top:12px" onclick="tx({type:'skip'})">Pular ${nm(s.queue[0])}</button>`:''}</div>
     <div class="card"><label>Palavras enviadas</label><ul>${s.entries.map(e=>`<li><span class="nm">${av(e.id)} <b>${esc(e.name)}</b>: ${esc(e.text)}</span></li>`).join('')}</ul></div>`;
   }else{
     const end=ph==='end',voted=s.voted.includes(s.you);
     h+=head;
     if(end){const r=s.result;
-      h+=`<div class="card ctr"><label>${r.losers.length>1?'As piores escolhas foram:':'A pior escolha foi:'}</label>${r.losers.map(l=>`<div class="worst">“${esc(l.text)}” <span>- ${esc(l.name)}</span></div>`).join('')}<p class="mut">${r.max} voto${r.max>1?'s':''}</p>
+      h+=`<div class="card ctr"><label>${r.losers.length>1?'As piores escolhas foram:':'A pior escolha foi:'}</label>${r.losers.map(l=>`<div class="worst">“${esc(l.text)}” <span>- ${esc(l.name)}</span></div>`).join('')}<p class="mut">${r.max} voto${r.max>1?'s':''}${r.early?' · Votação encerrada por maioria':''}</p>
       ${host?`<div class="row" style="max-width:560px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera para mudar o tema e as letras?',{type:'lobby'})">Nova partida</button><button onclick="pikaAsk('Jogar novamente o mesmo tema, com uma nova letra?',{type:'replay'})">Jogar novamente o mesmo tema</button></div>`:'<p class="mut">Aguardando o líder…</p>'}</div>`;
     }else h+=`<p class="mut">Declare sua intenção e vote no pior nome. ${voted?'Você já votou.':''}</p>`;
     h+=board(s,s.entries,end);
   }
-  return h+modalHtml();
+  return h;
 }

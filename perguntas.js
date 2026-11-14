@@ -58,13 +58,16 @@ function reveal(r, ctx) {
 function check(r, ctx) {
   const vs = voters(r);
   if (r.phase === 'answer' && vs.length && vs.every(p => r.answers[p.id] !== undefined)) return reveal(r, ctx);
-  if (r.phase === 'vote' && vs.length && vs.every(p => r.votes[p.id])) {
-    const c = counts(r), max = Math.max(...Object.values(c));
-    const top = Object.keys(c).filter(k => c[k] === max).map(Number);
-    const nm = id => (r.players.find(p => p.id === id) || {}).name || r.names[id] || '?';
-    r.result = { caught: !r.impGone && top.length === 1 && top[0] === r.impostor, top: top.map(nm), max,
-      impostor: r.impName + (r.impGone ? ' (saiu da partida)' : '') };
-    r.phase = 'end';
+  if (r.phase === 'vote' && vs.length) {
+    const c = counts(r), max = Math.max(0, ...Object.values(c));
+    const need = Math.floor(vs.length / 2) + 1, all = vs.every(p => r.votes[p.id]);
+    if (all || max >= need) {
+      const top = Object.keys(c).filter(k => c[k] === max).map(Number);
+      const nm = id => (r.players.find(p => p.id === id) || {}).name || r.names[id] || '?';
+      r.result = { caught: !r.impGone && top.length === 1 && top[0] === r.impostor, top: top.map(nm), max, early: !all,
+        impostor: r.impName + (r.impGone ? ' (saiu da partida)' : '') };
+      r.phase = 'end';
+    }
   }
   ctx.push(r);
 }
