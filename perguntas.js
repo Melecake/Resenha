@@ -1,4 +1,4 @@
-const { draw } = require('./rand');
+const { drawWeighted } = require('./rand');
 const cl = (s, n) => String(s || '').trim().slice(0, n);
 const voters = r => r.players.filter(p => p.id !== r.hostId);
 const counts = r => { const c = {}; Object.values(r.votes).forEach(t => c[t] = (c[t] || 0) + 1); return c; };
@@ -97,7 +97,7 @@ exports.handle = (r, me, m, ctx) => {
     const qn = cl(m.qn, 200), qi = cl(m.qi, 200);
     if (!qn || !qi) return ctx.err(me.ws, 'Escreva as duas perguntas.');
     // Sorteio por ciclo: todos são o impostor uma vez antes de alguém repetir
-    const vs = voters(r), impId = draw(r, 'imp', vs.map(p => p.id)), imp = vs.find(p => p.id === impId);
+    const vs = voters(r), impId = drawWeighted(r, 'imp', vs.map(p => p.id)), imp = vs.find(p => p.id === impId);
     r.qn = qn; r.qi = qi; r.impostor = imp.id; r.impName = imp.name; r.impGone = false; r.phase = 'answer';
     return ctx.push(r);
   }

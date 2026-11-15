@@ -2,7 +2,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const pika = require('./pika');
 const perguntas = require('./perguntas');
-const { draw } = require('./rand');
+const { draw, drawWeighted } = require('./rand');
 process.on('uncaughtException', e => console.error('Erro não tratado:', e));
 const MODS = { pika, perguntas };
 const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
@@ -75,7 +75,7 @@ function begin(r) {
   // Sorteios por ciclo: local, espião e quem começa só repetem depois que todos já saíram
   const locName = draw(r, 'loc', locs.map(l => l.name));
   r.loc = locs.find(l => l.name === locName);
-  const sp = r.players.find(p => p.id === draw(r, 'spy', ids));
+  const sp = r.players.find(p => p.id === drawWeighted(r, 'spy', ids));
   r.spy = sp.id; r.spyName = sp.name; r.spyGone = false;
   r.starter = draw(r, 'starter', ids); r.round = (r.round || 0) + 1;
   r.phase = 'play'; r.ready = {}; r.intents = {}; r.votes = {}; r.result = null;
