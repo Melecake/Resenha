@@ -1,6 +1,6 @@
 const ALPHA='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const THEMES=["Comidas","Frutas","Animais","Países","Cidades","Profissões","Filmes","Séries","Cantores e bandas","Times de futebol","Marcas","Objetos da casa","Partes do corpo","Esportes","Cores","Roupas","Instrumentos musicais","Brinquedos","Personagens de desenho","Super-heróis","Matérias da escola","Meios de transporte","Doces e sobremesas","Bebidas","Lugares para visitar","Nomes de pessoas","Ferramentas","Plantas e flores","Jogos","Coisas que se encontram na praia"];
-const P={ph:'',theme:undefined,text:'',cur:'?',confirm:null,t:null,e1:0,e2:0,eL:0,cdEnd:0};
+const P={ph:'',theme:undefined,text:'',cur:'?',confirm:null,t:null,e1:0,e2:0,eL:0,cdEnd:0,sug:false,ss:0};
 
 function pikaRender(nav){
   const e0=document.activeElement,fid=e0&&e0.id,st=e0&&e0.selectionStart,now=Date.now();
@@ -8,12 +8,13 @@ function pikaRender(nav){
   if(S.phase==='write'){P.e1=now+S.tl1;P.e2=now+S.tl2;P.eL=S.last?now+S.last.left:0}
   if(S.phase==='countdown')P.cdEnd=now+S.cdLeft;
   $('app').innerHTML=nav+pikaView();pikaAfter();trans('pika|'+S.phase);
+  const sl=document.querySelector('.sugl');if(sl)sl.scrollTop=P.ss||0;
   tick();
-  if(fid&&fid!=='vsel'&&fid!=='sug'&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
+  if(fid&&fid!=='vsel'&&$(fid)){const e=$(fid);e.focus();if(st!=null&&e.setSelectionRange)e.setSelectionRange(st,st)}
 }
 function pikaAfter(){
   const ph=S.phase;if(ph===P.ph)return;P.ph=ph;
-  if(ph==='lobby')P.theme=undefined;
+  if(ph==='lobby'){P.theme=undefined;P.sug=false;P.ss=0}
   if(ph==='roulette')spin();
 }
 function spin(){
@@ -34,52 +35,53 @@ function tick(){
 }
 setInterval(tick,150);
 
-const pikaSend0=()=>tx({type:'cfg',theme:P.theme??S.theme,excluded:S.excluded});
+const pikaSend0=()=>tx({type:'cfg',theme:P.theme??S.theme,excluded:S.excluded},1);
 function pikaCfg(){clearTimeout(P.t);P.t=setTimeout(pikaSend0,300)}
-function pikaTheme(v){if(!v)return;P.theme=v;clearTimeout(P.t);pikaSend0()}
-function pikaLetter(l){const ex=S.excluded;tx({type:'cfg',theme:P.theme??S.theme,excluded:ex.includes(l)?ex.filter(x=>x!==l):[...ex,l]})}
+function pikaTheme(v){P.theme=v;clearTimeout(P.t);pikaSend0()}
+function pikaLetter(l){const ex=S.excluded;tx({type:'cfg',theme:P.theme??S.theme,excluded:ex.includes(l)?ex.filter(x=>x!==l):[...ex,l]},1)}
 function pikaStart(){clearTimeout(P.t);pikaSend0();tx({type:'start'})}
 function pikaSend(){const t=P.text.trim();if(!t)return;tx({type:'submit',text:t});P.text=''}
 
+// Lista de temas sugeridos (própria do site, com a barra de rolagem no estilo da página)
+function pikaSugToggle(e){e.stopPropagation();P.sug=!P.sug;if(!P.sug)P.ss=0;render()}
+function pikaPickTheme(i){P.sug=false;P.ss=0;pikaTheme(THEMES[i]);render()}
+document.addEventListener('click',e=>{if(P.sug&&!e.target.closest('.sug')){P.sug=false;P.ss=0;if(S&&S.game==='pika'&&S.phase==='lobby')render()}});
+
 // Confirmação: contêiner próprio (#cfm), criado só pelo clique de quem a abriu
 function drawConfirm(){const c=$('cfm');if(!c)return;
-  c.innerHTML=P.confirm?`<div class="modal"><div class="box"><p style="font-size:1.1rem;margin:0 0 18px">${esc(P.confirm.text)}</p><div class="row"><button class="sec" onclick="closeConfirm()">Cancelar</button><button onclick="pikaOk()">Confirmar</button></div></div></div>`:''}
+  c.innerHTML=P.confirm?`<div class="modal"><div class="box"><p style="font-size:1.1rem;margin:0 0 18px">${esc(P.confirm.text)}</p><div class="row"><button class="cx" onclick="closeConfirm()">Cancelar</button><button onclick="pikaOk()">Confirmar</button></div></div></div>`:''}
 function closeConfirm(){P.confirm=null;drawConfirm()}
 function pikaAsk(text,msg){P.confirm={text,msg};drawConfirm()}
 function pikaOk(){const m=P.confirm&&P.confirm.msg;closeConfirm();if(m)tx(m)}
 function pikaVote(id){const p=S.players.find(x=>x.id===id);pikaAsk('Votar em '+(p?p.name:'?')+'? Não dá para desfazer.',{type:'vote',target:id})}
 function modalHtml(){return ''}
 
-// Janela de destaque da pior escolha (aparece depois da animação de votação encerrada)
-function showWorst(m){const r=m.result;if(!r||!r.losers)return;
-  $('fx').innerHTML=`<div class="modal wmodal" onclick="if(event.target===this)$('fx').innerHTML=''"><div class="wbox"><div class="wlab">${r.losers.length>1?'As piores escolhas foram':'A pior escolha foi'}</div>${r.losers.map(l=>`<div class="wtxt">“${esc(l.text)}”</div><div class="wnm">${esc(l.name)}</div>`).join('')}<div class="wv">${r.max} voto${r.max>1?'s':''}${r.early?' · encerrada por maioria':''}</div><button onclick="$('fx').innerHTML=''">Continuar</button></div></div>`}
-
 // Votação compartilhada com o Impostor - Locais e o Impostor - Perguntas
 let VSEL=null;
-function board(s,items,end){
+function board(s,items,end,o){o=o||{};
   const voted=s.voted.includes(s.you);
   const cand=items.filter(e=>e.id!==s.you||s.players.length===1);
   const canVote=!end&&!voted&&cand.length>0;
   if(!cand.some(e=>e.id===VSEL))VSEL=cand.length?cand[0].id:null;
+  const myInt=s.intents[s.you];
   const need=Math.floor(s.players.length/2)+1,waiting=s.players.filter(p=>!s.voted.includes(p.id));
-  const mineInt=s.intents[s.you]!=null&&!voted;
+  const intBtn=(mine,target)=>mine?`<button class="cx" onclick="tx({type:'unintent'},1)">Cancelar intenção</button>`:`<button class="sec" onclick="tx({type:'intent',target:${target}},1)">Declarar intenção</button>`;
   const side=end?'':`<aside class="vside"><div class="card vstat"><label>Faltam votar (${waiting.length})</label>
     <div class="vl">${waiting.length?waiting.map(p=>`<span class="chip sm">${av(p.id)}<b>${esc(p.name)}</b></span>`).join(''):'<span style="color:var(--mut)">Todos já votaram</span>'}</div>
     <small style="display:block;margin-top:14px">Maioria: ${need} voto${need>1?'s':''} encerra a votação</small>
-    <div class="legend"><span><i class="lg iv"></i>Intenção de voto</span><span><i class="lg cv"></i>Voto confirmado</span></div>
-    ${mineInt?`<button class="sec" style="width:100%;margin-top:16px" onclick="tx({type:'unintent'})">Remover minha intenção</button>`:''}</div></aside>`;
-  const sel=canVote?`<div class="vsel card"><label>Escolha o jogador</label><select id="vsel" onchange="VSEL=+this.value;this.blur()">${cand.map(e=>`<option value="${e.id}" ${e.id===VSEL?'selected':''}>${esc(e.name)}${e.text!=null?' — '+esc(e.text):''}</option>`).join('')}</select>
-    <div class="vb"><button class="sec" onclick="tx({type:'intent',target:VSEL})">Declarar intenção</button><button onclick="pikaVote(VSEL)">Votar</button></div></div>`:'';
+    <div class="legend"><span><i class="lg iv"></i>Intenção de voto</span><span><i class="lg cv"></i>Voto confirmado</span></div></div></aside>`;
+  const sel=canVote?`<div class="vsel card"><label>Escolha o jogador</label><select id="vsel" onchange="VSEL=+this.value;this.blur();render()">${cand.map(e=>`<option value="${e.id}" ${e.id===VSEL?'selected':''}>${esc(e.name)}${e.text!=null?' — '+esc(e.text):''}</option>`).join('')}</select>
+    <div class="vb">${intBtn(myInt===VSEL,'VSEL')}<button onclick="pikaVote(VSEL)">Votar</button></div></div>`:'';
   const grid=`<div class="vgrid">${items.map(e=>{
     const me=e.id===s.you,c=s.counts[e.id]||0,who=Object.keys(s.intents).filter(k=>s.intents[k]===e.id);
     const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
     const can=!end&&(!me||s.players.length===1)&&!voted;
     return `<div class="vc">${c?`<span class="vcnt">${c} voto${c>1?'s':''}</span>`:''}
-      <div class="vh">${av(e.id)}<span class="cn"><b>${esc(e.name)}</b>${me?'<small>(você)</small>':''}</span></div>
+      <div class="vh">${av(e.id)}<span class="cn"><b>${esc(e.name)}</b>${me?'<small>(você)</small>':''}</span>${o.note&&!me?`<button class="nb ${hasNotes(e.id)?'on':''}" onclick="openNotes(${e.id})">Anotações</button>`:''}</div>
       ${e.text!=null?`<div class="vt">${esc(e.text)}</div>`:''}
       <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*8+20}px">${who.map(k=>av(+k,s.voted.includes(+k)?'cv':'iv')).join('')}</div>
-      ${can?`<div class="vb"><button class="sec" onclick="tx({type:'intent',target:${e.id}})">Declarar intenção</button><button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`}).join('')}</div>`;
-  return `<div class="vlay ${end?'end':''}"><div class="vmain">${sel}${grid}</div>${side}</div>`;
+      ${can?`<div class="vb">${intBtn(myInt===e.id,e.id)}<button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`}).join('')}</div>`;
+  return side+`<div class="vmain">${sel}${grid}</div>`;
 }
 
 function pikaView(){
@@ -93,10 +95,10 @@ function pikaView(){
       <div class="card ctr"><label>Código da sala</label><div class="code">${s.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}${players()}</div>${rankCard()}${profileCard()}
       ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="pikaStart()">Iniciar partida</button>':'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
     <div><div class="card"><label>Tema</label>${host?`<input id="theme" maxlength="60" placeholder="Ex.: Comidas, Animais, Filmes…" value="${esc(P.theme??s.theme)}" oninput="P.theme=this.value;pikaCfg()">
-        <select id="sug" style="margin-top:10px" onchange="pikaTheme(this.value);this.blur()"><option value="">Sugestões de tema…</option>${THEMES.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select>`
+        <div class="sug"><button class="sec sugb" onclick="pikaSugToggle(event)"><span>Sugestões de tema</span><span>${P.sug?'▴':'▾'}</span></button>${P.sug?`<div class="sugl" onscroll="P.ss=this.scrollTop">${THEMES.map((t,i)=>`<div class="sugi" onclick="pikaPickTheme(${i})">${esc(t)}</div>`).join('')}</div>`:''}</div>`
         :`<p style="font-size:1.4rem;margin:8px 0">${s.theme?esc(s.theme):'<span class="mut">Aguardando o líder escolher…</span>'}</p>`}
       <label style="margin-top:18px">Letras</label><p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">${host?'Toque em uma letra para excluí-la do sorteio.':'Letras riscadas foram excluídas.'}</p>
-      <div class="letters">${ALPHA.map(l=>`<div class="lt ${s.excluded.includes(l)?'off':''}" ${host?`onclick="pikaLetter('${l}')"`:''}>${l}</div>`).join('')}</div></div></div></div>`;
+      <div class="letters">${ALPHA.map(l=>`<div class="lt ${s.excluded.includes(l)?'off':''} ${host?'can':''}" ${host?`onclick="pikaLetter('${l}')"`:''}>${l}</div>`).join('')}</div></div></div></div>`;
   }else if(ph==='roulette'){
     h+=`<div class="card ctr"><p class="mut">Sorteando a letra…</p><label>Letra</label><div id="spin" class="big">${P.cur}</div></div>`;
   }else if(ph==='countdown'){
@@ -104,7 +106,7 @@ function pikaView(){
   }else if(ph==='write'){
     const done=s.entries.some(e=>e.id===s.you),out=s.out.includes(s.you),inq=s.queue.includes(s.you),first=s.queue[0]===s.you;
     const lastMode=s.last&&s.last.id===s.tid;
-    const leaveQ=`<button class="sec" style="width:100%;margin-top:10px" onclick="tx({type:'unq'})">Sair da fila</button>`;
+    const leaveQ=`<button class="cx" style="width:100%;margin-top:10px" onclick="tx({type:'unq'})">Sair da fila</button>`;
     const ctl=done?'<p class="mut" style="margin:0">Você já enviou sua palavra.</p>'
       :out?'<p class="mut" style="margin:0">O tempo acabou e você ficou fora desta rodada.</p>'
       :!inq?`<button style="width:100%;padding:18px;font-size:1.2rem" onclick="tx({type:'have'})">Eu tenho!</button>`

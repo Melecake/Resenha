@@ -71,6 +71,12 @@ function begin(r) {
   r.loc = locs[Math.random() * locs.length | 0];
   const sp = r.players[Math.random() * r.players.length | 0];
   r.spy = sp.id; r.spyName = sp.name; r.spyGone = false;
+  // Quem começa perguntando: ninguém repete até todos já terem começado
+  r.starters = (r.starters || []).filter(id => r.players.some(p => p.id === id));
+  let pool = r.players.filter(p => !r.starters.includes(p.id));
+  if (!pool.length) { r.starters = []; pool = r.players.slice(); }
+  const st = pool[Math.random() * pool.length | 0];
+  r.starter = st.id; r.starters.push(st.id); r.round = (r.round || 0) + 1;
   r.phase = 'play'; r.ready = {}; r.intents = {}; r.votes = {}; r.result = null;
   return true;
 }
@@ -82,7 +88,10 @@ function view(r, p) {
   if (r.phase === 'lobby') {
     v.all = readLocs().locations.map(l => ({ name: l.name, icon: l.icon || '', img: l.img || '' }));
     v.selected = r.sel || v.all.map(l => l.name);
-  } else v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };
+  } else {
+    v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };
+    v.starter = r.starter; v.round = r.round;
+  }
   return v;
 }
 const push = r => r.players.forEach(p => {

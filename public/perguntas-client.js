@@ -76,7 +76,7 @@ function perguntasView(){
     const pair=`<div class="qpair ${showImp?'':'one'}"><div class="qc inn ${s.me==='inn'?'mine':''}">${s.me==='inn'?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta dos inocentes</label><div class="qbox">${esc(s.qn??'')}</div></div>
       ${showImp?`<div class="qc imp ${s.me==='imp'?'mine':''}">${s.me==='imp'?'<span class="tag mt">Você recebeu esta</span>':''}<label>Pergunta do impostor</label><div class="qbox">${esc(s.qi??'')}</div></div>`:''}</div>`;
     if(end){const r=s.result;
-      h+=`<div class="card ctr"><h2 style="color:var(--acc)">${r.caught?'Os jogadores venceram!':'O impostor venceu!'}</h2>
+      h+=`<div class="card ctr resultcard ${r.caught?'win':'lose'}"><label>Resultado da partida</label><div class="rtitle">${r.caught?'Os jogadores venceram!':'O impostor venceu!'}</div>
       <p>${r.caught?`<b>${esc(r.impostor)}</b> era o impostor.`:`O impostor era <b>${esc(r.impostor)}</b> e ganhou a partida.`}</p>
       <p class="mut">Mais votado: ${r.top.map(esc).join(' e ')} (${r.max} voto${r.max>1?'s':''})${r.early?' · Votação encerrada por maioria':''}</p>
       ${leader?`<div class="row" style="max-width:560px;margin:12px auto 0"><button class="sec" onclick="pikaAsk('Voltar para a sala de espera? Você poderá trocar o host.',{type:'lobby'})">Nova partida</button><button onclick="pikaAsk('Jogar de novo com o mesmo host? Ele escreve novas perguntas.',{type:'again'})">Jogar novamente</button></div>`:'<p class="mut">Aguardando o líder…</p>'}</div>`+rankCard()+pair;
