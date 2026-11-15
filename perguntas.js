@@ -1,3 +1,4 @@
+const { draw } = require('./rand');
 const cl = (s, n) => String(s || '').trim().slice(0, n);
 const voters = r => r.players.filter(p => p.id !== r.hostId);
 const counts = r => { const c = {}; Object.values(r.votes).forEach(t => c[t] = (c[t] || 0) + 1); return c; };
@@ -68,6 +69,7 @@ function check(r, ctx) {
       r.result = { caught, top: top.map(nm), max, early: !all,
         impostor: r.impName + (r.impGone ? ' (saiu da partida)' : '') };
       r.phase = 'end';
+      // Pontos vão para todo o lado vencedor, tenha votado ou não
       const pts = [];
       if (!r.impGone) {
         if (caught) vs.filter(p => p.id !== r.impostor).forEach(p => pts.push([p, 1]));
@@ -94,7 +96,8 @@ exports.handle = (r, me, m, ctx) => {
   if (ph === 'write_q' && isHost && m.type === 'questions') {
     const qn = cl(m.qn, 200), qi = cl(m.qi, 200);
     if (!qn || !qi) return ctx.err(me.ws, 'Escreva as duas perguntas.');
-    const vs = voters(r), imp = vs[Math.random() * vs.length | 0];
+    // Sorteio por ciclo: todos são o impostor uma vez antes de alguém repetir
+    const vs = voters(r), impId = draw(r, 'imp', vs.map(p => p.id)), imp = vs.find(p => p.id === impId);
     r.qn = qn; r.qi = qi; r.impostor = imp.id; r.impName = imp.name; r.impGone = false; r.phase = 'answer';
     return ctx.push(r);
   }

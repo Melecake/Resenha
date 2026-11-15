@@ -150,6 +150,91 @@
       "name": "Padaria",
       "icon": "🥖",
       "img": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cc/02/4d/photo1jpg.jpg?w=1200&h=1200&s=1"
+    },
+    {
+      "name": "Italia",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/250px-Flag_of_Italy.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Estados Unidos",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/3840px-Flag_of_the_United_States.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+    },
+    {
+      "name": "Brasil",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/250px-Flag_of_Brazil.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Argentina",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/250px-Flag_of_Argentina.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "China",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/250px-Flag_of_the_People%27s_Republic_of_China.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Australia",
+      "icon": "",
+      "img": "https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_Australia_%28converted%29.svg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
+    },
+    {
+      "name": "Mexico",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/250px-Flag_of_Mexico.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Japão",
+      "icon": "",
+      "img": "https://static.todamateria.com.br/upload/57/06/5706d70184371-japao.jpg"
+    },
+    {
+      "name": "França",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/250px-Flag_of_France.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Inglaterra",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/1280px-Flag_of_England.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+    },
+    {
+      "name": "Irlanda",
+      "icon": "",
+      "img": "https://upload.wikimedia.org/wikipedia/commons/4/45/Flag_of_Ireland.svg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
+    },
+    {
+      "name": "Coreia do Sul",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/250px-Flag_of_South_Korea.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Russia",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Russia.svg/1280px-Flag_of_Russia.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+    },
+    {
+      "name": "India",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/250px-Flag_of_India.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Espanha",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/250px-Flag_of_Spain.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Holanda",
+      "icon": "",
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmS89SIXsBCEoEZb7uWUFbilwrkMJqBkEUlop0NGDeaWTy334WR64u1AQp&s=10"
+    },
+    {
+      "name": "Portugal",
+      "icon": "",
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/250px-Flag_of_Portugal_%28official%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
     }
   ],
   "covers": {

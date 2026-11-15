@@ -2,6 +2,7 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const pika = require('./pika');
 const perguntas = require('./perguntas');
+const { draw } = require('./rand');
 process.on('uncaughtException', e => console.error('Erro não tratado:', e));
 const MODS = { pika, perguntas };
 const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
@@ -51,13 +52,15 @@ const cleanLoc = l => {
 const count = r => { const c = {}; Object.values(r.votes || {}).forEach(t => c[t] = (c[t] || 0) + 1); return c; };
 const valid = (r, me, t) => (t !== me.id || r.players.length === 1) && r.players.some(p => p.id === t);
 
-// Ranking da sala: guardado por token do jogador enquanto a sala existir
+// Ranking da sala: guardado por token do jogador enquanto a sala existir.
+// r.gain guarda quanto cada jogador ganhou na última partida (aparece como +N na tela final).
 function award(r, list) {
-  r.scores = r.scores || {};
+  r.scores = r.scores || {}; r.gain = {};
   for (const [p, n] of list) {
     const k = p.token || ('id' + p.id);
     const s = r.scores[k] || (r.scores[k] = { name: p.name, pts: 0 });
     s.name = p.name; s.pts += n;
+    r.gain[p.id] = (r.gain[p.id] || 0) + n;
   }
   r.rounds = (r.rounds || 0) + 1;
 }
@@ -68,15 +71,13 @@ function begin(r) {
   const locs = d.locations.filter(l => pick.has(l.name)).map(cleanLoc).filter(Boolean).slice(0, 150);
   if (locs.length < 2) return false;
   r.locs = locs; r.spyImg = d.spyImage || '';
-  r.loc = locs[Math.random() * locs.length | 0];
-  const sp = r.players[Math.random() * r.players.length | 0];
+  const ids = r.players.map(p => p.id);
+  // Sorteios por ciclo: local, espião e quem começa só repetem depois que todos já saíram
+  const locName = draw(r, 'loc', locs.map(l => l.name));
+  r.loc = locs.find(l => l.name === locName);
+  const sp = r.players.find(p => p.id === draw(r, 'spy', ids));
   r.spy = sp.id; r.spyName = sp.name; r.spyGone = false;
-  // Quem começa perguntando: ninguém repete até todos já terem começado
-  r.starters = (r.starters || []).filter(id => r.players.some(p => p.id === id));
-  let pool = r.players.filter(p => !r.starters.includes(p.id));
-  if (!pool.length) { r.starters = []; pool = r.players.slice(); }
-  const st = pool[Math.random() * pool.length | 0];
-  r.starter = st.id; r.starters.push(st.id); r.round = (r.round || 0) + 1;
+  r.starter = draw(r, 'starter', ids); r.round = (r.round || 0) + 1;
   r.phase = 'play'; r.ready = {}; r.intents = {}; r.votes = {}; r.result = null;
   return true;
 }
@@ -96,7 +97,7 @@ function view(r, p) {
 }
 const push = r => r.players.forEach(p => {
   const v = view(r, p);
-  v.gid = r.game; v.rank = rank(r); v.rounds = r.rounds || 0;
+  v.gid = r.game; v.rank = rank(r); v.rounds = r.rounds || 0; v.gain = r.gain || {};
   if (v.players) v.players = v.players.map(x => ({ ...x, away: !!(r.players.find(q => q.id === x.id) || {}).away }));
   send(p.ws, v);
 });
@@ -114,6 +115,7 @@ function step(r) {
       r.result = { caught: !r.spyGone && top.length === 1 && top[0] === r.spy, top: top.map(name), max, early: !all,
         spy: r.spyName + (r.spyGone ? ' (saiu da partida)' : ''), loc: r.loc };
       r.phase = 'end';
+      // Pontos vão para todo o lado vencedor, tenha votado ou não
       const pts = [];
       if (!r.spyGone) {
         if (r.result.caught) r.players.filter(p => p.id !== r.spy).forEach(p => pts.push([p, 1]));
