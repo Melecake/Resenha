@@ -22,7 +22,7 @@ button.sec{background:var(--n2);color:#eaf0ff;border-color:var(--line);box-shado
 .box img{max-width:100%;max-height:240px;border-radius:12px;margin:12px 0;background:var(--n1)}
 </style></head><body><main><div class="top"><a class="home" href="/">← Início</a></div><div id="a"></div></main><script>
 let pw='',D=null,M=null;const $=id=>document.getElementById(id);
-const GN={locais:'Impostor - Locais',pika:'O meu é mais Pika',perguntas:'Impostor - Perguntas'};
+const GN={locais:'Impostor - Locais',pika:'O meu é mais Pika',perguntas:'Impostor - Perguntas',cidade:'Cidade Dorme'};
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(p,b){const r=await fetch('/api/admin/'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw,...b})});return r.json()}
 function login(){$('a').innerHTML=`<h2>Painel</h2><div class="card"><div class="r"><input id="pw" type="password" placeholder="Senha" onkeydown="if(event.key==='Enter')enter()"><button onclick="enter()">Entrar</button></div><p id="e" style="color:#ff7b7b;margin:6px 0 0"></p></div>`}

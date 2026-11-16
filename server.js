@@ -2,9 +2,10 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const pika = require('./pika');
 const perguntas = require('./perguntas');
+const cidade = require('./cidade');
 const { draw, drawWeighted } = require('./rand');
 process.on('uncaughtException', e => console.error('Erro não tratado:', e));
-const MODS = { pika, perguntas };
+const MODS = { pika, perguntas, cidade };
 const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
@@ -72,7 +73,7 @@ function begin(r) {
   if (locs.length < 2) return false;
   r.locs = locs; r.spyImg = d.spyImage || '';
   const ids = r.players.map(p => p.id);
-  // Sorteios por ciclo: local, espião e quem começa só repetem depois que todos já saíram
+  // Local e quem começa: sorteio por ciclos. Espião: sorteio ponderado pelo histórico recente da sala
   const locName = draw(r, 'loc', locs.map(l => l.name));
   r.loc = locs.find(l => l.name === locName);
   const sp = r.players.find(p => p.id === drawWeighted(r, 'spy', ids));
@@ -132,6 +133,11 @@ function removePlayer(r, p) {
   r.players = r.players.filter(x => x !== p);
   if (!r.players.length) { clearTimeout(r.timer); clearTimeout(r.qt); clearTimeout(r.lt); delete rooms[r.code]; return; }
   if (MODS[r.game]) return MODS[r.game].leave(r, p, ctx);
+  // Espião saiu no meio da rodada: recomeça com novo local e novo espião
+  if (r.phase !== 'lobby' && r.phase !== 'end' && p.id === r.spy && begin(r)) {
+    r.players.forEach(q => send(q.ws, { type: 'info', msg: p.name + ' (o espião) saiu da sala. Nova rodada com novo local e novo espião.' }));
+    return push(r);
+  }
   if (r.phase !== 'lobby' && p.id === r.spy) r.spyGone = true;
   for (const o of [r.ready, r.intents, r.votes]) {
     if (!o) continue;
