@@ -23,6 +23,7 @@ const server = http.createServer(async (q, s) => {
     if (u === '/api/admin/check') return json(s, 200, { ok: true });
     if (u === '/api/admin/save') {
       if (!b.data || !Array.isArray(b.data.locations)) return json(s, 400, { error: 'Dados inválidos' });
+      b.data.locations.forEach(l => { l.labels = [...new Set((Array.isArray(l.labels) ? l.labels : []).map(x => String(x).trim().slice(0, 30)).filter(Boolean))].slice(0, 10); });
       try { fs.writeFileSync(LOC, JSON.stringify(b.data, null, 2)); return json(s, 200, { ok: true }); }
       catch { return json(s, 500, { error: 'Erro ao salvar' }); }
     }
@@ -48,7 +49,7 @@ const clean = s => String(s || '').trim().slice(0, 30);
 const cleanLoc = l => {
   const name = clean(l && l.name); if (!name) return null;
   const img = /^(https?:\/\/|\/)\S{1,500}$/.test((l && l.img) || '') ? l.img : '';
-  return { name, img, icon: String((l && l.icon) || '').slice(0, 8) };
+  return { name, img };
 };
 const count = r => { const c = {}; Object.values(r.votes || {}).forEach(t => c[t] = (c[t] || 0) + 1); return c; };
 const valid = (r, me, t) => (t !== me.id || r.players.length === 1) && r.players.some(p => p.id === t);
@@ -88,7 +89,7 @@ function view(r, p) {
     players: r.players.map(x => ({ id: x.id, name: x.name, emo: x.emo, color: x.color })), result: r.result || null,
     ready: Object.keys(r.ready || {}).map(Number), intents: r.intents || {}, voted: Object.keys(r.votes || {}).map(Number), counts: count(r) };
   if (r.phase === 'lobby') {
-    v.all = readLocs().locations.map(l => ({ name: l.name, icon: l.icon || '', img: l.img || '' }));
+    v.all = readLocs().locations.map(l => ({ name: l.name, img: l.img || '', labels: Array.isArray(l.labels) ? l.labels : [] }));
     v.selected = r.sel || v.all.map(l => l.name);
   } else {
     v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };

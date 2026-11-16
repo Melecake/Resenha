@@ -15,7 +15,7 @@ input,button{font:500 1rem Rubik,sans-serif;padding:11px 14px;border-radius:10px
 input:focus{outline:none;border-color:var(--acc)}
 button{background:var(--acc);color:var(--ink);border:2px solid #7a5200;box-shadow:0 4px 0 var(--acc2);font-weight:700;cursor:pointer}button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--acc2)}
 button.sec{background:var(--n2);color:#eaf0ff;border-color:var(--line);box-shadow:0 4px 0 #0a1230}button.bad{background:#e04848;color:#fff;border-color:#8c1f1f;box-shadow:0 4px 0 #8c1f1f}
-.r{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.r input[type=text]{flex:1;min-width:130px}.r .nmx{width:170px;font-weight:700}.ic{width:64px!important;flex:0 0 64px!important;text-align:center}
+.r{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.r input[type=text]{flex:1;min-width:130px}.r .nmx{width:170px;font-weight:700}
 .p{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--n1)}
 .modal{position:fixed;inset:0;background:transparent;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
 .box{background:linear-gradient(180deg,var(--n2),var(--n1));border:2px solid var(--acc);border-radius:20px;padding:24px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
@@ -35,15 +35,20 @@ function askImg(el){const t=JSON.parse(el.dataset.t),nv=el.value.trim(),old=getI
   if(nv&&!/^https?:\/\/\S+$/.test(nv)){el.value=old;return alert('O link deve começar com http:// ou https://')}M={t,nv};draw()}
 function okImg(){setImg(M.t,M.nv);M=null;draw()}function noImg(){M=null;draw()}
 function who(t){return t.k==='spy'?'do espião':t.k==='cover'?'da capa de "'+GN[t.id]+'"':'de "'+esc(D.locations[t.i].name)+'"'}
+function setLabels(i,v){D.locations[i].labels=[...new Set(v.split(',').map(x=>x.trim().slice(0,30)).filter(Boolean))];draw()}
 function draw(){
+  const cnt={};D.locations.forEach(l=>(l.labels||[]).forEach(b=>cnt[b]=(cnt[b]||0)+1));
+  const LB=Object.entries(cnt).map(([k,v])=>esc(k)+' ('+v+')').join(' · ')||'nenhuma ainda';
   $('a').innerHTML=`<h2>Painel</h2>
   <div class="card"><label>Capas dos jogos (tela inicial)</label>${Object.keys(GN).map(id=>`<div class="r"><img class="p" src="${esc(D.covers[id])}" onerror="this.style.visibility='hidden'"><span class="nmx">${GN[id]}</span>${imgField({k:'cover',id})}</div>`).join('')}</div>
   <div class="card"><label>Imagem do espião</label><div class="r"><img class="p" src="${esc(D.spyImage)}" onerror="this.style.visibility='hidden'">${imgField({k:'spy'})}</div></div>
-  <div class="card"><label>Localidades (${D.locations.length})</label>${D.locations.map((l,i)=>`<div class="r"><img class="p" src="${esc(l.img)}" onerror="this.style.visibility='hidden'">
-    <input class="ic" type="text" value="${esc(l.icon)}" oninput="D.locations[${i}].icon=this.value" title="Ícone (usado se não houver imagem)">
-    <input type="text" value="${esc(l.name)}" oninput="D.locations[${i}].name=this.value">${imgField({k:'loc',i})}
+  <div class="card"><label>Localidades (${D.locations.length})</label>
+    <p style="color:var(--mut);font-size:.85rem;margin:8px 0 4px">Labels existentes: ${LB}. Para várias labels na mesma localidade, separe por vírgula.</p>
+    ${D.locations.map((l,i)=>`<div class="r"><img class="p" src="${esc(l.img)}" onerror="this.style.visibility='hidden'">
+    <input type="text" value="${esc(l.name)}" oninput="D.locations[${i}].name=this.value">
+    <input type="text" placeholder="Labels (ex.: Países)" value="${esc((l.labels||[]).join(', '))}" onchange="setLabels(${i},this.value)">${imgField({k:'loc',i})}
     <button class="bad" onclick="D.locations.splice(${i},1);draw()">Excluir</button></div>`).join('')}
-    <button class="sec" onclick="D.locations.push({name:'Nova localidade',icon:'',img:''});draw()">+ Adicionar localidade</button></div>
+    <button class="sec" onclick="D.locations.push({name:'Nova localidade',img:'',labels:[]});draw()">+ Adicionar localidade</button></div>
     <div class="r"><button class="sec" style="padding:14px 28px" onclick="copyJson(this)">Copiar JSON</button><button onclick="save()" style="padding:14px 28px">Salvar alterações</button></div>  ${M?`<div class="modal"><div class="box"><h3 style="margin:0;color:var(--acc)">${M.nv?'Usar esta imagem '+who(M.t)+'?':'Remover a imagem '+who(M.t)+'?'}</h3>
     ${M.nv?`<img src="${esc(M.nv)}" onerror="this.replaceWith(Object.assign(document.createElement('p'),{textContent:'Não foi possível carregar essa imagem. Confira o link.'}))">`:''}
     <div class="r" style="justify-content:center"><button class="bad" onclick="noImg()">Cancelar</button><button onclick="okImg()">Confirmar</button></div></div></div>`:''}`}

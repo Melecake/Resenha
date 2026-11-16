@@ -1,12 +1,16 @@
 const { drawWeighted } = require('./rand');
 const ROLES = ['assassino', 'detetive', 'anjo'];
-const counts = r => { const c = {}; Object.values(r.votes).forEach(t => c[t] = (c[t] || 0) + 1); return c; };
+const NIGHT_MS = 15000;  // duração da noite
+const SLEEP_MS = 5000;   // card "A cidade dorme" depois da votação
+const counts = r => { const c = {}; Object.values(r.votes).forEach(t => { if (t !== 'skip') c[t] = (c[t] || 0) + 1; }); return c; };
+const skipsOf = r => Object.values(r.votes).filter(t => t === 'skip').length;
 const present = (r, id) => id != null && r.players.some(p => p.id === id);
 const alive = r => r.players.filter(p => !r.dead[p.id]);
 const idOf = (r, role) => { const k = Object.keys(r.roles).find(i => r.roles[i] === role); return k === undefined ? null : +k; };
 
 function fresh(r) {
-  Object.assign(r, { roles: {}, dead: {}, gone: {}, act: {}, inv: {}, ready: {}, intents: {}, votes: {}, night: 0, dawn: null, lastVote: null, result: null, killerName: '' });
+  clearTimeout(r.timer); clearTimeout(r.lt);
+  Object.assign(r, { roles: {}, dead: {}, gone: {}, act: {}, inv: {}, miss: {}, nightEnd: 0, ready: {}, intents: {}, votes: {}, night: 0, dawn: null, lastVote: null, result: null, killerName: '' });
 }
 exports.init = r => { fresh(r); };
 
@@ -31,22 +35,42 @@ function winner(r) {
   return others <= 1 ? 'assassino' : null;
 }
 
-function finish(r, w, ctx) {
+function finish(r, w) {
+  clearTimeout(r.timer); clearTimeout(r.lt);
   const kid = idOf(r, 'assassino');
   r.result = { winner: w, killerName: r.killerName };
   r.phase = 'end';
   const pts = [];
   if (w === 'cidade') r.players.filter(p => p.id !== kid).forEach(p => pts.push([p, 1]));
   else { const k = r.players.find(p => p.id === kid); if (k) pts.push([k, 2]); }
-  ctx_award(r, pts);
+  r._ctx.award(r, pts);
   r._ctx.push(r);
 }
-const ctx_award = (r, pts) => r._ctx.award(r, pts);
+
+// Noite com tempo fixo: quem não escolheu ninguém simplesmente não age
+function startNight(r) {
+  clearTimeout(r.timer); clearTimeout(r.lt);
+  r.phase = 'night'; r.act = {}; r.ready = {}; r.nightEnd = Date.now() + NIGHT_MS;
+  const n = r.night;
+  r.timer = setTimeout(() => { if (r.phase === 'night' && r.night === n) resolveNight(r); }, NIGHT_MS);
+}
+
+// "A cidade dorme" por alguns segundos antes da tela de ação
+function startSleep(r) {
+  clearTimeout(r.timer); clearTimeout(r.lt);
+  r.night++; r.phase = 'sleep'; r.act = {}; r.ready = {};
+  const n = r.night;
+  r.lt = setTimeout(() => { if (r.phase === 'sleep' && r.night === n) { startNight(r); r._ctx.push(r); } }, SLEEP_MS);
+}
 
 function resolveNight(r) {
+  clearTimeout(r.timer);
   const victim = r.act.assassino, prot = r.act.anjo, det = r.act.detetive, did = idOf(r, 'detetive');
+  // Só o próprio jogador fica sabendo que não escolheu ninguém
+  r.miss = {};
+  ROLES.forEach(ro => { const id = idOf(r, ro); if (present(r, id) && !r.dead[id] && r.act[ro] == null) r.miss[id] = r.night; });
   if (present(r, did) && !r.dead[did] && det != null) {
-    (r.inv[did] = r.inv[did] || []).push({ night: r.night, target: det, killer: r.roles[det] === 'assassino' });
+    (r.inv[did] = r.inv[did] || []).push({ night: r.night, target: det, diff: r.roles[det] !== 'cidadao' });
   }
   const dead = [];
   if (victim != null && present(r, victim) && !r.dead[victim] && victim !== prot) { r.dead[victim] = true; dead.push(victim); }
@@ -58,27 +82,23 @@ function resolveNight(r) {
 }
 
 function resolveVote(r, early) {
-  const c = counts(r), max = Math.max(0, ...Object.values(c));
+  const c = counts(r), max = Math.max(0, ...Object.values(c)), skips = skipsOf(r);
   const top = Object.keys(c).filter(k => c[k] === max).map(Number);
-  const out = top.length === 1 && max > 0 ? top[0] : null;
+  // "Pular" funciona como um voto em ninguém: se empatar ou superar o mais votado, ninguém sai
+  const out = top.length === 1 && max > skips ? top[0] : null;
   if (out != null) r.dead[out] = true;
-  r.lastVote = { early, out };
+  r.lastVote = { early, out, reason: out != null ? null : (skips >= max ? 'skip' : 'tie') };
   r.intents = {}; r.votes = {};
   const w = winner(r);
   if (w) return finish(r, w);
-  r.night++; r.phase = 'night'; r.act = {}; r.ready = {}; r._ctx.push(r);
+  startSleep(r); r._ctx.push(r);
 }
 
 function progress(r, ctx) {
   r._ctx = ctx;
   const al = alive(r);
   if (r.phase === 'roles') {
-    if (al.every(p => r.ready[p.id])) { r.phase = 'night'; r.night = 1; r.ready = {}; r.act = {}; }
-    return ctx.push(r);
-  }
-  if (r.phase === 'night') {
-    const need = ROLES.filter(ro => { const id = idOf(r, ro); return present(r, id) && !r.dead[id]; });
-    if (need.every(ro => r.act[ro] !== undefined)) return resolveNight(r);
+    if (al.every(p => r.ready[p.id])) { r.night = 1; startNight(r); }
     return ctx.push(r);
   }
   if (r.phase === 'day') {
@@ -88,10 +108,10 @@ function progress(r, ctx) {
   if (r.phase === 'vote') {
     const c = counts(r), max = Math.max(0, ...Object.values(c));
     const need = Math.floor(al.length / 2) + 1, all = al.length > 0 && al.every(p => r.votes[p.id]);
-    if (all || max >= need) return resolveVote(r, !all);
+    if (all || max >= need || skipsOf(r) >= need) return resolveVote(r, !all);
     return ctx.push(r);
   }
-  ctx.push(r);
+  ctx.push(r); // noite e "cidade dorme" são controladas por tempo
 }
 
 exports.view = (r, p) => {
@@ -104,11 +124,14 @@ exports.view = (r, p) => {
     intents: r.intents, voted: Object.keys(r.votes).map(Number), counts: counts(r),
     lastVote: r.lastVote, dawn: r.dawn, result: r.result };
   if (started) { v.role = role; v.isDead = isDead; }
+  if (ph === 'vote') { v.skips = skipsOf(r); v.mySkip = r.votes[me] === 'skip'; }
+  if (ph === 'day' && r.miss && r.miss[me]) v.missed = r.miss[me];
   if (started && (isDead || ph === 'end')) { v.roles = {}; r.players.forEach(x => { v.roles[x.id] = r.roles[x.id]; }); }
   if (started && role === 'detetive') v.inv = r.inv[me] || [];
   if (ph === 'night' && !isDead && ROLES.includes(role)) {
     const al = alive(r).map(x => x.id);
-    v.act = { role, done: r.act[role] !== undefined, targets: role === 'anjo' ? al : al.filter(i => i !== me) };
+    v.act = { role, done: r.act[role] !== undefined, left: Math.max(0, r.nightEnd - Date.now()), targets: role === 'anjo' ? al : al.filter(i => i !== me) };
+    if (role === 'detetive') { v.act.known = {}; (r.inv[me] || []).forEach(i => { v.act.known[i.target] = i.diff; }); }
   }
   return v;
 };
@@ -129,7 +152,8 @@ exports.handle = (r, me, m, ctx) => {
     const role = r.roles[me.id], t = +m.target;
     if (!ROLES.includes(role) || r.act[role] !== undefined) return;
     if (!present(r, t) || r.dead[t] || (role !== 'anjo' && t === me.id)) return;
-    r.act[role] = t; return progress(r, ctx);
+    if (role === 'detetive' && (r.inv[me.id] || []).some(i => i.target === t)) return; // já investigado
+    r.act[role] = t; return ctx.push(r);
   }
   if (ph === 'day' && m.type === 'ready' && isAlive) {
     if (m.ready) r.ready[me.id] = true; else delete r.ready[me.id];
@@ -137,6 +161,7 @@ exports.handle = (r, me, m, ctx) => {
   }
   if (ph === 'vote' && isAlive) {
     if (m.type === 'unintent' && !r.votes[me.id]) { delete r.intents[me.id]; return ctx.push(r); }
+    if (m.type === 'skip' && !r.votes[me.id]) { r.votes[me.id] = 'skip'; delete r.intents[me.id]; return progress(r, ctx); }
     const t = +m.target;
     if (!r.votes[me.id] && present(r, t) && !r.dead[t] && t !== me.id) {
       if (m.type === 'intent') { r.intents[me.id] = t; return ctx.push(r); }

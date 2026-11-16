@@ -235,11 +235,92 @@
       "name": "Portugal",
       "icon": "",
       "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/250px-Flag_of_Portugal_%28official%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+    },
+    {
+      "name": "Gotham City (Batman)",
+      "icon": "",
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_3TcxwaTVb-u_r6ErK8Ax5L3h21Hila46pWVYcwLTIU7p6IsbP6csfhCD&s=10"
+    },
+    {
+      "name": "Mirage (Counter-Strike)",
+      "icon": "",
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCnqHfVHLlfwQRXm4kwYzP9raalsrqPEp7_3pa921j5Q&s=10"
+    },
+    {
+      "name": "Fenda do Biquíni (Bob Esponja)",
+      "icon": "",
+      "img": "https://preview.redd.it/ever-wonder-why-bikini-bottom-is-called-bikini-bottom-v0-v8ks07ynk8lc1.jpeg?auto=webp&s=d011d0a626f1e07559fce719560ac165c7df1b56"
+    },
+    {
+      "name": "Vila da Folha (Naruto)",
+      "icon": "",
+      "img": "https://www.fatosdesconhecidos.com.br/wp-content/uploads/2018/11/o3oopzjSUkB1DcOewnKWwg_store_header_image.png"
+    },
+    {
+      "name": "Nether (Minecraft)",
+      "icon": "",
+      "img": "https://www.ghostcap.com/images/nether-minecraft.webp"
+    },
+    {
+      "name": "Los Santos (GTA V)",
+      "icon": "",
+      "img": "https://static.wikia.nocookie.net/gta/images/d/db/Downtown_Los_Santos_%28V%29.jpeg/revision/latest?cb=20150629180218&path-prefix=pt"
+    },
+    {
+      "name": "Torres Tortas (Fortnite)",
+      "icon": "",
+      "img": "https://static.wikia.nocookie.net/fortnite_ptbr_gamepedia_ptbr/images/4/47/Tilted_Towers_%28Chapter_4-_Season_OG%29_-_Location_-_Fortnite.png/revision/latest?cb=20240618103550"
+    },
+    {
+      "name": "Summoner's Rift (League of Legends)",
+      "icon": "",
+      "img": "https://s2-techtudo.glbimg.com/FvVp6C8s9wmFWC2YwdO096XlUXM=/0x0:2400x1708/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_08fbf48bc0524877943fe86e43087e7a/internal_photos/bs/2018/K/y/nj1EsBR0ANgvEBN9BWvA/summoners-rift-update-map.png"
+    },
+    {
+      "name": "Hogwarts (Harry Potter)",
+      "icon": "",
+      "img": "https://contentful.harrypotter.com/usf1vwtuqyxm/7EsDSrJhr0pNwUNK8lrUwY/f8d7e5101de6dda8f46c0f94673087a9/HP-Hogwarts-39PHOTOBU17074_PHUP_HP.jpg?q=75&fm=jpg&w=2560"
+    },
+    {
+      "name": "Wakanda (Pantera Negra)",
+      "icon": "",
+      "img": "https://sm.ign.com/ign_br/screenshot/default/wakanda-serie-disney_3te9.jpg"
+    },
+    {
+      "name": "Springfield (Os Simpsons)",
+      "icon": "",
+      "img": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1500w,f_auto,q_auto:best/streams/2012/April/120410/318811-120410-ent-springfield-vmed.jpg"
+    },
+    {
+      "name": "Mundo Invertido (Stranger Things)",
+      "icon": "",
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqpf3pNUIloWIXhgl_IuBgZjSO-UfdX_RmVgU9OwFyLYsYl12JEyGOdog&s=10"
+    },
+    {
+      "name": "Oregon (Rainbow Six)",
+      "icon": "",
+      "img": "https://staticctf.ubisoft.com/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/Z9a0gU7iR0vfcbXtoJUOW/98c0c194937998b8c1310788bd874d57/r6s_maps_oregon_thumbnail.jpg"
+    },
+    {
+      "name": "A Fantástica Fabrica de Chocolate",
+      "icon": "",
+      "img": "https://img.odcdn.com.br/wp-content/uploads/2021/09/A-Fantastica-Fabrica-de-Chocolate.jpg"
+    },
+    {
+      "name": "A Estrela da Morte (Star Wars)",
+      "icon": "",
+      "img": "https://super.abril.com.br/wp-content/uploads/2018/07/567051f40e2163522f011fe5death-star-ii_b5760154.jpeg"
+    },
+    {
+      "name": "Asgard (Thor)",
+      "icon": "",
+      "img": "https://segredosdomundo.r7.com/wp-content/uploads/2020/09/asgard-o-que-e-historia-e-curiosidade-do-reino-dos-deuses-2-e1657114493498.jpg"
     }
   ],
   "covers": {
     "locais": "https://img.magnific.com/fotos-gratis/vista-superior-mao-segurando-a-lupa_23-2149617676.jpg?semt=ais_hybrid&w=740&q=80",
     "pika": "https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2023/10/14/648673018-festa-lucas-tylty-2.jpg",
-    "perguntas": "https://cdn.aptoide.com/imgs/5/7/b/57b4ed9f9cf9a33f2d4aeeb27e1f7e08_icon.jpg"
+    "perguntas": "https://cdn.aptoide.com/imgs/5/7/b/57b4ed9f9cf9a33f2d4aeeb27e1f7e08_icon.jpg",
+    "cidade": "https://images.stockcake.com/public/7/e/8/7e8ce333-8827-4447-8ab4-3c9790bd9673_large/noir-detective-mystery-stockcake.jpg"
   }
 }

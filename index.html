@@ -211,6 +211,9 @@ button,.tile,.gc,.pc,.lt{touch-action:manipulation;-webkit-tap-highlight-color:t
   .chip{padding-right:12px}.av{width:40px;height:40px;flex-basis:40px;font-size:1.3rem}
   .top{flex-direction:column;align-items:flex-start}.worst{font-size:1.5rem}.bub{padding:16px}
 }
+.lbls{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.lb{padding:6px 12px;font-size:.78rem;letter-spacing:0;background:var(--n1);color:var(--txt);border:2px solid var(--line);box-shadow:none}
+.lb:hover,.lb:active{transform:none;box-shadow:none}.lb.sel{border-color:var(--acc);color:var(--acc)}
 </style></head><body><div id="lb"></div><div id="rc" class="rc">Reconectando…</div>
 <header class="bar"><button class="nbtn l" id="bk" onclick="back()"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Voltar</button>
 <div class="logo" id="lg"><span class="moon"></span><span class="lgt">Resenha da Madrugada</span></div>
@@ -228,7 +231,7 @@ locais:{brief:'Todos recebem o mesmo local, menos o espião. Façam perguntas un
 full:`<h4>Objetivo</h4><p>Todos os jogadores recebem o mesmo <b>local</b>, menos um: o <b>espião</b>, que não sabe onde está. Os jogadores tentam descobrir quem é o espião. O espião tenta descobrir o local e não ser pego.</p>
 <h4>Antes de começar</h4><ul><li><b>Ícone e cor:</b> cada jogador escolhe um emoji e uma cor. Dois jogadores não podem ter o mesmo emoji, mas as cores podem se repetir.</li><li><b>Localidades:</b> o líder (quem criou a sala) marca quais localidades entram na partida, e todos veem a seleção.</li><li><b>Convite:</b> o botão "Copiar convite" gera um link que leva os amigos direto para a entrada da sala.</li><li><b>Iniciar:</b> só o líder inicia a partida.</li></ul>
 <h4>Sorteios</h4><ul><li>O <b>local</b> e <b>quem começa perguntando</b> são sorteados por ciclos: só se repetem depois que todos os outros já tiveram a sua vez.</li><li>O <b>espião</b> é sorteado com chances ajustadas pelo histórico recente da sala: quem foi espião há pouco tempo, ou várias vezes nas últimas 10 partidas, tem menos chance de ser sorteado de novo, mas qualquer um pode se repetir. O histórico vale enquanto a sala existir.</li></ul>
-<h4>Durante a partida</h4><ul><li><b>Seu cartão:</b> mostra o local, ou "Espião" se você for o espião.</li><li><b>Quem começa:</b> no início de cada rodada, uma janela mostra quem faz a primeira pergunta.</li><li><b>Conversa:</b> façam perguntas uns aos outros sobre o local, sem entregar demais.</li><li><b>Anotações:</b> o botão <b>Anotar</b> (no card de cada jogador do quadro de suspeitos) e o botão <b>Anotações</b> (nos cards da votação e no card "Prontos para votar") abrem um balão só seu. Nele você escolhe um jogador (inclusive você) e anota as perguntas que ele fez (para quem fez e a resposta) e as que ele recebeu (quem perguntou e a resposta). Cada pergunta é um único registro: se você anota que X perguntou algo a Y, a mesma pergunta aparece nas anotações de Y como recebida, e a resposta anotada aparece nos dois lados. Ninguém mais vê, e as anotações são apagadas a cada rodada.</li><li><b>Quadro de suspeitos:</b> só você vê. Clique em um jogador para alternar entre Na dúvida, Suspeito e Inocente. É só uma anotação sua, e o seu próprio card não muda. O espião não tem esse quadro.</li><li><b>Possíveis localidades:</b> toque em uma localidade para riscá-la e lembrar o que já descartou.</li></ul>
+<h4>Durante a partida</h4><ul><li><b>Seu cartão:</b> mostra o local, ou "Espião" se você for o espião.</li><li><b>Quem começa:</b> no início de cada rodada, uma janela mostra quem faz a primeira pergunta.</li><li><b>Conversa:</b> façam perguntas uns aos outros sobre o local, sem entregar demais.</li><li><b>Anotações:</b> o botão <b>Anotar</b> (no card de cada jogador do quadro de suspeitos) e o botão <b>Anotações</b> (nos cards da votação e no card "Prontos para votar") abrem um balão só seu. Nele você escolhe um jogador (inclusive você) e anota as perguntas que ele fez (para quem fez e a resposta) e as que ele recebeu (quem perguntou e a resposta). Cada pergunta é um único registro: se você anota que X perguntou algo a Y, a mesma pergunta aparece nas anotações de Y como recebida, e a resposta anotada aparece nos dois lados. Ninguém mais vê, e as anotações são apagadas a cada rodada.</li><li><b>Quadro de suspeitos:</b> só você vê. Clique em um jogador para alternar entre Na dúvida, Suspeito e Inocente. É só uma anotação sua, e o seu próprio card não muda. O espião não tem esse quadro, mas tem uma lista de jogadores só para anotações.</li><li><b>Possíveis localidades:</b> toque em uma localidade para riscá-la e lembrar o que já descartou.</li></ul>
 <h4>Votação</h4><ul><li><b>Pronto para votar:</b> quando achar que já deu, clique no botão. Se mudar de ideia, clique em Cancelar. A votação só abre quando todos estiverem prontos.</li><li><b>Declarar intenção:</b> seu emoji aparece no card da pessoa escolhida, para a turma ver em quem a maioria quer votar. Você pode mudar de alvo quantas vezes quiser.</li><li><b>Votar:</b> abre uma confirmação só para você, e o voto é definitivo. Quando a votação termina, o mais votado é revelado.</li>${VOTEINFO}</ul>
 <h4>Quem vence e pontos</h4><ul><li>Se o espião for o único mais votado, <b>os jogadores vencem</b> e todos os inocentes ganham 1 ponto, mesmo quem não chegou a votar porque a votação terminou por maioria.</li><li>Se outra pessoa for a mais votada, ou houver empate, <b>o espião vence</b> e ganha 2 pontos.</li><li><b>Ranking:</b> os pontos só contam quando a partida termina, ficam guardados enquanto a sala existir e aparecem na tela final (com um selo +1 ou +2 em quem pontuou) e na sala de espera.</li></ul>
 <h4>Outras regras</h4><ul><li>Se alguém sair, a partida continua. <b>Se o espião sair da sala, a rodada recomeça</b> com novo local e novo espião. Se a sua conexão cair, você tem 60 segundos para voltar sozinho à partida.</li><li>O painel <b>Jogadores</b> mostra quem está na sala. O líder o vê aberto em telas grandes e pode remover quem estiver parado, ou minimizá-lo.</li><li>Não é possível entrar em uma partida em andamento.</li><li>No fim, o líder pode clicar em <b>Jogar novamente</b> para sortear novo espião e novo local.</li></ul>`},
@@ -249,8 +252,8 @@ full:`<h4>Objetivo</h4><p>O <b>host</b> escreve duas perguntas parecidas: uma pa
 cidade:{brief:'A cidade dorme e um assassino age em segredo. Todo dia a cidade debate e vota em quem acha que é o assassino. Há também um detetive e um anjo. O narrador é o servidor.',
 full:`<h4>Objetivo</h4><p>A cidade dorme e um <b>assassino</b> age em segredo. Os moradores precisam descobrir quem é o assassino antes que sobrem poucos vivos. O narrador é o próprio servidor.</p>
 <h4>Antes de começar</h4><ul><li>São necessários <b>5 jogadores</b> (o jogo fica melhor com 6 ou mais). Só o líder inicia.</li><li>Os papéis são sorteados com o mesmo sistema ponderado dos outros jogos (histórico da sala), e só você vê o seu.</li></ul>
-<h4>Papéis</h4><ul><li><b>Assassino (1):</b> a cada noite escolhe alguém para eliminar.</li><li><b>Detetive (1):</b> a cada noite investiga alguém e descobre, só para ele, se a pessoa é o assassino.</li><li><b>Anjo (1):</b> a cada noite protege alguém. Pode proteger a si mesmo e pode repetir a mesma pessoa. Se o assassino escolher quem está protegido, ninguém morre.</li><li><b>Cidadãos:</b> não têm poder especial; debatem e votam.</li></ul>
-<h4>Como funciona uma rodada</h4><ul><li><b>Papéis:</b> cada um vê o seu papel e clica "Entendi, pode dormir". Quando todos clicam, começa a noite.</li><li><b>Noite:</b> todos veem "A cidade dorme". Assassino, detetive e anjo vivos escolhem seus alvos e confirmam. Não há tempo: a noite só termina quando os três tiverem agido.</li><li><b>Amanhecer:</b> aparece "Cidade acorda: Ninguém morreu" ou "Cidade acorda: uma pessoa morreu" (ou "N pessoas morreram"), com o nome de quem morreu. O papel de quem morre não é revelado.</li><li><b>Dia:</b> a cidade debate (por voz ou presencialmente, o site não tem chat). Quando todos os vivos clicam em <b>Pronto para votar</b>, abre a votação.</li><li><b>Votação:</b> cada vivo declara intenção e vota. Quem tiver mais votos é eliminado. Em caso de empate, ninguém é eliminado. Depois da votação a noite recomeça.</li></ul>
+<h4>Papéis</h4><ul><li><b>Assassino (1):</b> a cada noite escolhe alguém para eliminar.</li><li><b>Detetive (1):</b> a cada noite investiga alguém e descobre, só para ele, se a pessoa é um cidadão comum ou alguém diferente (assassino ou anjo), sem saber a função. Cada pessoa só pode ser investigada uma vez.</li><li><b>Anjo (1):</b> a cada noite protege alguém. Pode proteger a si mesmo e pode repetir a mesma pessoa. Se o assassino escolher quem está protegido, ninguém morre.</li><li><b>Cidadãos:</b> não têm poder especial; debatem e votam.</li></ul>
+<h4>Como funciona uma rodada</h4><ul><li><b>Papéis:</b> cada um vê o seu papel e clica "Entendi, pode dormir". Quando todos clicam, começa a noite.</li><li><b>Noite:</b> todos veem "A cidade dorme". Assassino, detetive e anjo vivos escolhem seus alvos e confirmam. Cada noite dura 15 segundos. Quem não escolher ninguém nesse tempo fica sem agir naquela noite, e só essa pessoa sabe disso.</li><li><b>Amanhecer:</b> aparece "Cidade acorda: Ninguém morreu" ou "Cidade acorda: uma pessoa morreu" (ou "N pessoas morreram"), com o nome de quem morreu. O papel de quem morre não é revelado.</li><li><b>Dia:</b> a cidade debate (por voz ou presencialmente, o site não tem chat). Quando todos os vivos clicam em <b>Pronto para votar</b>, abre a votação.</li><li><b>Votação:</b> cada vivo declara intenção e vota. Quem tiver mais votos é eliminado. Em caso de empate, ninguém é eliminado. Quem quiser pode <b>pular a votação</b> (não votar em ninguém): se os votos para pular empatarem ou superarem o mais votado, ninguém é eliminado. Depois da votação aparece "A cidade dorme" com o resultado por 5 segundos e a noite recomeça.</li></ul>
 <h4>Votação</h4><ul>${VOTEINFO}</ul>
 <h4>Quem morre</h4><ul><li>Quem morre (ou é eliminado) vira espectador: continua vendo a tela e <b>vê os papéis de todos</b>. Não conte para ninguém!</li><li>Quem sair da sala é tratado como morto.</li></ul>
 <h4>Como se vence e pontos</h4><ul><li><b>A cidade vence</b> quando o assassino é eliminado (ou sai da sala). Todos os que não são o assassino ganham 1 ponto, mesmo os mortos.</li><li><b>O assassino vence</b> quando sobra apenas mais uma pessoa viva além dele, e ganha 2 pontos.</li><li>No fim, o papel de todos é revelado, e o ranking da sala é atualizado.</li></ul>`}};
@@ -288,7 +291,7 @@ function onMsg(e){busy(false);const m=JSON.parse(e.data);let closing=false;
   if(m.type==='kicked'){store.set('inroom',false);S=null;screen='home';mode='menu';if(typeof closeConfirm==='function')closeConfirm();$('fx').innerHTML='';NT.open=false;drawNotes();notify(m.msg||'Você saiu da sala.');render();return}
   if(m.type==='error'){if(m.alert)notify(m.msg);else err=m.msg}
   else{if(m.gid)game=m.gid;
-    closing=!!S&&S.phase==='vote'&&(m.phase==='end'||(m.game==='cidade'&&m.phase==='night'));
+    closing=!!S&&S.phase==='vote'&&(m.phase==='end'||(m.game==='cidade'&&(m.phase==='night'||m.phase==='sleep')));
     if(typeof closeConfirm==='function'&&(!S||S.phase!==m.phase||(P.confirm&&P.confirm.msg&&P.confirm.msg.type==='vote'&&m.voted&&m.voted.includes(m.you))))closeConfirm();
     if(S&&m.phase==='play'&&(S.phase!=='play'||(m.round&&S.round!==m.round))){struck=new Set();marks={};notes=[];saveNotes()}
     S=m;err='';invCode='';if(screen==='game'||S)store.set('inroom',true)}
@@ -308,7 +311,7 @@ document.addEventListener('visibilitychange',()=>{
   if(!ws||ws.readyState>1){retry=0;connect();return}
   if(ws.readyState===1){const t=Date.now();ws.send(JSON.stringify({type:'ping'}));setTimeout(()=>{if(lastPong<t)reopen()},3000)}});
 window.addEventListener('online',()=>{if(!ws||ws.readyState>1){retry=0;connect()}});
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.classList.contains('fab')&&!b.classList.contains('mini')&&!b.classList.contains('nb')&&!b.classList.contains('bchip')&&!b.closest('.emos,.cols,.sug')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.classList.contains('fab')&&!b.classList.contains('mini')&&!b.classList.contains('nb')&&!b.classList.contains('bchip')&&!b.closest('.emos,.cols,.sug,.lbls')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
 window.addEventListener('error',e=>{if(e.message)notify('Erro na página: '+e.message)});
 window.addEventListener('unhandledrejection',e=>notify('Erro: '+((e.reason&&e.reason.message)||e.reason)));
 function trans(k){if(k===lastKey)return;lastKey=k;window.scrollTo(0,0);const a=$('app');a.classList.remove('enter');void a.offsetWidth;a.classList.add('enter');setTimeout(()=>a.classList.remove('enter'),900)}
@@ -326,12 +329,18 @@ const av=(id,c='')=>{const p=pl(id);return `<span class="av ${c}" style="backgro
 const hue=n=>[...n].reduce((a,c)=>a+c.charCodeAt(0),0)*37%360;
 const bg=n=>{const h=hue(n);return `background:linear-gradient(135deg,hsl(${h} 45% 30%),hsl(${(h+50)%360} 50% 16%))`};
 const pic=l=>l.img?`<img src="${esc(l.img)}" referrerpolicy="no-referrer" onerror="this.remove()">`:'';
-const tile=(l,cls='',click='')=>`<div class="tile ${cls}" style="${bg(l.name)}" ${click}>${pic(l)}<i>${esc(l.icon||'')}</i><span>${esc(l.name)}</span></div>`;
+const tile=(l,cls='',click='')=>`<div class="tile ${cls}" style="${bg(l.name)}" ${click}>${pic(l)}<span>${esc(l.name)}</span></div>`;
 const start=()=>tx({type:'start'}),again=()=>tx({type:'again'}),setReady=v=>tx({type:'ready',ready:v});
 const prof=(e,c)=>tx({type:'profile',emo:e,color:c},1);
 const mark=id=>{marks[id]=((marks[id]||0)+1)%3;render()};
 function togLoc(i){const n=S.all[i].name,s=new Set(S.selected);s.has(n)?s.delete(n):s.add(n);tx({type:'locs',selected:[...s]},1)}
-const selAll=v=>tx({type:'locs',selected:v?S.all.map(l=>l.name):[]},1);
+const LBL={f:'',
+  has:l=>!LBL.f||(l.labels||[]).includes(LBL.f),
+  vis:()=>S.all.filter(LBL.has).map(l=>l.name),
+  all:()=>[...new Set(S.all.flatMap(l=>l.labels||[]))].sort((a,b)=>a.localeCompare(b,'pt-BR')),
+  set:i=>{LBL.f=i<0?'':(LBL.all()[i]||'');window._pickReset=1;render()},
+  only:()=>tx({type:'locs',selected:LBL.vis()},1)};
+const selAll=v=>{const vis=new Set(LBL.vis()),s=new Set(S.selected);vis.forEach(n=>v?s.add(n):s.delete(n));tx({type:'locs',selected:[...s]},1)};
 
 // Anotações pessoais (balão) do Impostor - Locais: só o próprio jogador vê.
 // Cada pergunta é UM registro {de quem, para quem, pergunta, resposta}: aparece em "fez" de quem perguntou e em "recebeu" de quem recebeu.
@@ -342,8 +351,10 @@ function openNotes(pid){if(!S)return;const ids=S.players.map(p=>p.id);
   NT.open=true;NT.pid=(pid&&ids.includes(pid))?pid:(NT.pid&&ids.includes(NT.pid)?NT.pid:(ids.find(x=>x!==S.you)||S.you));drawNotes()}
 function closeNotes(){NT.open=false;drawNotes()}
 function addNote(kind,pid){notes.push({id:uid(),from:kind==='fez'?pid:null,to:kind==='fez'?null:pid,q:'',a:''});saveNotes();drawNotes()}
-function setN(id,f,v){const n=notes.find(x=>x.id===id);if(!n)return;n[f]=(f==='from'||f==='to')?(v===''?null:+v):v;saveNotes()}
-function delN(id){notes=notes.filter(x=>x.id!==id);saveNotes();drawNotes()}
+NT.sig=()=>S?S.players.filter(p=>hasNotes(p.id)).map(p=>p.id).join():'';
+NT.dots=()=>document.querySelectorAll('.bchip .dot').forEach(d=>{d.hidden=!hasNotes(+d.dataset.p)});
+function setN(id,f,v){const n=notes.find(x=>x.id===id);if(!n)return;const b=NT.sig();n[f]=(f==='from'||f==='to')?(v===''?null:+v):v;saveNotes();if(NT.sig()!==b){render();NT.dots()}}
+function delN(id){notes=notes.filter(x=>x.id!==id);saveNotes();drawNotes();render()}
 function drawNotes(){const c=$('nt');if(!c)return;
   if(!NT.open||!S||screen==='home'){c.innerHTML='';return}
   const pid=NT.pid;if(!S.players.some(p=>p.id===pid)){NT.open=false;c.innerHTML='';return}
@@ -354,7 +365,7 @@ function drawNotes(){const c=$('nt');if(!c)return;
   c.innerHTML=`<div class="modal" onclick="if(event.target===this)closeNotes()"><div class="bubw"><div class="bub">
     <div class="pph"><b style="font-family:var(--disp);color:var(--acc)">Anotações</b><button class="cx mini" onclick="closeNotes()">Fechar</button></div>
     <p style="color:var(--mut);margin:0 0 6px;font-size:.88rem">Só você vê estas anotações. Escolha um jogador e preencha só o que quiser. Cada pergunta é um único registro: ela aparece para quem perguntou e para quem recebeu.</p>
-    <div class="bchips">${S.players.map(o=>`<button class="bchip ${o.id===pid?'sel':''}" onclick="openNotes(${o.id})">${av(o.id)}<span>${esc(o.name)}${o.id===S.you?' (você)':''}${hasNotes(o.id)?' •':''}</span></button>`).join('')}</div>
+    <div class="bchips">${S.players.map(o=>`<button class="bchip ${o.id===pid?'sel':''}" onclick="openNotes(${o.id})">${av(o.id)}<span>${esc(o.name)}${o.id===S.you?' (você)':''}<span class="dot" data-p="${o.id}" ${hasNotes(o.id)?'':'hidden'}> •</span></span></button>`).join('')}</div>
     <div class="bsec">Perguntas que ${W(pid)} fez</div>
     ${fez.map(n=>`<div class="bn"><label>Pergunta</label><input value="${esc(n.q)}" oninput="setN('${n.id}','q',this.value)">
       <label>Para quem</label><select onchange="setN('${n.id}','to',this.value)"><option value="">Não sei / não anotei</option>${opts(pid,n.to)}</select>
@@ -414,10 +425,11 @@ function render(){
   const a=document.activeElement;
   if(a&&a.id==='vsel'&&rDefer<6){rDefer++;clearTimeout(rTimer);rTimer=setTimeout(render,500);return}
   rDefer=0;
-  const y=window.scrollY,k0=lastKey;
+  const y=window.scrollY,k0=lastKey,pk=document.querySelector('.pick');let pt=pk?pk.scrollTop:0;if(window._pickReset){pt=0;window._pickReset=0}
   try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message+' ['+String(e.stack||'').split('\n')[1]+']')}
   document.body.classList.toggle('vs-open',!!document.querySelector('.vside'));
   if(lastKey===k0&&Math.abs(window.scrollY-y)>2)window.scrollTo(0,y);
+  const pk2=document.querySelector('.pick');if(pk2&&lastKey===k0)pk2.scrollTop=pt;
 }
 function renderMain(){
   const G=GAMES.find(g=>g.id===game),A=$('app');
@@ -445,13 +457,14 @@ function renderMain(){
       <label>Código da sala</label><input id="code" class="codein" maxlength="4" placeholder="ABCD" value="${esc(invCode)}" onkeydown="if(event.key==='Enter')join()">${E}
       <div class="row"><button onclick="join()">Entrar</button></div></div></div>`;
   }else if(S.phase==='lobby'){
-    const host=S.you===S.host,sel=new Set(S.selected);
+    const host=S.you===S.host,sel=new Set(S.selected),lbs=LBL.all();if(LBL.f&&!lbs.includes(LBL.f))LBL.f='';
     h=`${E}<div class="hero rel" style="padding:0 0 10px"><div class="eyebrow">Sala de espera</div><h1>${G.name}</h1>${infoBtn(game)}</div>
     <div class="split" style="align-items:start"><div><div class="card ctr"><label>Código da sala</label><div class="code">${S.code}</div><p class="mut">Compartilhe o código com os amigos</p>${inviteBtn()}${players()}</div>${rankCard()}${profileCard()}
     ${host?'<button style="width:100%;padding:18px;font-size:1.1rem" onclick="start()">Iniciar partida</button>':'<div class="card ctr"><div class="spin" style="margin:0 auto 14px"></div><p class="mut" style="margin:0">Aguardando o líder iniciar…</p></div>'}</div>
-    <div><div class="card"><label>Localidades da partida (${sel.size} de ${S.all.length})</label>
-    ${host?`<div class="row"><button class="sec" onclick="selAll(true)">Marcar todas</button><button class="sec" onclick="selAll(false)">Desmarcar todas</button></div>`:'<p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">Só o líder escolhe as localidades.</p>'}
-    <div class="pick">${S.all.map((l,i)=>tile(l,sel.has(l.name)?'on':'off',host?`onclick="togLoc(${i})" style="cursor:pointer"`:'')).join('')}</div></div></div></div>`;
+        <div><div class="card"><label>Localidades da partida (${sel.size} de ${S.all.length})</label>
+    ${lbs.length?`<div class="lbls"><button class="lb ${LBL.f?'':'sel'}" onclick="LBL.set(-1)">Todas</button>${lbs.map((b,i)=>`<button class="lb ${LBL.f===b?'sel':''}" onclick="LBL.set(${i})">${esc(b)} (${S.all.filter(l=>(l.labels||[]).includes(b)).length})</button>`).join('')}</div>`:''}
+    ${host?`<div class="row"><button class="sec" onclick="selAll(true)">${LBL.f?'Marcar estas':'Marcar todas'}</button><button class="sec" onclick="selAll(false)">${LBL.f?'Desmarcar estas':'Desmarcar todas'}</button></div>${LBL.f?`<button style="width:100%;margin:0 0 12px" onclick="LBL.only()">Jogar só com “${esc(LBL.f)}”</button>`:''}`:'<p style="color:var(--mut);font-size:.85rem;margin:0 0 12px">Só o líder escolhe as localidades.</p>'}
+    <div class="pick">${S.all.map((l,i)=>LBL.has(l)?tile(l,sel.has(l.name)?'on':'off',host?`onclick="togLoc(${i})" style="cursor:pointer"`:''):'').join('')}</div></div></div></div>`;
   }else{
     const R=S.role,me=pl(S.you),host=S.you===S.host;
     h=`<div class="top"><h1>Partida em andamento</h1><div class="me">${av(S.you)}<div><b>${esc(me.name)}</b><small>Sala ${S.code}</small></div></div></div>${E}`;
@@ -474,6 +487,7 @@ function renderMain(){
       if(!R.spy)h+=`<h3>Quadro de suspeitos</h3><p style="color:var(--mut);margin:0 0 14px">Clique em um jogador para alternar: <b style="color:var(--txt)">Na dúvida</b> → <b style="color:#ef4444">Suspeito</b> → <b style="color:#3ddc97">Inocente</b></p>
         <div class="sus">${S.players.map(p=>{const self=p.id===S.you,m=marks[p.id]||0;return self?`<div class="pc self">${av(p.id)}<div class="cn"><b>${esc(p.name)}</b><small>(você)</small></div><button class="nb ${hasNotes(p.id)?'on':''}" onclick="openNotes(${p.id})">Anotar</button></div>`:`<div class="pc s${m}" onclick="mark(${p.id})">${av(p.id)}<div class="cn"><b>${esc(p.name)}</b><small>${['Na dúvida','Suspeito','Inocente'][m]}</small></div><button class="nb ${hasNotes(p.id)?'on':''}" onclick="event.stopPropagation();openNotes(${p.id})">Anotar</button></div>`}).join('')}</div>
         <hr style="border:0;border-top:2px solid var(--line);margin:28px 0">`;
+      else h+=`<h3>Anotações</h3><p style="color:var(--mut);margin:0 0 14px">Toque em um jogador para anotar as perguntas e respostas dele. Só você vê.</p><div class="sus">${S.players.map(p=>`<div class="pc" onclick="openNotes(${p.id})">${av(p.id)}<div class="cn"><b>${esc(p.name)}</b>${p.id===S.you?'<small>(você)</small>':''}</div><button class="nb ${hasNotes(p.id)?'on':''}" onclick="event.stopPropagation();openNotes(${p.id})">Anotar</button></div>`).join('')}</div><hr style="border:0;border-top:2px solid var(--line);margin:28px 0">`;
       h+=`<h3>Possíveis localidades <small style="font-weight:400">(toque para riscar)</small></h3><div class="grid6">${R.locs.map((l,i)=>tile(l,struck.has(i)?'x':'',`onclick="strike(${i})"`)).join('')}</div></div></div>`;
     }
   }
