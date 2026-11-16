@@ -259,8 +259,7 @@ full:`<h4>Objetivo</h4><p>A cidade dorme e um <b>assassino</b> age em segredo. O
 <h4>Como se vence e pontos</h4><ul><li><b>A cidade vence</b> quando o assassino é eliminado (ou sai da sala). Todos os que não são o assassino ganham 1 ponto, mesmo os mortos.</li><li><b>O assassino vence</b> quando sobra apenas mais uma pessoa viva além dele, e ganha 2 pontos.</li><li>No fim, o papel de todos é revelado, e o ranking da sala é atualizado.</li></ul>`}};
 const EMOTES=["😎","🤠","🥸","🤓","😈","👻","🤖","👽","🦊","🐸","🐙","🦄","🐼","🦁","🐵","🐲","🐶","🐱","🦉","🐧"];
 const HUES=[0,24,45,75,130,165,190,215,245,275,305,335];
-const store={get:(k,d)=>{try{return JSON.parse(sessionStorage.getItem(k))??d}catch{return d}},set:(k,v)=>sessionStorage.setItem(k,JSON.stringify(v))};
-const TOKEN=(()=>{let t=sessionStorage.getItem('tk');if(!t){t=((window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Math.random()).slice(2)+Date.now())+'';sessionStorage.setItem('tk',t)}return t})();
+const store={get:(k,d)=>{try{return JSON.parse((k==='name'?localStorage:sessionStorage).getItem(k))??d}catch{return d}},set:(k,v)=>{try{(k==='name'?localStorage:sessionStorage).setItem(k,JSON.stringify(v))}catch{}}};const TOKEN=(()=>{let t=sessionStorage.getItem('tk');if(!t){t=((window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Math.random()).slice(2)+Date.now())+'';sessionStorage.setItem('tk',t)}return t})();
 let COVERS={},S=null,err='',struck=new Set(),marks={},mode='menu',screen='home',game='locais',ready=false,lastKey='',lt,invCode='',ppOpen=null;
 let notes=store.get('notes2',[]),NT={open:false,pid:null};
 (()=>{const q=new URLSearchParams(location.search),c=(q.get('sala')||'').toUpperCase().slice(0,4),g=q.get('jogo');
@@ -420,6 +419,10 @@ function profileCard(){const me=pl(S.you),taken=new Set(S.players.filter(p=>p.id
   return `<div class="card"><label>Seu ícone</label><div class="emos">${EMOTES.map((e,i)=>`<button class="eb ${me.emo===i?'sel':''}" ${taken.has(i)?'disabled':''} onclick="prof(${i},${me.color})">${e}</button>`).join('')}</div>
   <label style="margin-top:16px">Sua cor</label><div class="cols">${HUES.map((h,i)=>`<button class="cb ${me.color===i?'sel':''}" style="background:hsl(${h} 55% 40%)" onclick="prof(${me.emo},${i})"></button>`).join('')}</div></div>`}
 
+const WL={l:null,
+  async on(){try{if(!('wakeLock' in navigator)||WL.l||document.hidden)return;WL.l=await navigator.wakeLock.request('screen');WL.l.addEventListener('release',()=>{WL.l=null})}catch(e){WL.l=null}},
+  off(){try{if(WL.l)WL.l.release()}catch(e){}WL.l=null}};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S&&screen!=='home')WL.on()});
 let rDefer=0,rTimer;
 function render(){
   const a=document.activeElement;
@@ -428,6 +431,7 @@ function render(){
   const y=window.scrollY,k0=lastKey,pk=document.querySelector('.pick');let pt=pk?pk.scrollTop:0;if(window._pickReset){pt=0;window._pickReset=0}
   try{renderMain()}catch(e){console.error(e);notify('Erro ao montar a tela: '+e.message+' ['+String(e.stack||'').split('\n')[1]+']')}
   document.body.classList.toggle('vs-open',!!document.querySelector('.vside'));
+  if(S&&screen!=='home')WL.on();else WL.off();
   if(lastKey===k0&&Math.abs(window.scrollY-y)>2)window.scrollTo(0,y);
   const pk2=document.querySelector('.pick');if(pk2&&lastKey===k0)pk2.scrollTop=pt;
 }

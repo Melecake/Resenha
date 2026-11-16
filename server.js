@@ -6,11 +6,17 @@ const cidade = require('./cidade');
 const { draw, drawWeighted } = require('./rand');
 process.on('uncaughtException', e => console.error('Erro não tratado:', e));
 const MODS = { pika, perguntas, cidade };
-const PASS = process.env.ADMIN_PASSWORD || 'Joao123abcd789Milli';
+const PASS = process.env.ADMIN_PASSWORD;
+if (!PASS || PASS.length < 8) { console.error('Defina a variável de ambiente ADMIN_PASSWORD (mínimo 8 caracteres).'); process.exit(1); }
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
 const EMOJIS = 20, COLORS = 12, GRACE = 60000;
-const readLocs = () => JSON.parse(fs.readFileSync(LOC, 'utf8'));
+let locCache = null, locMtime = 0;
+const readLocs = () => {
+  const m = fs.statSync(LOC).mtimeMs;
+  if (!locCache || m !== locMtime) { locCache = JSON.parse(fs.readFileSync(LOC, 'utf8')); locMtime = m; }
+  return locCache;
+};
 const body = q => new Promise(r => { let b = ''; q.on('data', c => { b += c; if (b.length > 2e6) q.destroy(); }); q.on('end', () => { try { r(JSON.parse(b)); } catch { r(null); } }); });
 const json = (s, c, o) => { s.writeHead(c, { 'Content-Type': 'application/json' }); s.end(JSON.stringify(o)); };
 
@@ -24,7 +30,7 @@ const server = http.createServer(async (q, s) => {
     if (u === '/api/admin/save') {
       if (!b.data || !Array.isArray(b.data.locations)) return json(s, 400, { error: 'Dados inválidos' });
       b.data.locations.forEach(l => { l.labels = [...new Set((Array.isArray(l.labels) ? l.labels : []).map(x => String(x).trim().slice(0, 30)).filter(Boolean))].slice(0, 10); });
-      try { fs.writeFileSync(LOC, JSON.stringify(b.data, null, 2)); return json(s, 200, { ok: true }); }
+      try { fs.writeFileSync(LOC + '.tmp', JSON.stringify(b.data, null, 2)); fs.renameSync(LOC + '.tmp', LOC); return json(s, 200, { ok: true }); }
       catch { return json(s, 500, { error: 'Erro ao salvar' }); }
     }
     return json(s, 404, {});
@@ -155,7 +161,7 @@ wss.on('connection', ws => {
   let room = null;
   const leave = () => { if (!room) return; const r = room; room = null; removePlayer(r, me); };
 
-  ws.on('message', raw => {
+  const onMessage = raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
     ws.isAlive = true;
     if (m.type === 'ping') return send(ws, { type: 'pong' });
@@ -233,6 +239,10 @@ wss.on('connection', ws => {
       if (m.type === 'intent') { r.intents[me.id] = m.target; return push(r); }
       if (m.type === 'vote') { r.votes[me.id] = m.target; r.intents[me.id] = m.target; return step(r); }
     }
+  };
+  ws.on('message', raw => {
+    try { onMessage(raw); }
+    catch (e) { console.error('Erro ao tratar mensagem:', e); err(ws, 'Algo deu errado. Tente novamente.'); }
   });
 
   ws.on('close', () => {

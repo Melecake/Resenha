@@ -4,317 +4,506 @@
     {
       "name": "Avião",
       "icon": "✈️",
-      "img": "https://media.istockphoto.com/id/155150766/pt/foto/passageiros-de-avi%C3%A3o-a-jato-a-voar-acima-de-nuvens.jpg?s=612x612&w=0&k=20&c=UZ0FGfAph4G_0qIZDxNVe257irUJiFTw6WfkW9q6Qs8="
+      "img": "https://media.istockphoto.com/id/155150766/pt/foto/passageiros-de-avi%C3%A3o-a-jato-a-voar-acima-de-nuvens.jpg?s=612x612&w=0&k=20&c=UZ0FGfAph4G_0qIZDxNVe257irUJiFTw6WfkW9q6Qs8=",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Banco",
       "icon": "🏦",
-      "img": "https://storage.googleapis.com/bucket.timesbrasil.com.br/sites/2026/01/31995b31-banco-master-usando-%E2%80%98laranjas-entenda-o-que-isso-significa-708x416.webp"
+      "img": "https://storage.googleapis.com/bucket.timesbrasil.com.br/sites/2026/01/31995b31-banco-master-usando-%E2%80%98laranjas-entenda-o-que-isso-significa-708x416.webp",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Praia",
       "icon": "🏖️",
-      "img": "https://static.nationalgeographicbrasil.com/files/styles/image_3200/public/gettyimages-2202479142resized.webp?w=1600&h=1067"
+      "img": "https://static.nationalgeographicbrasil.com/files/styles/image_3200/public/gettyimages-2202479142resized.webp?w=1600&h=1067",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Teatro",
       "icon": "🎭",
-      "img": "https://www.coladaweb.com/wp-content/uploads/2017/05/20170531-teatro.png"
+      "img": "https://www.coladaweb.com/wp-content/uploads/2017/05/20170531-teatro.png",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Cassino",
       "icon": "🎰",
-      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeh9FEDTIo5GJT1af8VbQLEqhNoDwmID0iB3qXd7o3M67of-4VMmCms3kT&s=10"
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeh9FEDTIo5GJT1af8VbQLEqhNoDwmID0iB3qXd7o3M67of-4VMmCms3kT&s=10",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Igreja",
       "icon": "⛪",
-      "img": "https://img.magnific.com/fotos-gratis/edificio-vazio-de-uma-igreja-crista_23-2151103910.jpg?semt=ais_hybrid&w=740&q=80"
+      "img": "https://img.magnific.com/fotos-gratis/edificio-vazio-de-uma-igreja-crista_23-2151103910.jpg?semt=ais_hybrid&w=740&q=80",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Circo",
       "icon": "🎪",
-      "img": "https://static.historiadomundo.com.br/2025/01/tenda-colorido-de-circo-uma-alusao-a-historia-do-circo.jpg"
+      "img": "https://static.historiadomundo.com.br/2025/01/tenda-colorido-de-circo-uma-alusao-a-historia-do-circo.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Festa de Empresa",
       "icon": "🥂",
-      "img": "https://lets.events/blog/wp-content/uploads/2022/05/salao-festa-scaled.jpg"
+      "img": "https://lets.events/blog/wp-content/uploads/2022/05/salao-festa-scaled.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Parque de Diversões",
       "icon": "🎡",
-      "img": "https://www.civitatis.com/blog/wp-content/uploads/2025/05/shutterstock_2498769433.jpg"
+      "img": "https://www.civitatis.com/blog/wp-content/uploads/2025/05/shutterstock_2498769433.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Spa",
       "icon": "💆",
-      "img": "https://blog.adcosprofissional.com.br/wp-content/uploads/2025/02/cuidaod-para-o-dia-da-mulher.jpg"
+      "img": "https://blog.adcosprofissional.com.br/wp-content/uploads/2025/02/cuidaod-para-o-dia-da-mulher.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Embaixada",
       "icon": "🏛️",
-      "img": "https://admin.cnnbrasil.com.br/wp-content/uploads/sites/12/2021/10/foto1-embaixada-site.jpg?w=1200&h=1200&crop=1"
+      "img": "https://admin.cnnbrasil.com.br/wp-content/uploads/sites/12/2021/10/foto1-embaixada-site.jpg?w=1200&h=1200&crop=1",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Hospital",
       "icon": "🏥",
-      "img": "https://reduz.ia.br/hospital/assets/img/hospital-fachada.jpg"
+      "img": "https://reduz.ia.br/hospital/assets/img/hospital-fachada.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Hotel",
       "icon": "🏨",
-      "img": "https://www.ahstatic.com/photos/9952_ho_00_p_1024x768.jpg"
+      "img": "https://www.ahstatic.com/photos/9952_ho_00_p_1024x768.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Base militar",
       "icon": "🪖",
-      "img": "https://ogimg.infoglobo.com.br/in/24228712-70d-c99/FT1086A/760/Anapolis01.jpg"
+      "img": "https://ogimg.infoglobo.com.br/in/24228712-70d-c99/FT1086A/760/Anapolis01.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Estúdio de cinema",
       "icon": "🎬",
-      "img": "https://ecdd.blog/wp-content/uploads/sites/2/2021/05/estudio-cinema-chromakey-1024x601.jpg"
+      "img": "https://ecdd.blog/wp-content/uploads/sites/2/2021/05/estudio-cinema-chromakey-1024x601.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Cruzeiro",
       "icon": "🚢",
-      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3YtQbb0YUksqx5ekK2Bi13X-mOVL-onySTugbqKz8NqtAMNSa8T1OfZI&s=10"
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3YtQbb0YUksqx5ekK2Bi13X-mOVL-onySTugbqKz8NqtAMNSa8T1OfZI&s=10",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Trem",
       "icon": "🚆",
-      "img": "https://www.melhoresdestinos.com.br/wp-content/uploads/2026/03/trem-sp-campinas-capa.jpg"
+      "img": "https://www.melhoresdestinos.com.br/wp-content/uploads/2026/03/trem-sp-campinas-capa.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Navio pirata",
       "icon": "🏴‍☠️",
-      "img": "https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/b/b3/Ss1.jpg/revision/latest?cb=20150624221232"
+      "img": "https://static.wikia.nocookie.net/seaofthieves_gamepedia/images/b/b3/Ss1.jpg/revision/latest?cb=20150624221232",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Estação polar",
       "icon": "🧊",
-      "img": "https://nautica.com.br/wp-content/uploads/2026/02/Estacao-Polar-Tara-1.jpg"
+      "img": "https://nautica.com.br/wp-content/uploads/2026/02/Estacao-Polar-Tara-1.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Delegacia",
       "icon": "🚓",
-      "img": "https://senadorcanedo.go.gov.br/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-04-at-08.15.53-scaled.jpeg"
+      "img": "https://senadorcanedo.go.gov.br/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-04-at-08.15.53-scaled.jpeg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Restaurante",
       "icon": "🍽️",
-      "img": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Abu_Nawas_Beach_restaurant_-_Flickr_-_Al_Jazeera_English_%281%29.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Abu_Nawas_Beach_restaurant_-_Flickr_-_Al_Jazeera_English_%281%29.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Escola",
       "icon": "🏫",
-      "img": "https://static.mundoeducacao.uol.com.br/mundoeducacao/2022/03/dia-escola.jpg"
+      "img": "https://static.mundoeducacao.uol.com.br/mundoeducacao/2022/03/dia-escola.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Posto de gasolina",
       "icon": "⛽",
-      "img": "https://postogalo.com.br/wp-content/uploads/2022/12/SM-2-scaled.jpg"
+      "img": "https://postogalo.com.br/wp-content/uploads/2022/12/SM-2-scaled.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Estação espacial",
       "icon": "🛰️",
-      "img": "https://t.ctcdn.com.br/qpR4uGE4RRkitfcUQ2A4amNJdZM=/640x360/smart/i466731.png"
+      "img": "https://t.ctcdn.com.br/qpR4uGE4RRkitfcUQ2A4amNJdZM=/640x360/smart/i466731.png",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Submarino",
       "icon": "🌊",
-      "img": "https://upload.wikimedia.org/wikipedia/commons/b/bb/US_Navy_040730-N-1234E-002_PCU_Virginia_%28SSN_774%29_returns_to_the_General_Dynamics_Electric_Boat_shipyard.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/b/bb/US_Navy_040730-N-1234E-002_PCU_Virginia_%28SSN_774%29_returns_to_the_General_Dynamics_Electric_Boat_shipyard.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Supermercado",
       "icon": "🛒",
-      "img": "https://blog.ciss.com.br/wp-content/uploads/2020/06/blog-cisslive-layout-de-supermercado.jpg"
+      "img": "https://blog.ciss.com.br/wp-content/uploads/2020/06/blog-cisslive-layout-de-supermercado.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Universidade",
       "icon": "🎓",
-      "img": "https://www.estudarfora.org.br/wp-content/uploads/2020/11/howard.jpg"
+      "img": "https://www.estudarfora.org.br/wp-content/uploads/2020/11/howard.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Zoológico",
       "icon": "🦁",
-      "img": "https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/zoo-sp-mapa-2.jpg"
+      "img": "https://www.melhoresdestinos.com.br/wp-content/uploads/2026/05/zoo-sp-mapa-2.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Biblioteca",
       "icon": "📚",
-      "img": "https://assets.ischolar.com.br/estante_biblioteca_escolar_digital_107f8753ac_adab4784e6.jpg"
+      "img": "https://assets.ischolar.com.br/estante_biblioteca_escolar_digital_107f8753ac_adab4784e6.jpg",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Padaria",
       "icon": "🥖",
-      "img": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cc/02/4d/photo1jpg.jpg?w=1200&h=1200&s=1"
+      "img": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cc/02/4d/photo1jpg.jpg?w=1200&h=1200&s=1",
+      "labels": [
+        "Locais Comuns"
+      ]
     },
     {
       "name": "Italia",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/250px-Flag_of_Italy.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/250px-Flag_of_Italy.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Estados Unidos",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/3840px-Flag_of_the_United_States.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/3840px-Flag_of_the_United_States.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Brasil",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/250px-Flag_of_Brazil.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/250px-Flag_of_Brazil.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Argentina",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/250px-Flag_of_Argentina.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/250px-Flag_of_Argentina.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "China",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/250px-Flag_of_the_People%27s_Republic_of_China.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/250px-Flag_of_the_People%27s_Republic_of_China.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Australia",
       "icon": "",
-      "img": "https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_Australia_%28converted%29.svg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_Australia_%28converted%29.svg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Mexico",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/250px-Flag_of_Mexico.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/250px-Flag_of_Mexico.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Japão",
       "icon": "",
-      "img": "https://static.todamateria.com.br/upload/57/06/5706d70184371-japao.jpg"
+      "img": "https://static.todamateria.com.br/upload/57/06/5706d70184371-japao.jpg",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "França",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/250px-Flag_of_France.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/250px-Flag_of_France.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Inglaterra",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/1280px-Flag_of_England.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/1280px-Flag_of_England.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Irlanda",
       "icon": "",
-      "img": "https://upload.wikimedia.org/wikipedia/commons/4/45/Flag_of_Ireland.svg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
+      "img": "https://upload.wikimedia.org/wikipedia/commons/4/45/Flag_of_Ireland.svg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Coreia do Sul",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/250px-Flag_of_South_Korea.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/250px-Flag_of_South_Korea.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Russia",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Russia.svg/1280px-Flag_of_Russia.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Russia.svg/1280px-Flag_of_Russia.svg.png?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "India",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/250px-Flag_of_India.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/250px-Flag_of_India.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Espanha",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/250px-Flag_of_Spain.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/250px-Flag_of_Spain.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Holanda",
       "icon": "",
-      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmS89SIXsBCEoEZb7uWUFbilwrkMJqBkEUlop0NGDeaWTy334WR64u1AQp&s=10"
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmS89SIXsBCEoEZb7uWUFbilwrkMJqBkEUlop0NGDeaWTy334WR64u1AQp&s=10",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Portugal",
       "icon": "",
-      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/250px-Flag_of_Portugal_%28official%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
+      "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/250px-Flag_of_Portugal_%28official%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+      "labels": [
+        "Países"
+      ]
     },
     {
       "name": "Gotham City (Batman)",
       "icon": "",
-      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_3TcxwaTVb-u_r6ErK8Ax5L3h21Hila46pWVYcwLTIU7p6IsbP6csfhCD&s=10"
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_3TcxwaTVb-u_r6ErK8Ax5L3h21Hila46pWVYcwLTIU7p6IsbP6csfhCD&s=10",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Mirage (Counter-Strike)",
       "icon": "",
-      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCnqHfVHLlfwQRXm4kwYzP9raalsrqPEp7_3pa921j5Q&s=10"
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCnqHfVHLlfwQRXm4kwYzP9raalsrqPEp7_3pa921j5Q&s=10",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Fenda do Biquíni (Bob Esponja)",
       "icon": "",
-      "img": "https://preview.redd.it/ever-wonder-why-bikini-bottom-is-called-bikini-bottom-v0-v8ks07ynk8lc1.jpeg?auto=webp&s=d011d0a626f1e07559fce719560ac165c7df1b56"
+      "img": "https://preview.redd.it/ever-wonder-why-bikini-bottom-is-called-bikini-bottom-v0-v8ks07ynk8lc1.jpeg?auto=webp&s=d011d0a626f1e07559fce719560ac165c7df1b56",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Vila da Folha (Naruto)",
       "icon": "",
-      "img": "https://www.fatosdesconhecidos.com.br/wp-content/uploads/2018/11/o3oopzjSUkB1DcOewnKWwg_store_header_image.png"
+      "img": "https://www.fatosdesconhecidos.com.br/wp-content/uploads/2018/11/o3oopzjSUkB1DcOewnKWwg_store_header_image.png",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Nether (Minecraft)",
       "icon": "",
-      "img": "https://www.ghostcap.com/images/nether-minecraft.webp"
+      "img": "https://www.ghostcap.com/images/nether-minecraft.webp",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Los Santos (GTA V)",
       "icon": "",
-      "img": "https://static.wikia.nocookie.net/gta/images/d/db/Downtown_Los_Santos_%28V%29.jpeg/revision/latest?cb=20150629180218&path-prefix=pt"
+      "img": "https://static.wikia.nocookie.net/gta/images/d/db/Downtown_Los_Santos_%28V%29.jpeg/revision/latest?cb=20150629180218&path-prefix=pt",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Torres Tortas (Fortnite)",
       "icon": "",
-      "img": "https://static.wikia.nocookie.net/fortnite_ptbr_gamepedia_ptbr/images/4/47/Tilted_Towers_%28Chapter_4-_Season_OG%29_-_Location_-_Fortnite.png/revision/latest?cb=20240618103550"
+      "img": "https://static.wikia.nocookie.net/fortnite_ptbr_gamepedia_ptbr/images/4/47/Tilted_Towers_%28Chapter_4-_Season_OG%29_-_Location_-_Fortnite.png/revision/latest?cb=20240618103550",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Summoner's Rift (League of Legends)",
       "icon": "",
-      "img": "https://s2-techtudo.glbimg.com/FvVp6C8s9wmFWC2YwdO096XlUXM=/0x0:2400x1708/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_08fbf48bc0524877943fe86e43087e7a/internal_photos/bs/2018/K/y/nj1EsBR0ANgvEBN9BWvA/summoners-rift-update-map.png"
+      "img": "https://s2-techtudo.glbimg.com/FvVp6C8s9wmFWC2YwdO096XlUXM=/0x0:2400x1708/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_08fbf48bc0524877943fe86e43087e7a/internal_photos/bs/2018/K/y/nj1EsBR0ANgvEBN9BWvA/summoners-rift-update-map.png",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Hogwarts (Harry Potter)",
       "icon": "",
-      "img": "https://contentful.harrypotter.com/usf1vwtuqyxm/7EsDSrJhr0pNwUNK8lrUwY/f8d7e5101de6dda8f46c0f94673087a9/HP-Hogwarts-39PHOTOBU17074_PHUP_HP.jpg?q=75&fm=jpg&w=2560"
+      "img": "https://contentful.harrypotter.com/usf1vwtuqyxm/7EsDSrJhr0pNwUNK8lrUwY/f8d7e5101de6dda8f46c0f94673087a9/HP-Hogwarts-39PHOTOBU17074_PHUP_HP.jpg?q=75&fm=jpg&w=2560",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Wakanda (Pantera Negra)",
       "icon": "",
-      "img": "https://sm.ign.com/ign_br/screenshot/default/wakanda-serie-disney_3te9.jpg"
+      "img": "https://sm.ign.com/ign_br/screenshot/default/wakanda-serie-disney_3te9.jpg",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Springfield (Os Simpsons)",
       "icon": "",
-      "img": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1500w,f_auto,q_auto:best/streams/2012/April/120410/318811-120410-ent-springfield-vmed.jpg"
+      "img": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1500w,f_auto,q_auto:best/streams/2012/April/120410/318811-120410-ent-springfield-vmed.jpg",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Mundo Invertido (Stranger Things)",
       "icon": "",
-      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqpf3pNUIloWIXhgl_IuBgZjSO-UfdX_RmVgU9OwFyLYsYl12JEyGOdog&s=10"
+      "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqpf3pNUIloWIXhgl_IuBgZjSO-UfdX_RmVgU9OwFyLYsYl12JEyGOdog&s=10",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Oregon (Rainbow Six)",
       "icon": "",
-      "img": "https://staticctf.ubisoft.com/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/Z9a0gU7iR0vfcbXtoJUOW/98c0c194937998b8c1310788bd874d57/r6s_maps_oregon_thumbnail.jpg"
+      "img": "https://staticctf.ubisoft.com/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/Z9a0gU7iR0vfcbXtoJUOW/98c0c194937998b8c1310788bd874d57/r6s_maps_oregon_thumbnail.jpg",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "A Fantástica Fabrica de Chocolate",
       "icon": "",
-      "img": "https://img.odcdn.com.br/wp-content/uploads/2021/09/A-Fantastica-Fabrica-de-Chocolate.jpg"
+      "img": "https://img.odcdn.com.br/wp-content/uploads/2021/09/A-Fantastica-Fabrica-de-Chocolate.jpg",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "A Estrela da Morte (Star Wars)",
       "icon": "",
-      "img": "https://super.abril.com.br/wp-content/uploads/2018/07/567051f40e2163522f011fe5death-star-ii_b5760154.jpeg"
+      "img": "https://super.abril.com.br/wp-content/uploads/2018/07/567051f40e2163522f011fe5death-star-ii_b5760154.jpeg",
+      "labels": [
+        "Locais Fictícios"
+      ]
     },
     {
       "name": "Asgard (Thor)",
       "icon": "",
-      "img": "https://segredosdomundo.r7.com/wp-content/uploads/2020/09/asgard-o-que-e-historia-e-curiosidade-do-reino-dos-deuses-2-e1657114493498.jpg"
+      "img": "https://segredosdomundo.r7.com/wp-content/uploads/2020/09/asgard-o-que-e-historia-e-curiosidade-do-reino-dos-deuses-2-e1657114493498.jpg",
+      "labels": [
+        "Locais Fictícios"
+      ]
     }
   ],
   "covers": {
