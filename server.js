@@ -4,6 +4,7 @@ const pika = require('./pika');
 const perguntas = require('./perguntas');
 const cidade = require('./cidade');
 const { draw, drawWeighted } = require('./rand');
+const { blocked } = require('./nomes');
 process.on('uncaughtException', e => console.error('Erro não tratado:', e));
 const MODS = { pika, perguntas, cidade };
 const PASS = process.env.ADMIN_PASSWORD;
@@ -52,6 +53,8 @@ const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => L[Math.random() * L.length | 0]).join(''); } while (rooms[c]); return c; };
 const send = (w, m) => w && w.readyState === 1 && w.send(JSON.stringify(m));
 const clean = s => String(s || '').trim().slice(0, 30);
+// Chave para comparar nomes: sem acento, sem diferença de maiúscula/minúscula e sem espaços repetidos
+const nameKey = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
 const cleanLoc = l => {
   const name = clean(l && l.name); if (!name) return null;
   const img = /^(https?:\/\/|\/)\S{1,500}$/.test((l && l.img) || '') ? l.img : '';
@@ -185,8 +188,11 @@ wss.on('connection', ws => {
 
     if (m.type === 'create' || m.type === 'join') {
       if (room) return;
-      me.name = clean(m.name);
-      if (!me.name) return err(ws, 'Digite seu nome.');
+      const nm = clean(m.name);
+      if (!nm) return err(ws, 'Digite seu nome.');
+      // Filtro de nomes com palavras preconceituosas (ver nomes.js)
+      if (blocked(nm)) return err(ws, 'Esse nome não é permitido. Escolha outro.');
+      me.name = nm;
       const tk = String(m.token || '').slice(0, 64);
       me.token = tk.length >= 8 ? tk : Math.random().toString(36).slice(2) + Date.now().toString(36);
       for (const r0 of Object.values(rooms)) { const p0 = r0.players.find(x => x.token === me.token && x !== me); if (p0) removePlayer(r0, p0); }
@@ -199,6 +205,9 @@ wss.on('connection', ws => {
         if (!room) return err(ws, 'Sala não encontrada.');
         if (m.game && room.game !== m.game) { room = null; return err(ws, 'Essa sala é de outro jogo.'); }
         if (room.phase !== 'lobby') { room = null; return err(ws, 'Não é possível entrar em uma partida em andamento.', true); }
+        // Nome já usado por outra pessoa da sala
+        const key = nameKey(me.name);
+        if (room.players.some(p => p !== me && nameKey(p.name) === key)) { room = null; return err(ws, 'Já existe alguém com esse nome na sala. Escolha outro nome.'); }
       }
       const used = new Set(room.players.map(p => p.emo)); let e = 0;
       while (used.has(e)) e++;

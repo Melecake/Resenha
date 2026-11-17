@@ -53,26 +53,31 @@ function drawConfirm(){const c=$('cfm');if(!c)return;
 function closeConfirm(){P.confirm=null;drawConfirm()}
 function pikaAsk(text,msg){P.confirm={text,msg};drawConfirm()}
 function pikaOk(){const m=P.confirm&&P.confirm.msg;closeConfirm();if(m)tx(m)}
-function pikaVote(id){const p=S.players.find(x=>x.id===id);pikaAsk('Votar em '+(p?p.name:'?')+'? Não dá para desfazer.',{type:'vote',target:id})}
+// Votar em pular a votação (só jogos que ligam a opção "skip" no board, como o Cidade Dorme)
+function pikaSkip(){pikaAsk('Pular a votação? Você não votará em ninguém. Não dá para desfazer.',{type:'skip'})}
+function pikaVote(id){if(id==='skip')return pikaSkip();const p=S.players.find(x=>x.id===id);pikaAsk('Votar em '+(p?p.name:'?')+'? Não dá para desfazer.',{type:'vote',target:id})}
 function modalHtml(){return ''}
 
-// Votação compartilhada com o Impostor - Locais e o Impostor - Perguntas
+// Votação compartilhada com o Impostor - Locais, o Impostor - Perguntas e o Cidade Dorme.
+// Opção o.skip: acrescenta o card "Pular votação" (e a opção no menu do celular). Usa s.skipV (quem confirmou) e s.skipI (quem declarou intenção).
 let VSEL=null;
 function board(s,items,end,o){o=o||{};
   const voted=s.voted.includes(s.you);
   const cand=items.filter(e=>e.id!==s.you||s.players.length===1);
+  if(o.skip)cand.push({id:'skip',name:'Pular votação'});
   const canVote=!end&&!voted&&cand.length>0;
   if(!cand.some(e=>e.id===VSEL))VSEL=cand.length?cand[0].id:null;
-  const myInt=s.intents[s.you];
+  const myInt=s.intents[s.you],skipInt=(s.skipI||[]).includes(s.you);
+  const isInt=id=>id==='skip'?skipInt:myInt===id;
   const need=Math.floor(s.players.length/2)+1,waiting=s.players.filter(p=>!s.voted.includes(p.id));
   const intBtn=(mine,target)=>mine?`<button class="cx" onclick="tx({type:'unintent'},1)">Cancelar intenção</button>`:`<button class="sec" onclick="tx({type:'intent',target:${target}},1)">Declarar intenção</button>`;
   const side=end?'':`<aside class="vside"><div class="card vstat"><label>Faltam votar (${waiting.length})</label>
     <div class="vl">${waiting.length?waiting.map(p=>`<span class="chip sm">${av(p.id)}<b>${esc(p.name)}</b></span>`).join(''):'<span style="color:var(--mut)">Todos já votaram</span>'}</div>
     <small style="display:block;margin-top:14px">Maioria: ${need} voto${need>1?'s':''} encerra a votação</small>
     <div class="legend"><span><i class="lg iv"></i>Intenção de voto</span><span><i class="lg cv"></i>Voto confirmado</span></div></div></aside>`;
-  const sel=canVote?`<div class="vsel card"><label>Escolha o jogador</label><select id="vsel" onchange="VSEL=+this.value;this.blur();render()">${cand.map(e=>`<option value="${e.id}" ${e.id===VSEL?'selected':''}>${esc(e.name)}${e.text!=null?' — '+esc(e.text):''}</option>`).join('')}</select>
-    <div class="vb">${intBtn(myInt===VSEL,'VSEL')}<button onclick="pikaVote(VSEL)">Votar</button></div></div>`:'';
-  const grid=`<div class="vgrid">${items.map(e=>{
+  const sel=canVote?`<div class="vsel card"><label>Escolha o jogador</label><select id="vsel" onchange="VSEL=this.value==='skip'?'skip':+this.value;this.blur();render()">${cand.map(e=>`<option value="${e.id}" ${e.id===VSEL?'selected':''}>${esc(e.name)}${e.text!=null?' — '+esc(e.text):''}</option>`).join('')}</select>
+    <div class="vb">${intBtn(isInt(VSEL),'VSEL')}<button onclick="pikaVote(VSEL)">Votar</button></div></div>`:'';
+  const cards=items.map(e=>{
     const me=e.id===s.you,c=s.counts[e.id]||0,who=Object.keys(s.intents).filter(k=>s.intents[k]===e.id);
     const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
     const can=!end&&(!me||s.players.length===1)&&!voted;
@@ -80,7 +85,16 @@ function board(s,items,end,o){o=o||{};
       <div class="vh">${av(e.id)}<span class="cn"><b>${esc(e.name)}</b>${me?'<small>(você)</small>':''}</span>${o.note?`<button class="nb ${hasNotes(e.id)?'on':''}" onclick="openNotes(${e.id})">Anotações</button>`:''}</div>
       ${e.text!=null?`<div class="vt">${esc(e.text)}</div>`:''}
       <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*8+20}px">${who.map(k=>av(+k,s.voted.includes(+k)?'cv':'iv')).join('')}</div>
-      ${can?`<div class="vb">${intBtn(myInt===e.id,e.id)}<button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`}).join('')}</div>`;
+      ${can?`<div class="vb">${intBtn(myInt===e.id,e.id)}<button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`});
+  if(o.skip){
+    // Card "Pular votação": funciona como os cards dos jogadores (intenção tracejada, voto confirmado com ✓)
+    const sv=s.skipV||[],si=s.skipI||[],n=sv.length+si.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
+    cards.push(`<div class="vc">${sv.length?`<span class="vcnt">${sv.length} voto${sv.length>1?'s':''}</span>`:''}
+      <div class="vh"><span class="cn"><b>Pular votação</b><small>Ninguém é eliminado se a maioria pular</small></span></div>
+      <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*8+20}px">${sv.map(k=>av(k,'cv')).concat(si.map(k=>av(k,'iv'))).join('')}</div>
+      ${(!end&&!voted)?`<div class="vb">${intBtn(skipInt,"'skip'")}<button onclick="pikaSkip()">Votar</button></div>`:''}</div>`);
+  }
+  const grid=`<div class="vgrid">${cards.join('')}</div>`;
   return side+`<div class="vmain">${sel}${grid}</div>`;
 }
 

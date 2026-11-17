@@ -1,6 +1,7 @@
 const { drawWeighted } = require('./rand');
 const ROLES = ['assassino', 'detetive', 'anjo'];
-const NIGHT_MS = 15000;  // duração da noite
+const NIGHT_OPTS = [10, 15, 20, 30, 45, 60]; // durações da noite que o líder pode escolher (segundos)
+const NIGHT_DEFAULT = 15;
 const SLEEP_MS = 5000;   // card "A cidade dorme" depois da votação
 const counts = r => { const c = {}; Object.values(r.votes).forEach(t => { if (t !== 'skip') c[t] = (c[t] || 0) + 1; }); return c; };
 const skipsOf = r => Object.values(r.votes).filter(t => t === 'skip').length;
@@ -10,9 +11,9 @@ const idOf = (r, role) => { const k = Object.keys(r.roles).find(i => r.roles[i] 
 
 function fresh(r) {
   clearTimeout(r.timer); clearTimeout(r.lt);
-  Object.assign(r, { roles: {}, dead: {}, gone: {}, act: {}, inv: {}, miss: {}, nightEnd: 0, ready: {}, intents: {}, votes: {}, night: 0, dawn: null, lastVote: null, result: null, killerName: '' });
+  Object.assign(r, { roles: {}, dead: {}, gone: {}, act: {}, inv: {}, log: {}, miss: {}, nightEnd: 0, ready: {}, intents: {}, votes: {}, night: 0, dawn: null, lastVote: null, result: null, killerName: '' });
 }
-exports.init = r => { fresh(r); };
+exports.init = r => { fresh(r); r.nightSec = NIGHT_DEFAULT; };
 
 // Papéis sorteados pelo mesmo sistema ponderado dos outros jogos (histórico da sala)
 function start(r) {
@@ -47,12 +48,14 @@ function finish(r, w) {
   r._ctx.push(r);
 }
 
-// Noite com tempo fixo: quem não escolheu ninguém simplesmente não age
+// Noite com tempo fixo (definido pelo líder): sempre dura o tempo inteiro, para ninguém deduzir
+// quem tem poder pelo tempo. Quem não escolheu ninguém simplesmente não age.
 function startNight(r) {
   clearTimeout(r.timer); clearTimeout(r.lt);
-  r.phase = 'night'; r.act = {}; r.ready = {}; r.nightEnd = Date.now() + NIGHT_MS;
+  const ms = (r.nightSec || NIGHT_DEFAULT) * 1000;
+  r.phase = 'night'; r.act = {}; r.ready = {}; r.nightEnd = Date.now() + ms;
   const n = r.night;
-  r.timer = setTimeout(() => { if (r.phase === 'night' && r.night === n) resolveNight(r); }, NIGHT_MS);
+  r.timer = setTimeout(() => { if (r.phase === 'night' && r.night === n) resolveNight(r); }, ms);
 }
 
 // "A cidade dorme" por alguns segundos antes da tela de ação
@@ -65,13 +68,17 @@ function startSleep(r) {
 
 function resolveNight(r) {
   clearTimeout(r.timer);
-  const victim = r.act.assassino, prot = r.act.anjo, det = r.act.detetive, did = idOf(r, 'detetive');
+  const victim = r.act.assassino, prot = r.act.anjo, det = r.act.detetive;
+  const did = idOf(r, 'detetive'), aid = idOf(r, 'assassino'), gid = idOf(r, 'anjo');
   // Só o próprio jogador fica sabendo que não escolheu ninguém
   r.miss = {};
   ROLES.forEach(ro => { const id = idOf(r, ro); if (present(r, id) && !r.dead[id] && r.act[ro] == null) r.miss[id] = r.night; });
+  // Históricos de ações (só o próprio jogador vê)
   if (present(r, did) && !r.dead[did] && det != null) {
     (r.inv[did] = r.inv[did] || []).push({ night: r.night, target: det, diff: r.roles[det] !== 'cidadao' });
   }
+  if (present(r, aid) && !r.dead[aid] && victim != null) (r.log[aid] = r.log[aid] || []).push({ night: r.night, target: victim });
+  if (present(r, gid) && !r.dead[gid] && prot != null) (r.log[gid] = r.log[gid] || []).push({ night: r.night, target: prot });
   const dead = [];
   if (victim != null && present(r, victim) && !r.dead[victim] && victim !== prot) { r.dead[victim] = true; dead.push(victim); }
   r.dawn = { night: r.night, dead };
@@ -117,17 +124,25 @@ function progress(r, ctx) {
 exports.view = (r, p) => {
   const ph = r.phase, me = p.id, started = ph !== 'lobby';
   const role = started ? r.roles[me] : null, isDead = started && !!r.dead[me];
+  // A intenção de pular fica separada das intenções em jogadores (o quadro de votação só conhece jogadores)
+  const intents = {};
+  Object.keys(r.intents).forEach(k => { if (r.intents[k] !== 'skip') intents[k] = r.intents[k]; });
   const v = { type: 'state', game: 'cidade', you: me, code: r.code, phase: ph, host: r.players[0].id,
     players: r.players.map(x => ({ id: x.id, name: x.name, emo: x.emo, color: x.color })),
     dead: started ? r.players.filter(x => r.dead[x.id]).map(x => x.id) : [],
-    night: r.night, ready: Object.keys(r.ready).map(Number),
-    intents: r.intents, voted: Object.keys(r.votes).map(Number), counts: counts(r),
+    night: r.night, nightSec: r.nightSec || NIGHT_DEFAULT, ready: Object.keys(r.ready).map(Number),
+    intents, voted: Object.keys(r.votes).map(Number), counts: counts(r),
     lastVote: r.lastVote, dawn: r.dawn, result: r.result };
   if (started) { v.role = role; v.isDead = isDead; }
-  if (ph === 'vote') { v.skips = skipsOf(r); v.mySkip = r.votes[me] === 'skip'; }
+  if (ph === 'vote') {
+    v.skips = skipsOf(r); v.mySkip = r.votes[me] === 'skip';
+    v.skipV = Object.keys(r.votes).filter(k => r.votes[k] === 'skip').map(Number);
+    v.skipI = Object.keys(r.intents).filter(k => r.intents[k] === 'skip' && !r.votes[k]).map(Number);
+  }
   if (ph === 'day' && r.miss && r.miss[me]) v.missed = r.miss[me];
   if (started && (isDead || ph === 'end')) { v.roles = {}; r.players.forEach(x => { v.roles[x.id] = r.roles[x.id]; }); }
   if (started && role === 'detetive') v.inv = r.inv[me] || [];
+  if (started && (role === 'assassino' || role === 'anjo')) v.log = r.log[me] || [];
   if (ph === 'night' && !isDead && ROLES.includes(role)) {
     const al = alive(r).map(x => x.id);
     v.act = { role, done: r.act[role] !== undefined, left: Math.max(0, r.nightEnd - Date.now()), targets: role === 'anjo' ? al : al.filter(i => i !== me) };
@@ -141,6 +156,11 @@ exports.handle = (r, me, m, ctx) => {
   const leader = r.players[0] === me, ph = r.phase;
   const isAlive = r.roles[me.id] !== undefined && !r.dead[me.id];
   if (ph === 'lobby') {
+    if (m.type === 'cfg' && leader) {
+      const s = +m.sec;
+      if (NIGHT_OPTS.includes(s)) { r.nightSec = s; return ctx.push(r); }
+      return;
+    }
     if (m.type === 'start' && leader) {
       if (r.players.length < 5) return ctx.err(me.ws, 'São necessários pelo menos 5 jogadores.');
       start(r); return ctx.push(r);
@@ -162,6 +182,8 @@ exports.handle = (r, me, m, ctx) => {
   if (ph === 'vote' && isAlive) {
     if (m.type === 'unintent' && !r.votes[me.id]) { delete r.intents[me.id]; return ctx.push(r); }
     if (m.type === 'skip' && !r.votes[me.id]) { r.votes[me.id] = 'skip'; delete r.intents[me.id]; return progress(r, ctx); }
+    // Intenção de pular a votação
+    if (m.type === 'intent' && m.target === 'skip' && !r.votes[me.id]) { r.intents[me.id] = 'skip'; return ctx.push(r); }
     const t = +m.target;
     if (!r.votes[me.id] && present(r, t) && !r.dead[t] && t !== me.id) {
       if (m.type === 'intent') { r.intents[me.id] = t; return ctx.push(r); }
