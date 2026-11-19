@@ -1,4 +1,4 @@
-const http = require('http'), fs = require('fs'), path = require('path');
+const http = require('http'), fs = require('fs'), path = require('path'), zlib = require('zlib');
 const { WebSocketServer } = require('ws');
 const pika = require('./pika');
 const perguntas = require('./perguntas');
@@ -10,20 +10,73 @@ const MODS = { pika, perguntas, cidade };
 const PASS = process.env.ADMIN_PASSWORD;
 if (!PASS || PASS.length < 8) { console.error('Defina a variável de ambiente ADMIN_PASSWORD (mínimo 8 caracteres).'); process.exit(1); }
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
 const EMOJIS = 20, COLORS = 12, GRACE = 60000;
-let locCache = null, locMtime = 0;
+// Limites de proteção do servidor
+const MAX_ROOMS = 300;               // salas abertas ao mesmo tempo
+const ROOM_TTL = +process.env.ROOM_TTL_MS || 3 * 60 * 60 * 1000; // sala sem nenhuma atividade por 3 h é encerrada (a variável serve para testes)
+const MAX_PER_IP = +process.env.MAX_PER_IP || 80; // conexões simultâneas por endereço (uma casa/escola inteira pode dividir o mesmo)
+const MAX_MSGS_PER_SEC = 40;         // mensagens por segundo em cada conexão (mais que isso é ignorado; o dobro derruba a conexão)
+const MAX_PAYLOAD = 32 * 1024;       // tamanho máximo de uma mensagem
+
+// ---------- localidades (com cache) ----------
+// O arquivo só é conferido no disco a cada 2 s. Quando muda, guarda a lista, o JSON pronto para a API e um "carimbo" (locMtime).
+let locCache = null, locMtime = 0, locChecked = 0, locNames = [], locReply = null;
 const readLocs = () => {
+  const now = Date.now();
+  if (locCache && now - locChecked < 2000) return locCache;
+  locChecked = now;
   const m = fs.statSync(LOC).mtimeMs;
-  if (!locCache || m !== locMtime) { locCache = JSON.parse(fs.readFileSync(LOC, 'utf8')); locMtime = m; }
+  if (!locCache || m !== locMtime) {
+    const txt = fs.readFileSync(LOC, 'utf8');
+    locCache = JSON.parse(txt); locMtime = m;
+    locNames = locCache.locations.map(l => l.name);
+    locReply = { type: MIME['.json'], raw: Buffer.from(JSON.stringify(locCache)), etag: 'W/"loc-' + Math.floor(m) + '"', compress: true, cache: 'no-cache' };
+  }
   return locCache;
 };
+
+// ---------- respostas HTTP: compressão (br/gzip) e cache por ETag ----------
+const TEXT = new Set(['.html', '.js', '.css', '.json', '.svg']);
+function reply(q, s, o) {
+  const h = { 'Content-Type': o.type, 'ETag': o.etag, 'Cache-Control': o.cache, 'Vary': 'Accept-Encoding' };
+  if (q.headers['if-none-match'] === o.etag) { s.writeHead(304, h); return s.end(); }
+  let body = o.raw;
+  if (o.compress) {
+    const ae = String(q.headers['accept-encoding'] || '');
+    if (/\bbr\b/.test(ae)) { body = o.br || (o.br = zlib.brotliCompressSync(o.raw, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 5 } })); h['Content-Encoding'] = 'br'; }
+    else if (/\bgzip\b/.test(ae)) { body = o.gz || (o.gz = zlib.gzipSync(o.raw, { level: 6 })); h['Content-Encoding'] = 'gzip'; }
+  }
+  h['Content-Length'] = body.length;
+  s.writeHead(200, h);
+  s.end(q.method === 'HEAD' ? undefined : body);
+}
+const fileCache = new Map();
+function serveFile(q, s, file) {
+  fs.stat(file, (e, st) => {
+    if (e || !st.isFile()) { s.writeHead(404); return s.end('Não encontrado'); }
+    const o0 = fileCache.get(file);
+    if (o0 && o0.m === st.mtimeMs && o0.size === st.size) return reply(q, s, o0);
+    fs.readFile(file, (e2, d) => {
+      if (e2) { s.writeHead(404); return s.end('Não encontrado'); }
+      const ext = path.extname(file);
+      const o = { m: st.mtimeMs, size: st.size, raw: d, type: MIME[ext] || 'application/octet-stream',
+        etag: 'W/"' + st.size.toString(16) + '-' + Math.floor(st.mtimeMs).toString(16) + '"', compress: TEXT.has(ext),
+        // páginas e scripts sempre conferem se mudou (304 é barato); imagens ficam 1 dia no navegador
+        cache: /\.(png|jpe?g|webp|gif)$/.test(ext) ? 'public, max-age=86400' : 'no-cache' };
+      if (st.size <= 1e6) fileCache.set(file, o);
+      reply(q, s, o);
+    });
+  });
+}
+
 const body = q => new Promise(r => { let b = ''; q.on('data', c => { b += c; if (b.length > 2e6) q.destroy(); }); q.on('end', () => { try { r(JSON.parse(b)); } catch { r(null); } }); });
 const json = (s, c, o) => { s.writeHead(c, { 'Content-Type': 'application/json' }); s.end(JSON.stringify(o)); };
 
 const server = http.createServer(async (q, s) => {
-  const u = decodeURIComponent(q.url.split('?')[0]);
-  if (u === '/api/locations') return json(s, 200, readLocs());
+  let u;
+  try { u = decodeURIComponent(q.url.split('?')[0]); } catch { s.writeHead(400); return s.end(); }
+  if (u === '/api/locations') { try { readLocs(); } catch { return json(s, 500, { error: 'Erro ao ler as localidades' }); } return reply(q, s, locReply); }
   if (u.startsWith('/api/admin/') && q.method === 'POST') {
     const b = await body(q);
     if (!b || b.password !== PASS) return json(s, 401, { error: 'Senha incorreta' });
@@ -31,7 +84,7 @@ const server = http.createServer(async (q, s) => {
     if (u === '/api/admin/save') {
       if (!b.data || !Array.isArray(b.data.locations)) return json(s, 400, { error: 'Dados inválidos' });
       b.data.locations.forEach(l => { l.labels = [...new Set((Array.isArray(l.labels) ? l.labels : []).map(x => String(x).trim().slice(0, 30)).filter(Boolean))].slice(0, 10); });
-      try { fs.writeFileSync(LOC + '.tmp', JSON.stringify(b.data, null, 2)); fs.renameSync(LOC + '.tmp', LOC); return json(s, 200, { ok: true }); }
+      try { fs.writeFileSync(LOC + '.tmp', JSON.stringify(b.data, null, 2)); fs.renameSync(LOC + '.tmp', LOC); locChecked = 0; return json(s, 200, { ok: true }); }
       catch { return json(s, 500, { error: 'Erro ao salvar' }); }
     }
     return json(s, 404, {});
@@ -40,18 +93,15 @@ const server = http.createServer(async (q, s) => {
   if (u === '/') file = path.join(DIR, 'index.html');
   else if (u === '/gerenciar-locais') file = path.join(DIR, 'admin.html');
   else { file = path.join(PUB, path.normalize(u)); if (!file.startsWith(PUB)) { s.writeHead(403); return s.end(); } }
-  fs.readFile(file, (e, d) => {
-    if (e) { s.writeHead(404); return s.end('Não encontrado'); }
-    s.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' }); s.end(d);
-  });
+  serveFile(q, s, file);
 });
 
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server, maxPayload: MAX_PAYLOAD });
 const rooms = {};
 let nextId = 1;
 const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const newCode = () => { let c; do { c = Array.from({ length: 4 }, () => L[Math.random() * L.length | 0]).join(''); } while (rooms[c]); return c; };
-const send = (w, m) => w && w.readyState === 1 && w.send(JSON.stringify(m));
+const send = (w, m) => { if (w && w.readyState === 1) { w.send(JSON.stringify(m)); return true; } return false; };
 const clean = s => String(s || '').trim().slice(0, 30);
 // Chave para comparar nomes: sem acento, sem diferença de maiúscula/minúscula e sem espaços repetidos
 const nameKey = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
@@ -86,7 +136,9 @@ function begin(r) {
   // Local e quem começa: sorteio por ciclos. Espião: sorteio ponderado pelo histórico recente da sala
   const locName = draw(r, 'loc', locs.map(l => l.name));
   r.loc = locs.find(l => l.name === locName);
-  const sp = r.players.find(p => p.id === drawWeighted(r, 'spy', ids));
+  // Sorteia UMA vez (antes o sorteio ficava dentro do find e rodava uma vez por jogador: às vezes não achava ninguém e quebrava a rodada)
+  const spyId = drawWeighted(r, 'spy', ids);
+  const sp = r.players.find(p => p.id === spyId);
   r.spy = sp.id; r.spyName = sp.name; r.spyGone = false;
   r.starter = draw(r, 'starter', ids); r.round = (r.round || 0) + 1;
   r.phase = 'play'; r.ready = {}; r.intents = {}; r.votes = {}; r.result = null;
@@ -98,20 +150,31 @@ function view(r, p) {
     players: r.players.map(x => ({ id: x.id, name: x.name, emo: x.emo, color: x.color })), result: r.result || null,
     ready: Object.keys(r.ready || {}).map(Number), intents: r.intents || {}, voted: Object.keys(r.votes || {}).map(Number), counts: count(r) };
   if (r.phase === 'lobby') {
-    v.all = readLocs().locations.map(l => ({ name: l.name, img: l.img || '', labels: Array.isArray(l.labels) ? l.labels : [] }));
-    v.selected = r.sel || v.all.map(l => l.name);
+    const d = readLocs();
+    // A lista completa de localidades (pesada) só vai quando o jogador ainda não a recebeu ou quando o arquivo mudou.
+    // O cliente guarda a última lista recebida.
+    if (p.sentLoc !== locMtime) v.all = d.locations.map(l => ({ name: l.name, img: l.img || '', labels: Array.isArray(l.labels) ? l.labels : [] }));
+    v.selected = r.sel || locNames;
   } else {
-    v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, locs: r.locs, spyImg: r.spyImg };
+    v.role = { spy: p.id === r.spy, loc: p.id === r.spy ? null : r.loc, spyImg: r.spyImg };
+    // A lista de localidades da rodada só vai uma vez por rodada (o cliente guarda)
+    if (p.sentRound !== r.round) v.role.locs = r.locs;
     v.starter = r.starter; v.round = r.round;
   }
   return v;
 }
-const push = r => r.players.forEach(p => {
-  const v = view(r, p);
-  v.gid = r.game; v.rank = rank(r); v.rounds = r.rounds || 0; v.gain = r.gain || {};
-  if (v.players) v.players = v.players.map(x => ({ ...x, away: !!(r.players.find(q => q.id === x.id) || {}).away }));
-  send(p.ws, v);
-});
+const push = r => {
+  r.lastAct = Date.now();
+  r.players.forEach(p => {
+    const v = view(r, p);
+    v.gid = r.game; v.rank = rank(r); v.rounds = r.rounds || 0; v.gain = r.gain || {};
+    if (v.players) v.players = v.players.map(x => ({ ...x, away: !!(r.players.find(q => q.id === x.id) || {}).away }));
+    if (send(p.ws, v)) { // só marca como enviada se a mensagem realmente saiu
+      if (v.all) p.sentLoc = locMtime;
+      if (v.role && v.role.locs) p.sentRound = r.round;
+    }
+  });
+};
 const err = (w, msg, alert) => send(w, { type: 'error', msg, alert: !!alert });
 const ctx = { push, err, award };
 
@@ -157,15 +220,32 @@ function removePlayer(r, p) {
   step(r);
 }
 
-wss.on('connection', ws => {
+// Encerra uma sala inteira (usado na limpeza por inatividade)
+function closeRoom(r, msg) {
+  clearTimeout(r.timer); clearTimeout(r.qt); clearTimeout(r.lt);
+  r.players.forEach(p => { clearTimeout(p.grace); send(p.ws, { type: 'kicked', msg }); });
+  r.players = [];
+  delete rooms[r.code];
+}
+
+const ipOf = req => String((req.headers['x-forwarded-for'] || '').split(',')[0] || req.socket.remoteAddress || '?').trim();
+const ipCount = new Map();
+
+wss.on('connection', (ws, req) => {
+  const ip = ipOf(req);
+  if ((ipCount.get(ip) || 0) >= MAX_PER_IP) { try { ws.close(1013, 'Muitas conexões'); } catch {} return; }
+  ipCount.set(ip, (ipCount.get(ip) || 0) + 1);
+  ws.on('close', () => { const n = (ipCount.get(ip) || 1) - 1; if (n) ipCount.set(ip, n); else ipCount.delete(ip); });
+
   ws.isAlive = true;
   ws.on('pong', () => { ws.isAlive = true; });
-  let me = { id: nextId++, ws, name: '', emo: 0, color: 0, token: '', away: false };
+  let me = { id: nextId++, ws, name: '', emo: 0, color: 0, token: '', away: false, sentLoc: null, sentRound: null };
   let room = null;
   const leave = () => { if (!room) return; const r = room; room = null; removePlayer(r, me); };
 
   const onMessage = raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
+    if (!m || typeof m !== 'object') return;
     ws.isAlive = true;
     if (m.type === 'ping') return send(ws, { type: 'pong' });
     if (room && !room.players.includes(me)) room = null;
@@ -181,6 +261,7 @@ wss.on('connection', ws => {
       const old = p.ws;
       if (old !== ws) { send(old, { type: 'kicked', msg: 'Sua sessão foi aberta em outra aba ou aparelho.' }); try { old.close(); } catch {} }
       p.ws = ws; me = p; room = r;
+      me.sentLoc = null; me.sentRound = null; // página nova: precisa receber as listas de localidades de novo
       send(ws, { type: 'resumed', gid: r.game });
       return push(r);
     }
@@ -197,8 +278,9 @@ wss.on('connection', ws => {
       me.token = tk.length >= 8 ? tk : Math.random().toString(36).slice(2) + Date.now().toString(36);
       for (const r0 of Object.values(rooms)) { const p0 = r0.players.find(x => x.token === me.token && x !== me); if (p0) removePlayer(r0, p0); }
       if (m.type === 'create') {
+        if (Object.keys(rooms).length >= MAX_ROOMS) return err(ws, 'O servidor está cheio no momento. Tente de novo em alguns minutos.');
         const c = newCode();
-        room = rooms[c] = { code: c, game: MODS[m.game] ? m.game : 'locais', players: [], phase: 'lobby', sel: null, scores: {}, rounds: 0 };
+        room = rooms[c] = { code: c, game: MODS[m.game] ? m.game : 'locais', players: [], phase: 'lobby', sel: null, scores: {}, rounds: 0, lastAct: Date.now() };
         if (MODS[room.game]) MODS[room.game].init(room);
       } else {
         room = rooms[String(m.code || '').toUpperCase().trim()];
@@ -212,7 +294,7 @@ wss.on('connection', ws => {
       const used = new Set(room.players.map(p => p.emo)); let e = 0;
       while (used.has(e)) e++;
       if (e >= EMOJIS) { room = null; return err(ws, 'Sala cheia (máx. 20 jogadores).'); }
-      me.emo = e; me.color = e % COLORS;
+      me.emo = e; me.color = e % COLORS; me.sentLoc = null; me.sentRound = null;
       room.players.push(me); return push(room);
     }
     if (!room) return;
@@ -231,7 +313,8 @@ wss.on('connection', ws => {
     }
     if (MODS[r.game]) return MODS[r.game].handle(r, me, m, ctx);
     if (m.type === 'locs' && isHost && r.phase === 'lobby') {
-      const ok = new Set(readLocs().locations.map(l => l.name));
+      readLocs();
+      const ok = new Set(locNames);
       r.sel = (Array.isArray(m.selected) ? m.selected : []).filter(n => ok.has(n));
       return push(r);
     }
@@ -249,7 +332,17 @@ wss.on('connection', ws => {
       if (m.type === 'vote') { r.votes[me.id] = m.target; r.intents[me.id] = m.target; return step(r); }
     }
   };
+
+  // Limite de mensagens por segundo: o excesso é ignorado e, se for o dobro do limite, a conexão é derrubada
+  let win = Date.now(), cnt = 0;
   ws.on('message', raw => {
+    const now = Date.now();
+    if (now - win >= 1000) { win = now; cnt = 0; }
+    if (++cnt > MAX_MSGS_PER_SEC) {
+      if (cnt === MAX_MSGS_PER_SEC + 1) console.warn('Conexão acima do limite de mensagens (' + ip + ')');
+      if (cnt > MAX_MSGS_PER_SEC * 2) ws.terminate();
+      return;
+    }
     try { onMessage(raw); }
     catch (e) { console.error('Erro ao tratar mensagem:', e); err(ws, 'Algo deu errado. Tente novamente.'); }
   });
@@ -267,4 +360,13 @@ setInterval(() => {
   wss.clients.forEach(c => { if (!c.isAlive) return c.terminate(); c.isAlive = false; try { c.ping(); } catch {} });
 }, 25000);
 
-server.listen(process.env.PORT || 3000, () => console.log('Rodando em http://localhost:' + (process.env.PORT || 3000)));
+// Limpeza: salas sem nenhuma atividade por muito tempo são encerradas e saem da memória
+setInterval(() => {
+  const now = Date.now();
+  for (const r of Object.values(rooms)) if (now - (r.lastAct || 0) > ROOM_TTL) closeRoom(r, 'A sala foi encerrada por inatividade.');
+}, +process.env.SWEEP_MS || 5 * 60 * 1000);
+
+if (require.main === module) {
+  server.listen(process.env.PORT || 3000, () => console.log('Rodando em http://localhost:' + (process.env.PORT || 3000)));
+}
+module.exports = { server, rooms };

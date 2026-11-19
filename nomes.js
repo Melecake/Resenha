@@ -33,12 +33,8 @@ const SQRE = SUB.filter(w => w.length >= 6 || FORCE.has(w)).map(w => rep(w, fals
 const WORDRE = WORD.map(w => rep(w, true));
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's', '!': 'i', '|': 'i' };
 
-exports.blocked = function (name) {
-  const raw = String(name || '');
-  if (/1488/.test(raw)) return true;
-  const s = raw.toLowerCase().normalize('NFD')
-    .replace(/[\u0300-\u036f\u200b-\u200f\u2060\ufeff]/g, '')
-    .replace(/[013457@$!|]/g, c => LEET[c]);
+// Confere um texto já normalizado (só letras a-z e separadores)
+function check(s) {
   const toks = s.split(/[^a-z]+/).filter(Boolean);
   // letras soltas em sequência ("n i g g a" ou "n.i.g.g.a") viram uma palavra só
   const extra = []; let run = '';
@@ -51,4 +47,13 @@ exports.blocked = function (name) {
   const squashed = s.replace(/[^a-z]/g, '');
   return all.some(t => SUBRE.some(re => re.test(t)) || WORDRE.some(re => re.test(t)))
     || SQRE.some(re => re.test(squashed));
+}
+
+exports.blocked = function (name) {
+  const raw = String(name || '');
+  if (/1488/.test(raw)) return true;
+  const base = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f\u200b-\u200f\u2060\ufeff]/g, '');
+  // Duas leituras: com números/símbolos trocados por letras ("n1gg4" -> "nigga") e sem trocar
+  // (assim "macaco!" continua sendo "macaco", e não "macacoi").
+  return check(base.replace(/[013457@$!|]/g, c => LEET[c])) || check(base);
 };

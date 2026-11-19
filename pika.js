@@ -91,8 +91,12 @@ function after(r, ctx) {
       });
       r.result = { max, early: !all, losers };
       r.phase = 'end';
+      // Quem não teve a pior escolha ganha 1 ponto; o mais votado (todos os empatados) perde 1 ponto.
+      // O placar da sala pode ficar negativo.
       const lose = new Set(losers.map(l => l.id));
-      ctx.award(r, vs.filter(p => !lose.has(p.id)).map(p => [p, 1]));
+      const pts = vs.filter(p => !lose.has(p.id)).map(p => [p, 1]);
+      losers.forEach(l => { const p = r.players.find(x => x.id === l.id); if (p) pts.push([p, -1]); });
+      ctx.award(r, pts);
     }
   }
   if (r.phase === 'write') { armLast(r, ctx); arm(r, ctx); }
