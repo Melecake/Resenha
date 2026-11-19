@@ -91,7 +91,7 @@ function cidadeView(){
   }else if(ph==='roles'){
     const R=ROLE[s.role],acked=s.ready.includes(s.you),sp=s.role!=='cidadao';
     h+=`<div class="card ctr nightcard t-${s.role}"><label>Seu papel (só você vê)</label>${sp?`<div class="orb ${s.role}"></div>`:''}<div class="rtitle">${R.n}</div><p>${R.d}</p>
-      <p class="mut">Cada noite dura ${s.nightSec} segundos.${sp?' Se você não escolher ninguém nesse tempo, fica sem agir naquela noite.':' Durante a noite, aguarde enquanto os outros jogadores agem em segredo.'}</p>
+      <p class="mut">Cada noite dura ${s.nightSec} segundos.${sp?' Você precisa escolher alguém nesse tempo. Se não escolher, uma pessoa será sorteada para a sua ação.':' Durante a noite, aguarde enquanto os outros jogadores agem em segredo.'}</p>
       ${acked?'<p class="mut" style="margin:0">Aguardando os outros jogadores…</p>':`<button style="width:100%" onclick="tx({type:'ack'})">Entendi, pode dormir</button>`}</div>
       <div class="card"><label>Prontos (${s.ready.length}/${s.players.length})</label><ul>${s.players.map(p=>`<li><span class="nm">${av(p.id)}${esc(p.name)}</span>${s.ready.includes(p.id)?'<span class="tag">pronto</span>':''}</li>`).join('')}</ul></div>`;
   }else if(ph==='sleep'){
@@ -108,7 +108,7 @@ function cidadeView(){
   }else if(ph==='day'){
     const d=s.dawn,rdy=s.ready,mine=rdy.includes(s.you);
     h+=`<div class="card ctr dawncard"><label>Amanhecer</label><div class="dawnt">Cidade acorda: ${dawnTxt(d)}</div>${d&&d.dead.length?`<div class="chips" style="margin-top:0">${d.dead.map(id=>`<span class="chip">${av(id)}<b>${nm(id)}</b></span>`).join('')}</div>`:''}</div>`;
-    if(s.missed)h+=`<div class="card ctr${dc}"><p class="mut" style="margin:0">Você não escolheu ninguém na noite ${s.missed}.</p></div>`;
+    if(s.missed)h+=`<div class="card ctr${dc}"><p class="mut" style="margin:0">Você não escolheu a tempo na noite ${s.missed}, então a sua ação foi sorteada.</p></div>`;
     if(role==='detetive'&&s.inv)h+=histCard('Suas investigações',s.inv.map(i=>({night:i.night,target:i.target,tag:`<span class="tag ${kCls(i.diff)}">${kTxt(i.diff)}</span>`})));
     else if(role==='anjo'&&s.log)h+=histCard('Quem você protegeu',s.log);
     else if(role==='assassino'&&s.log)h+=histCard('Quem você matou ou tentou matar',s.log);

@@ -49,7 +49,7 @@ function finish(r, w) {
 }
 
 // Noite com tempo fixo (definido pelo líder): sempre dura o tempo inteiro, para ninguém deduzir
-// quem tem poder pelo tempo. Quem não escolheu ninguém simplesmente não age.
+// quem tem poder pelo tempo. Quem não escolheu a tempo tem o alvo sorteado (ver resolveNight).
 function startNight(r) {
   clearTimeout(r.timer); clearTimeout(r.lt);
   const ms = (r.nightSec || NIGHT_DEFAULT) * 1000;
@@ -68,11 +68,22 @@ function startSleep(r) {
 
 function resolveNight(r) {
   clearTimeout(r.timer);
-  const victim = r.act.assassino, prot = r.act.anjo, det = r.act.detetive;
   const did = idOf(r, 'detetive'), aid = idOf(r, 'assassino'), gid = idOf(r, 'anjo');
-  // Só o próprio jogador fica sabendo que não escolheu ninguém
+  // Quem não escolheu a tempo tem o alvo sorteado entre as opções válidas do seu papel.
+  // Só o próprio jogador fica sabendo que a escolha foi automática (r.miss).
   r.miss = {};
-  ROLES.forEach(ro => { const id = idOf(r, ro); if (present(r, id) && !r.dead[id] && r.act[ro] == null) r.miss[id] = r.night; });
+  ROLES.forEach(ro => {
+    const id = idOf(r, ro);
+    if (!present(r, id) || r.dead[id] || r.act[ro] != null) return;
+    const known = new Set((r.inv[id] || []).map(i => i.target));
+    const opts = alive(r).map(p => p.id)
+      .filter(t => ro === 'anjo' || t !== id)               // só o anjo pode escolher a si mesmo
+      .filter(t => ro !== 'detetive' || !known.has(t));      // detetive não repete investigados
+    if (!opts.length) return;
+    r.act[ro] = opts[Math.random() * opts.length | 0];
+    r.miss[id] = r.night;
+  });
+  const victim = r.act.assassino, prot = r.act.anjo, det = r.act.detetive;
   // Históricos de ações (só o próprio jogador vê)
   if (present(r, did) && !r.dead[did] && det != null) {
     (r.inv[did] = r.inv[did] || []).push({ night: r.night, target: det, diff: r.roles[det] !== 'cidadao' });
