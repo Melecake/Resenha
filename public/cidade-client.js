@@ -55,7 +55,10 @@ function tick(){const e=document.getElementById('ctimer');if(!e)return;const s=t
 setInterval(tick,250);
 
 function cidadeRender(){
-  const key=S.phase+'|'+S.night;if(C.k!==key){C.k=key;C.sel=null}
+  // Cidadãos comuns e mortos veem a mesma tela em "sleep" e "night": só o texto muda, sem animação de entrada.
+  // (Quem tem ação à noite continua trocando de tela de verdade.)
+  const calm=(S.phase==='sleep'||S.phase==='night')&&(S.isDead||S.role==='cidadao');
+  const key=calm?'sn|'+S.night:S.phase+'|'+S.night;if(C.k!==key){C.k=key;C.sel=null}
   if(C.s!==S){C.s=S;C.end=Date.now()+((S.act&&S.act.left)||0)}
   $('app').classList.toggle('wide',['lobby','day','vote','end'].includes(S.phase));
   $('app').innerHTML=cidadeView();trans('c|'+key);tick();
@@ -74,7 +77,7 @@ function cidadeView(){
   const bar=()=>{if(ph==='lobby'||ph==='roles'||ph==='end')return '';
     if(dead)return `<div class="rolebar rb-dead"><span>Situação</span><b>Fora do jogo</b></div>`;
     return `<div class="rolebar ${ph==='night'?'rb-'+role:'rb-neutral'}"><span>Seu papel</span><b>${ROLE[role].n}</b></div>`};
-  const sleepCard=(extra)=>`<div class="card ctr nightcard${dc}"><label>Noite ${s.night}</label><div class="${dead?'orb dead':'moonbig'}"></div><h2>A cidade dorme</h2>${extra||''}</div>`;
+  const sleepCard=(extra)=>`<div class="card ctr nightcard${dc}"><label>Noite ${s.night}</label><div class="${dead?'orb dead':'moonbig'}" style="animation-delay:-${((Date.now()%6000)/1000).toFixed(2)}s"></div><h2>A cidade dorme</h2>${extra||''}</div>`;
   // Histórico das ações do próprio jogador (só ele vê). Só o detetive recebe o resultado.
   const histCard=(title,rows)=>`<div class="card${dc}"><label>${title} (só você vê)</label>${rows.length?`<ul>${rows.map(i=>`<li><span class="nm">Noite ${i.night}: ${av(i.target)}<b>${nm(i.target)}</b></span>${i.tag||''}</li>`).join('')}</ul>`:'<p class="mut" style="margin:0">Nenhum ainda.</p>'}</div>`;
   let h=E+bar();
@@ -117,9 +120,12 @@ function cidadeView(){
       ${dead?'':`<button style="width:100%;margin:12px 0 10px" class="${mine?'cx':''}" onclick="tx({type:'ready',ready:${!mine}})">${mine?'Cancelar':'Pronto para votar'}</button>`}
       <ul class="rl">${aliveP.map(p=>`<li><span class="nm">${av(p.id)}${esc(p.name)}${p.away?'<span class="tag off2">offline</span>':''}</span>${rdy.includes(p.id)?'<span class="tag">pronto</span>':''}</li>`).join('')}</ul></div>`;
   }else if(ph==='vote'){
-    const voted=s.voted.includes(s.you);
-    h+=`<div class="card ctr${dc}"><label>Votação</label><h2>Quem é o assassino?</h2><p class="mut" style="margin:0">${dead?'Você está fora do jogo e não vota.':'Declare sua intenção e vote. Você também pode pular a votação. Em caso de empate, ninguém é eliminado. Se a maioria pular, ninguém é eliminado.'}${(!dead&&voted)?(s.mySkip?' Você pulou a votação.':' Você já votou.'):''}</p></div>`;
-    h+=board({...s,players:aliveP,voted:dead?s.voted.concat(s.you):s.voted},aliveP.map(p=>({id:p.id,name:p.name})),false,{skip:true});
+    const voted=s.voted.includes(s.you),sv=s.skipV||[],si=s.skipI||[],mine=si.includes(s.you),canSkip=!dead&&!voted;
+    const skAv=sv.map(id=>av(id,'cv')).concat(si.map(id=>av(id,'iv'))).join('');
+    h+=`<div class="card ctr${dc}"><label>Votação</label><h2>Quem é o assassino?</h2><p class="mut" style="margin:0">${dead?'Você está fora do jogo e não vota.':'Declare sua intenção e vote. Você também pode pular a votação. Em caso de empate, ninguém é eliminado. Se a maioria pular, ninguém é eliminado.'}${(!dead&&voted)?(s.mySkip?' Você pulou a votação.':' Você já votou.'):''}</p>
+      ${canSkip?`<div class="row" style="max-width:440px;margin:16px auto 0"><button class="${mine?'cx':'sec'}" onclick="${mine?`tx({type:'unintent'},1)`:`tx({type:'intent',target:'skip'},1)`}">${mine?'Cancelar intenção':'Declarar intenção de pular'}</button><button onclick="pikaSkip()">Pular votação</button></div>`:''}
+      ${skAv?`<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px">${skAv}</div>`:''}</div>`;
+    h+=board({...s,players:aliveP,voted:dead?s.voted.concat(s.you):s.voted},aliveP.map(p=>({id:p.id,name:p.name})),false);
     if(dead)h+=rolesCard();
   }else{
     const r=s.result,win=r.winner==='cidade',lead=leader;

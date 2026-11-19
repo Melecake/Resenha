@@ -98,7 +98,7 @@ body.home .games{flex:1;min-height:0;margin:3vh auto 0;width:100%}body.home .gc{
 ul{list-style:none;padding:0;margin:0}li{display:flex;justify-content:space-between;align-items:center;padding:6px 0;gap:8px}li .nm{flex:1;display:flex;align-items:center;gap:10px}
 .rk{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07)}.rk:last-child{border:0}
 .rp{font:400 1.1rem Bungee,Impact,sans-serif;color:var(--acc);width:44px}.rpt{font-weight:700;white-space:nowrap}
-.gn{display:inline-block;background:var(--acc);color:var(--ink);border-radius:6px;padding:2px 7px;font-size:.75rem;margin-left:6px;vertical-align:middle}
+.gn{display:inline-block;background:var(--acc);color:var(--ink);border-radius:6px;padding:2px 7px;font-size:.75rem;margin-left:6px;vertical-align:middle}.gn.neg{background:#e04848;color:#fff}
 .chips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:18px}
 .chip{display:inline-flex;align-items:center;gap:10px;background:#0a1230;border:2px solid var(--line);border-radius:14px;padding:6px 16px 6px 6px;font-weight:700;text-align:left}
 .chip.sm{padding:3px 12px 3px 3px;font-size:.85rem;gap:8px}.chip.sm .av{width:30px;height:30px;flex-basis:30px;font-size:1rem;border-radius:9px}
@@ -394,7 +394,7 @@ function drawNotes(){const c=$('nt');if(!c)return;
 
 // Ranking da sala (na tela final mostra +N em quem pontuou na partida)
 function rankCard(){if(!S||!S.rank||!S.rank.length)return '';let pos=0,last=null;const g=(S.phase==='end'&&S.gain)?S.gain:{};
-  const rows=S.rank.map((x,i)=>{if(x.pts!==last){pos=i+1;last=x.pts}return `<li class="rk"><span class="rp">${pos}º</span><span class="nm">${av(x.id)}<b>${nm(x.id)}</b></span><span class="rpt">${x.pts} ponto${x.pts===1?'':'s'}${g[x.id]?`<span class="gn">+${g[x.id]}</span>`:''}</span></li>`}).join('');
+  const rows=S.rank.map((x,i)=>{if(x.pts!==last){pos=i+1;last=x.pts}return `<li class="rk"><span class="rp">${pos}º</span><span class="nm">${av(x.id)}<b>${nm(x.id)}</b></span><span class="rpt">${x.pts} ponto${Math.abs(x.pts)===1?'':'s'}${g[x.id]?`<span class="gn${g[x.id]<0?' neg':''}">${g[x.id]>0?'+':''}${g[x.id]}</span>`:''}</span></li>`}).join('');
   return `<div class="card"><label>Ranking da sala (${S.rounds} partida${S.rounds>1?'s':''})</label><ul>${rows}</ul></div>`}
 
 // Convite
