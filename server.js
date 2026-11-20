@@ -323,6 +323,11 @@ wss.on('connection', (ws, req) => {
       r.sel = (Array.isArray(m.selected) ? m.selected : []).filter(n => ok.has(n));
       return push(r);
     }
+    // Fim da partida: o líder leva todo mundo de volta para a sala de espera (mantém ranking, histórico e localidades escolhidas)
+    if (m.type === 'lobby' && r.phase === 'end' && isHost) {
+      r.phase = 'lobby'; r.ready = {}; r.intents = {}; r.votes = {}; r.result = null;
+      return push(r);
+    }
     if ((m.type === 'start' && r.phase === 'lobby' || m.type === 'again' && r.phase === 'end') && isHost) {
       if (!begin(r)) return err(ws, 'Escolha pelo menos 2 localidades.');
       return push(r);
