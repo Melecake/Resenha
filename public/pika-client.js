@@ -78,8 +78,8 @@ function board(s,items,end,o){o=o||{};
     const me=e.id===s.you,c=s.counts[e.id]||0,who=Object.keys(s.intents).filter(k=>s.intents[k]===e.id);
     const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
     const can=!end&&(!me||s.players.length===1)&&!voted;
-    return `<div class="vc">${c?`<span class="vcnt">${c} voto${c>1?'s':''}</span>`:''}
-      <div class="vh">${av(e.id)}<span class="cn"><b>${esc(e.name)}</b>${me?'<small>(você)</small>':''}</span>${o.note?`<button class="nb ${hasNotes(e.id)?'on':''}" onclick="openNotes(${e.id})">Anotações</button>`:''}</div>
+    return `<div class="vc"${csA(e.id)}>${c?`<span class="vcnt">${c} voto${c>1?'s':''}</span>`:''}
+      <div class="vh">${av(e.id)}<span class="cn"><b class="${fc(e.id)}">${esc(e.name)}</b>${me?'<small>(você)</small>':''}</span>${o.note?`<button class="nb ${hasNotes(e.id)?'on':''}" onclick="openNotes(${e.id})">Anotações</button>`:''}</div>
       ${e.text!=null?`<div class="vt">${esc(e.text)}</div>`:''}
       <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*8+20}px">${who.map(k=>av(+k,s.voted.includes(+k)?'cv':'iv')).join('')}</div>
       ${can?`<div class="vb">${intBtn(myInt===e.id,e.id)}<button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`});

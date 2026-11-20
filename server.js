@@ -12,6 +12,8 @@ if (!PASS || PASS.length < 8) { console.error('Defina a variável de ambiente AD
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
 const EMOJIS = 20, COLORS = 12, GRACE = 60000;
+const LOOKS = 4; // opções de fonte e de card do nome (0 = padrão)
+const look = v => (v != null && Number.isInteger(+v) && +v >= 0 && +v < LOOKS) ? +v : 0;
 // Limites de proteção do servidor
 const MAX_ROOMS = 300;               // salas abertas ao mesmo tempo
 const ROOM_TTL = +process.env.ROOM_TTL_MS || 3 * 60 * 60 * 1000; // sala sem nenhuma atividade por 3 h é encerrada (a variável serve para testes)
@@ -168,7 +170,7 @@ const push = r => {
   r.players.forEach(p => {
     const v = view(r, p);
     v.gid = r.game; v.rank = rank(r); v.rounds = r.rounds || 0; v.gain = r.gain || {};
-    if (v.players) v.players = v.players.map(x => ({ ...x, away: !!(r.players.find(q => q.id === x.id) || {}).away }));
+    if (v.players) v.players = v.players.map(x => { const q = r.players.find(z => z.id === x.id) || {}; return { ...x, away: !!q.away, fnt: q.fnt | 0, cd: q.cd | 0 }; });
     if (send(p.ws, v)) { // só marca como enviada se a mensagem realmente saiu
       if (v.all) p.sentLoc = locMtime;
       if (v.role && v.role.locs) p.sentRound = r.round;
@@ -239,7 +241,7 @@ wss.on('connection', (ws, req) => {
 
   ws.isAlive = true;
   ws.on('pong', () => { ws.isAlive = true; });
-  let me = { id: nextId++, ws, name: '', emo: 0, color: 0, token: '', away: false, sentLoc: null, sentRound: null };
+  let me = { id: nextId++, ws, name: '', emo: 0, color: 0, token: '', away: false, fnt: 0, cd: 0, sentLoc: null, sentRound: null };
   let room = null;
   const leave = () => { if (!room) return; const r = room; room = null; removePlayer(r, me); };
 
@@ -273,7 +275,7 @@ wss.on('connection', (ws, req) => {
       if (!nm) return err(ws, 'Digite seu nome.');
       // Filtro de nomes com palavras preconceituosas (ver nomes.js)
       if (blocked(nm)) return err(ws, 'Esse nome não é permitido. Escolha outro.');
-      me.name = nm;
+      me.name = nm; me.fnt = look(m.fnt); me.cd = look(m.cd);
       const tk = String(m.token || '').slice(0, 64);
       me.token = tk.length >= 8 ? tk : Math.random().toString(36).slice(2) + Date.now().toString(36);
       for (const r0 of Object.values(rooms)) { const p0 = r0.players.find(x => x.token === me.token && x !== me); if (p0) removePlayer(r0, p0); }
@@ -303,6 +305,9 @@ wss.on('connection', (ws, req) => {
       const e = +m.emo, c = +m.color;
       if (Number.isInteger(e) && e >= 0 && e < EMOJIS && !r.players.some(p => p !== me && p.emo === e)) me.emo = e;
       if (Number.isInteger(c) && c >= 0 && c < COLORS) me.color = c;
+      // personalização (só vale se o campo veio na mensagem)
+      if (m.fnt != null) me.fnt = look(m.fnt);
+      if (m.cd != null) me.cd = look(m.cd);
       return push(r);
     }
     if (m.type === 'kick' && isHost) {

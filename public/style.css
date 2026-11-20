@@ -211,3 +211,23 @@ button,.tile,.gc,.pc,.lt{touch-action:manipulation;-webkit-tap-highlight-color:t
 .lbls{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .lb{padding:6px 12px;font-size:.78rem;letter-spacing:0;background:var(--n1);color:var(--txt);border:2px solid var(--line);box-shadow:none}
 .lb:hover,.lb:active{transform:none;box-shadow:none}.lb.sel{border-color:var(--acc);color:var(--acc)}
+
+/* ===== Personalização dos jogadores: fontes e cards do nome ===== */
+/* Fontes (índices 1 a 3; a 0 é a padrão). As fontes vêm do Google Fonts; se alguma não carregar, cai na Rubik. */
+.f1{font-family:'Tilt Neon',Rubik,sans-serif;font-weight:400;letter-spacing:.5px;color:#fff;text-shadow:0 0 3px #fff,0 0 9px #ff3df0,0 0 18px #ff3df0,0 0 30px #8a3dff}
+.f2{font-family:'Pixelify Sans',Rubik,monospace;font-weight:700;font-size:1.08em;letter-spacing:.5px;color:#b8ff8a;text-shadow:2px 2px 0 #1b4d0f}
+.f3{font-family:'Permanent Marker',Rubik,cursive;font-weight:400;letter-spacing:.8px;color:#ffe45c;text-shadow:2px 2px 0 rgba(0,0,0,.45)}
+/* Cards (data-cs 1 a 3; sem o atributo é o card azul padrão). Cada estilo é um desenho em CSS/SVG. */
+.chip[data-cs],.vc[data-cs],.opt[data-cs]{background:var(--csbg);border-color:var(--csbd)}
+.vc[data-cs]{box-shadow:0 8px 0 var(--csbs)}
+[data-cs="1"]{--csbd:#8a5cff;--csbs:#1a0b3d;--csbg:radial-gradient(circle at 90% 38%,#ff9ad5 0 7px,transparent 8px),radial-gradient(circle at 90% 38%,rgba(255,154,213,.22) 0 15px,transparent 16px),radial-gradient(1.5px 1.5px at 12% 25%,#fff,transparent),radial-gradient(1px 1px at 30% 72%,#fff,transparent),radial-gradient(1.5px 1.5px at 52% 28%,#ffe9a8,transparent),radial-gradient(1px 1px at 68% 78%,#fff,transparent),radial-gradient(1px 1px at 44% 55%,#fff,transparent),radial-gradient(1px 1px at 78% 18%,#fff,transparent),linear-gradient(135deg,#3b1a78,#0c0524)}
+[data-cs="2"]{--csbd:#ff7a1a;--csbs:#4a1204;--csbg:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40 V26 L0 26 L8 14 L16 28 L24 12 L32 30 L40 16 L48 30 L56 12 L64 28 L72 14 L80 30 L88 12 L96 28 L104 16 L112 30 L120 24 V40 Z' fill='%23ff3d1a'/%3E%3C/svg%3E") bottom/100% 16px no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40 V20 L0 20 L6 8 L12 22 L18 4 L24 24 L30 10 L36 26 L42 6 L48 24 L54 12 L60 28 L66 8 L72 24 L78 4 L84 22 L90 10 L96 26 L102 6 L108 22 L114 12 L120 20 V40 Z' fill='%23ffb02e'/%3E%3C/svg%3E") bottom/100% 28px no-repeat,linear-gradient(180deg,#3a0d0d,#150505)}
+[data-cs="3"]{--csbd:#3cc4dc;--csbs:#04202e;--csbg:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 26 Q15 14 30 26 T60 26 T90 26 T120 26 V40 H0 Z' fill='rgba(30,120,200,.85)'/%3E%3C/svg%3E") bottom/100% 18px no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 18 Q15 6 30 18 T60 18 T90 18 T120 18 V40 H0 Z' fill='rgba(90,210,230,.5)'/%3E%3C/svg%3E") bottom/100% 28px no-repeat,radial-gradient(3px 3px at 18% 28%,rgba(255,255,255,.5),transparent),radial-gradient(2px 2px at 40% 40%,rgba(255,255,255,.45),transparent),radial-gradient(3px 3px at 72% 22%,rgba(255,255,255,.4),transparent),linear-gradient(180deg,#0e5b80,#06223a)}
+[data-cs] .cn small{color:rgba(255,255,255,.75)}
+/* Escolha na sala de espera */
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:54px;padding:8px;font-size:1rem;background:var(--n1);color:var(--txt);border:2px solid var(--line);box-shadow:none;overflow:hidden}
+.opt:hover{transform:none;filter:brightness(1.15)}.opt:active{transform:none;box-shadow:none}
+.opt.sel{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,194,51,.35)}
+.opt small{font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}
+.opt[data-cs] span{font-weight:700;text-shadow:0 1px 3px #000}
