@@ -1,0 +1,104 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Capas dos jogos</title><meta name="theme-color" content="#070b17">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+main.cv{max-width:1100px;margin:0 auto;padding:24px clamp(14px,4vw,32px) 60px;display:block;min-height:0}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:18px;margin-top:18px}
+.cc{margin:0;display:flex;flex-direction:column;gap:10px}
+.cprev{aspect-ratio:3/4;border-radius:14px;border:2px solid var(--line);background:#0a1230 center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:.85rem;text-align:center;padding:10px}
+.cc h3{margin:0;min-height:2.5em}.cc small{display:block;line-height:1.35}
+.cc .row{margin:0}.cc .row button{padding:10px 8px;font-size:.82rem}
+.cst{min-height:1.3em;font-size:.82rem;color:var(--mut)}.cst.ok{color:#5ff0a8}.cst.er{color:#ff8a8a}
+.file{width:100%;padding:10px;font-size:.85rem}
+code{background:#0a1230;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.85em;word-break:break-all}
+</style></head><body>
+<main class="cv">
+<h1>Capas dos jogos</h1>
+<p class="mut" style="margin:6px 0 18px">Envie uma imagem para a capa de cada jogo da página inicial.</p>
+
+<div id="login" class="card ctr" style="max-width:420px;margin-left:auto;margin-right:auto">
+  <label>Senha do administrador</label>
+  <input id="pw" type="password" class="ctr" autocomplete="current-password" onkeydown="if(event.key==='Enter')enter()">
+  <p id="lmsg" class="err" style="min-height:1.3em;margin:10px 0 0"></p>
+  <button style="width:100%;margin-top:8px" onclick="enter()">Entrar</button>
+</div>
+
+<div id="panel" hidden>
+  <div class="card">
+    <label>Como funciona</label>
+    <p style="margin:0 0 8px;line-height:1.5">Escolha uma imagem (JPG, PNG ou WebP) e clique em <b>Enviar</b>. O navegador reduz a imagem sozinho (no máximo 1000 px e cerca de 900 KB). Ela é salva na pasta <code>public/images/covers/</code> e a capa muda na hora para todo mundo. Ao enviar outra imagem, a anterior daquele jogo é apagada da pasta.</p>
+    <p style="margin:0;line-height:1.5;color:#ffd97a"><b>Atenção:</b> no plano grátis do Render o disco é temporário. A capa enviada vale até o próximo reinício ou deploy. Para deixá-la <b>definitiva</b>, clique em <b>Baixar capa atual</b>, coloque o arquivo no GitHub em <code>public/images/covers/</code> (com o mesmo nome, apagando a capa antiga de lá) e confira se o <code>locations.json</code> tem, em <code>covers</code>, o caminho mostrado no card.</p>
+  </div>
+  <div class="cgrid" id="grid"></div>
+</div>
+</main>
+<script>
+const GAMES=[['locais','Impostor - Locais'],['pika','O meu é mais Pika'],['perguntas','Impostor - Perguntas'],['cidade','Cidade Dorme']];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let PW='',COV={},NEW={}; // NEW[jogo] = {blob, url} (imagem já reduzida, ainda não enviada)
+
+async function api(path,body){
+  const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:PW,...body})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||('Erro '+r.status));
+  return j}
+async function enter(){
+  PW=$('pw').value;$('lmsg').textContent='';
+  try{await api('/api/admin/check',{})}catch(e){$('lmsg').textContent=e.message;return}
+  $('login').hidden=true;$('panel').hidden=false;await load()}
+async function load(){
+  const d=await (await fetch('/api/locations',{cache:'no-store'})).json();COV=d.covers||{};draw()}
+function draw(){
+  $('grid').innerHTML=GAMES.map(([id,nome])=>{
+    const n=NEW[id],img=n?n.url:(COV[id]||''),saved=(COV[id]||'').startsWith('/images/covers/')?COV[id]:'',fname=saved.split('/').pop();
+    return `<div class="card cc" id="c-${id}"><h3>${nome}</h3>
+      <div class="cprev" style="${img?`background-image:url('${esc(img)}')`:''}">${img?'':'Sem capa (usa o desenho padrão)'}</div>
+      <input class="file" type="file" accept="image/*" onchange="pick('${id}',this)">
+      <button onclick="send('${id}')" ${n?'':'disabled'}>Enviar</button>
+      ${saved?`<a style="text-decoration:none" download="${esc(fname)}" href="${esc(saved)}"><button class="sec" style="width:100%;padding:10px 8px;font-size:.82rem">Baixar capa atual</button></a>`:`<button class="sec" style="padding:10px 8px;font-size:.82rem" disabled>Baixar capa atual</button>`}
+      <button class="cx" style="padding:10px;font-size:.82rem" onclick="removeCover('${id}')" ${COV[id]?'':'disabled'}>Remover capa</button>
+      <div class="cst" id="st-${id}"></div>
+      <small>${saved?`Arquivo atual: <code>${esc(fname)}</code>`:'Sem arquivo enviado.'}</small></div>`}).join('')}
+const say=(id,t,cls)=>{const e=$('st-'+id);if(e){e.textContent=t;e.className='cst '+(cls||'')}};
+
+// Abre a imagem, reduz para no máximo 1000 px e converte para JPEG de até ~900 KB
+function readImage(file){return new Promise((ok,no)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{URL.revokeObjectURL(u);ok(im)};im.onerror=()=>no(new Error('Não consegui abrir essa imagem.'));im.src=u})}
+async function toJpeg(file){
+  const im=await readImage(file);let w=im.naturalWidth,h=im.naturalHeight;
+  if(!w||!h)throw new Error('Imagem inválida.');
+  const k=Math.min(1,1000/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
+  for(let tentativa=0;tentativa<6;tentativa++){
+    const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+    x.fillStyle='#0b1230';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h); // fundo escuro para PNG com transparência
+    for(let q=.86;q>=.5;q-=.09){
+      const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',q));
+      if(blob&&blob.size<=900000)return blob}
+    w=Math.round(w*.8);h=Math.round(h*.8)}
+  throw new Error('Não consegui reduzir essa imagem o bastante.')}
+const toDataUrl=blob=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(new Error('Erro ao ler a imagem.'));r.readAsDataURL(blob)});
+
+async function pick(id,input){
+  const f=input.files&&input.files[0];if(!f)return;
+  say(id,'Preparando a imagem…');
+  try{
+    const blob=await toJpeg(f);
+    if(NEW[id])URL.revokeObjectURL(NEW[id].url);
+    NEW[id]={blob,url:URL.createObjectURL(blob)};draw();
+    say(id,'Pronta ('+Math.round(blob.size/1024)+' KB). Clique em Enviar.','ok')
+  }catch(e){say(id,e.message,'er')}}
+async function send(id){
+  const n=NEW[id];if(!n)return;say(id,'Enviando…');
+  try{
+    const j=await api('/api/admin/cover',{game:id,data:await toDataUrl(n.blob)});
+    COV[id]=j.url;URL.revokeObjectURL(n.url);delete NEW[id];draw();
+    say(id,'Capa enviada! Já aparece na página inicial.','ok')
+  }catch(e){say(id,e.message,'er')}}
+async function removeCover(id){
+  if(!confirm('Remover a capa deste jogo?'))return;say(id,'Removendo…');
+  try{await api('/api/admin/cover',{game:id,remove:true});COV[id]='';draw();say(id,'Capa removida.','ok')}
+  catch(e){say(id,e.message,'er')}}
+</script></body></html>

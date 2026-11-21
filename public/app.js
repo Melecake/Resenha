@@ -48,19 +48,28 @@ const loadCovers=()=>fetch('/api/locations').then(r=>r.json()).then(d=>{COVERS=d
 loadCovers();
 
 const busy=on=>document.body.classList.toggle('loading',on);
-let ws,retry=0,cTimer,lastPong=0;
+let ws,retry=0,cTimer,lastPong=0,hb,wd,rcT;
+// A barra "Reconectando…" só aparece se a conexão ficar fora por mais de ~1 s (evita piscar em quedas rápidas)
+const rcShow=on=>{clearTimeout(rcT);if(on)rcT=setTimeout(()=>$('rc').classList.add('on'),900);else $('rc').classList.remove('on')};
+function lost(){clearTimeout(wd);clearInterval(hb);rcShow(true);busy(false);clearTimeout(cTimer);cTimer=setTimeout(connect,Math.min(800*2**retry++,5000))}
+function drop(w){w.onopen=w.onmessage=w.onclose=null;try{w.close()}catch(e){}if(ws===w)ws=null;lost()}
 function connect(){
   clearTimeout(cTimer);
-  if(ws&&(ws.readyState===0||ws.readyState===1))return;
-  ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host);
-  ws.onopen=()=>{ready=true;retry=0;$('rc').classList.remove('on');
-    if(store.get('inroom',false))ws.send(JSON.stringify({type:'resume',token:TOKEN}));
+  if(ws&&ws.readyState===1)return;
+  if(ws&&ws.readyState===0)return;
+  const w=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host);ws=w;
+  // Conexão que nunca termina de abrir (comum no celular ao trocar de rede): desiste depois de 8 s e tenta de novo
+  clearTimeout(wd);wd=setTimeout(()=>{if(ws===w&&w.readyState===0)drop(w)},8000);
+  w.onopen=()=>{if(ws!==w)return;clearTimeout(wd);ready=true;retry=0;rcShow(false);startHb();
+    if(store.get('inroom',false))w.send(JSON.stringify({type:'resume',token:TOKEN}));
     render()};
-  ws.onmessage=onMsg;
-  ws.onclose=()=>{$('rc').classList.add('on');busy(false);cTimer=setTimeout(connect,Math.min(800*2**retry++,5000))};
-  ws.onerror=()=>{};
+  w.onmessage=e=>{if(ws===w)onMsg(e)};
+  w.onclose=()=>{if(ws===w){ws=null;lost()}};
+  w.onerror=()=>{};
 }
-function reopen(){try{ws.onclose=null;ws.close()}catch(e){}ws=null;$('rc').classList.add('on');connect()}
+// Batimento: a cada 20 s (com a aba visível) confere se o servidor responde; conexão "meio morta" é derrubada e refeita
+function startHb(){clearInterval(hb);hb=setInterval(()=>{if(!ws||ws.readyState!==1||document.hidden)return;const w=ws,t=Date.now();w.send(JSON.stringify({type:'ping'}));setTimeout(()=>{if(ws===w&&w.readyState===1&&lastPong<t)drop(w)},8000)},20000)}
+function reopen(){if(ws){ws.onopen=ws.onmessage=ws.onclose=null;try{ws.close()}catch(e){}ws=null}retry=0;rcShow(true);connect()}
 // "quiet" não mostra a barra de carregamento (usado em ações leves, como configurar a sala)
 const tx=(o,quiet)=>{if(!ws||ws.readyState!==1){toast('Sem conexão. Reconectando…');return}ws.send(JSON.stringify(o));if(!quiet){busy(true);clearTimeout(lt);lt=setTimeout(()=>busy(false),4000)}};
 function onMsg(e){busy(false);const m=JSON.parse(e.data);let closing=false;
@@ -91,8 +100,11 @@ function showStarter(){if(!S||!S.starter)return;const p=pl(S.starter),me=S.start
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden)return;
   if(!ws||ws.readyState>1){retry=0;connect();return}
-  if(ws.readyState===1){const t=Date.now();ws.send(JSON.stringify({type:'ping'}));setTimeout(()=>{if(lastPong<t)reopen()},3000)}});
-window.addEventListener('online',()=>{if(!ws||ws.readyState>1){retry=0;connect()}});
+  if(ws.readyState===0){reopen();return}
+  const w=ws,t=Date.now();w.send(JSON.stringify({type:'ping'}));setTimeout(()=>{if(ws===w&&lastPong<t)reopen()},3000)});
+// Celular: ao voltar de outra aba/app a página pode vir do cache do navegador com a conexão já morta
+window.addEventListener('pageshow',e=>{if(e.persisted)reopen()});
+window.addEventListener('online',()=>{reopen()});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.classList.contains('xbtn')&&!b.classList.contains('pen')&&!b.classList.contains('fab')&&!b.classList.contains('mini')&&!b.classList.contains('nb')&&!b.classList.contains('bchip')&&!b.closest('.emos,.cols,.sug,.lbls,.opts')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
 // Esc fecha a janela que estiver aberta (a de cima primeiro)
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;
@@ -113,6 +125,31 @@ function showInfo(id,full){const g=GAMES.find(x=>x.id===id),t=INFO[id];
 const infoBtn=id=>`<span class="iw"><span class="ihint">Explicação do jogo</span><button class="ibtn" title="Como jogar" onclick="event.stopPropagation();showInfo('${id}',true)">i</button></span>`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=id=>document.getElementById(id);
+// ---- Atualização da tela sem recriar tudo ----
+// Em vez de trocar o HTML inteiro a cada atualização do servidor (o que fazia a página piscar, recarregava imagens e
+// podia engolir um toque no meio), compara o HTML novo com o que já está na tela e muda só o que for diferente.
+function syncAttrs(a,b){
+  for(const at of [...a.attributes])if(!b.hasAttribute(at.name))a.removeAttribute(at.name);
+  for(const at of b.attributes)if(a.getAttribute(at.name)!==at.value)a.setAttribute(at.name,at.value)}
+function patchKids(a,b){
+  const ac=[...a.childNodes],bc=[...b.childNodes],n=Math.max(ac.length,bc.length);
+  for(let i=0;i<n;i++){const x=ac[i],y=bc[i];
+    if(!y){a.removeChild(x);continue}
+    if(!x){a.appendChild(y);continue}
+    if(x.nodeType!==y.nodeType||x.nodeName!==y.nodeName){a.replaceChild(y,x);continue}
+    if(x.nodeType!==1){if(x.nodeValue!==y.nodeValue)x.nodeValue=y.nodeValue;continue}
+    syncAttrs(x,y);patchKids(x,y);
+    const t=x.nodeName,busy=x===document.activeElement;
+    if(t==='INPUT'){if(!busy){const v=y.getAttribute('value')||'';if(x.value!==v)x.value=v}}
+    else if(t==='TEXTAREA'){if(!busy&&x.value!==y.value)x.value=y.value}
+    else if(t==='OPTION')x.selected=y.hasAttribute('selected')}}
+(()=>{const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+  for(const id of ['app','pp']){const el=document.getElementById(id);if(!el)continue;
+    Object.defineProperty(el,'innerHTML',{configurable:true,get(){return d.get.call(this)},
+      set(h){if(!this.firstChild||!h){d.set.call(this,h);return}
+        const t=document.createElement('template');t.innerHTML=h;
+        if(window.__morphCheck)window.__lastRef=t.innerHTML;
+        patchKids(this,t.content)}})}})();
 const pl=id=>S.players.find(p=>p.id===id)||{};
 const nm=id=>esc(pl(id).name||'?');
 const av=(id,c='')=>{const p=pl(id);return `<span class="av ${c}" style="background:hsl(${HUES[p.color]??200} 55% 32%)">${EMOTES[p.emo]??'?'}</span>`};
@@ -132,18 +169,23 @@ const prof=(e,c,f,d)=>{const me=pl(S.you);tx({type:'profile',emo:e,color:c,fnt:f
 const LK={open:false,sig:''};
 function openLook(){if(!S||S.phase!=='lobby')return;LK.open=true;LK.sig='';drawLook()}
 function closeLook(){LK.open=false;drawLook()}
-function drawLook(){const c=$('lk');if(!c)return;
-  if(!LK.open||!S||screen==='home'||S.phase!=='lobby'){LK.open=false;LK.sig='';if(c.innerHTML)c.innerHTML='';return}
-  const me=pl(S.you),sig=[me.name,me.emo,me.color,me.fnt|0,me.cd|0].join('|');
-  if(c.innerHTML&&sig===LK.sig)return; // nada mudou: não redesenha (evita piscar a cada atualização da sala)
-  const re=c.innerHTML?' re':'';LK.sig=sig;
-  c.innerHTML=`<div class="modal" onclick="if(event.target===this)closeLook()"><div class="box${re}" style="max-width:460px;text-align:left"><button class="xbtn" aria-label="Fechar" title="Fechar (Esc)" onclick="closeLook()">×</button>
+function lookInner(){const me=pl(S.you);
+  return `<button class="xbtn" aria-label="Fechar" title="Fechar (Esc)" onclick="closeLook()">×</button>
     <h3 style="margin:0 0 12px">Seu visual</h3>
     <div style="display:flex;justify-content:center;margin:0 0 18px"><span class="chip"${csA(S.you)}>${av(S.you)}<span class="cn"><b class="${fc(S.you)}">${esc(me.name)}</b></span></span></div>
     <label>Fonte</label><div class="opts">${FONTS.map((n,i)=>`<button class="opt ${(me.fnt|0)===i?'sel':''}" onclick="setLook('fnt',${i})"><span class="${i?'f'+i:''}">${esc(me.name||'Nome')}</span><small>${n}</small></button>`).join('')}</div>
     <label style="margin-top:16px">Card</label><div class="opts">${CARDS.map((n,i)=>`<button class="opt ${(me.cd|0)===i?'sel':''}"${i?` data-cs="${i}"`:''} onclick="setLook('cd',${i})">${i?`<span>${n}</span>`:`<span>${n}</span><small>card azul</small>`}</button>`).join('')}</div>
-    <div style="text-align:center"><button style="margin-top:18px" onclick="closeLook()">Pronto</button></div></div></div>`}
-function setLook(k,v){const me=pl(S.you);store.set(k,v);prof(me.emo,me.color,k==='fnt'?v:undefined,k==='cd'?v:undefined)}
+    <div style="text-align:center"><button style="margin-top:18px" onclick="closeLook()">Pronto</button></div>`}
+function drawLook(){const c=$('lk');if(!c)return;
+  if(!LK.open||!S||screen==='home'||S.phase!=='lobby'){LK.open=false;LK.sig='';if(c.innerHTML)c.innerHTML='';return}
+  const me=pl(S.you),sig=[me.name,me.emo,me.color,me.fnt|0,me.cd|0].join('|');
+  const box=c.querySelector('.box');
+  if(box){ // janela já aberta: só troca o conteúdo (recriar a janela repetiria a animação e a página piscaria)
+    if(sig!==LK.sig){LK.sig=sig;box.innerHTML=lookInner()}
+    return}
+  LK.sig=sig;
+  c.innerHTML=`<div class="modal" onclick="if(event.target===this)closeLook()"><div class="box" style="max-width:460px;text-align:left">${lookInner()}</div></div>`}
+function setLook(k,v){const me=pl(S.you);store.set(k,v);me[k]=v;drawLook();prof(me.emo,me.color,k==='fnt'?v:undefined,k==='cd'?v:undefined)}
 const mark=id=>{marks[id]=((marks[id]||0)+1)%3;render()};
 function togLoc(i){const n=S.all[i].name,s=new Set(S.selected);s.has(n)?s.delete(n):s.add(n);tx({type:'locs',selected:[...s]},1)}
 const LBL={f:'',

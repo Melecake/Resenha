@@ -198,7 +198,7 @@ html{-webkit-text-size-adjust:100%}
 button,.tile,.gc,.pc,.lt{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .vsel{display:none}.vsel .vb{display:grid;margin-top:14px}.vsel.card{margin-top:0}
 @media(max-width:900px){.loc{max-width:300px;margin-left:auto;margin-right:auto}.hero.rel .iw{position:static;justify-content:center;margin-top:8px}}
-@media(max-width:700px){.vsel{display:block}.vc .vb{display:none}.vgrid{gap:18px}.vc{padding:18px}}
+
 @media(max-width:560px){
   .lgt{display:none}.bar{padding:10px 14px}.nbtn{padding:9px 14px 9px 10px;font-size:.7rem;letter-spacing:1px}
   main{padding-left:14px;padding-right:14px}.card{padding:18px;border-radius:16px}
@@ -247,3 +247,38 @@ button,.tile,.gc,.pc,.lt{touch-action:manipulation;-webkit-tap-highlight-color:t
 .pen:hover{transform:none;filter:none;background:var(--acc);color:var(--ink);border-color:var(--acc)}.pen:active{transform:none;box-shadow:none}
 #lk .modal{z-index:73}
 .box.re{animation:none}
+
+/* ===== Ajustes para celular ===== */
+.rc{pointer-events:none;padding-top:calc(8px + env(safe-area-inset-top,0px))}
+@media(max-width:700px){
+  /* Votação: os botões ficam dentro do card de cada jogador, em duas colunas */
+  .vgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .vc{padding:12px;gap:10px;border-radius:16px;box-shadow:0 5px 0 #0a1230}
+  .vh{gap:8px;align-items:flex-start}.vh .av{width:34px;height:34px;flex-basis:34px;font-size:1.1rem}.vh b{font-size:.95rem}
+  .vc .mv{grid-template-columns:repeat(auto-fill,30px);gap:6px;padding:8px;min-height:62px;justify-content:center}
+  .vc .mv .av{width:30px;height:30px;font-size:.95rem}
+  .vb{grid-template-columns:1fr;gap:8px}.vb button{padding:11px 6px;font-size:.82rem}
+  .vcnt{right:-4px;top:-12px;font-size:.8rem;padding:4px 10px}
+  .vt{font-size:1rem;padding:8px 10px}
+  /* Locais: escolha das localidades (linhas de altura fixa, sem rolagem dentro da rolagem) */
+  .pick{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:108px;gap:8px;max-height:none;overflow:visible;padding:2px}
+  .pick .tile{aspect-ratio:auto;height:100%;min-height:0}
+  .pick .tile span{font-size:.7rem;padding:3px 6px;max-width:calc(100% - 8px)}
+  .grid6{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:84px}.grid6 .tile{aspect-ratio:auto;height:100%}
+}
+@media(max-width:339px){.vgrid{grid-template-columns:1fr}.pick{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== Celular: toques maiores, lista "Faltam votar" compacta, sem estouro lateral ===== */
+@media(max-width:700px){
+  .lb{min-height:40px;padding:8px 14px;font-size:.82rem}
+  .nb{min-height:38px;padding:8px 12px}
+  .mini{min-height:36px}
+  .vgrid{align-items:start}
+  /* "Faltam votar": os jogadores ficam lado a lado em vez de uma coluna enorme */
+  .vl{flex-direction:row;flex-wrap:wrap;gap:6px}.vl .chip{width:auto;max-width:100%}
+  .vside .card{padding:14px}
+  /* linhas com rótulo (ex.: resultado do detetive) quebram em vez de empurrar a página para o lado */
+  li{flex-wrap:wrap}li .nm{min-width:0}
+  .tag{white-space:normal}
+}
+@media(max-width:700px){.pen{width:38px;height:38px;flex-basis:38px}.cb{width:38px;height:38px}.xbtn{width:36px;height:36px}}

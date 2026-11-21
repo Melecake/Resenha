@@ -12,6 +12,8 @@ if (!PASS || PASS.length < 8) { console.error('Defina a variável de ambiente AD
 const DIR = __dirname, PUB = path.join(DIR, 'public'), LOC = path.join(DIR, 'locations.json');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json' };
 const EMOJIS = 20, COLORS = 12, GRACE = 60000;
+const GAME_IDS = ['locais', 'pika', 'perguntas', 'cidade']; // jogos que têm capa na home
+const COVERS_DIR = path.join(PUB, 'images', 'covers');
 const LOOKS = 4; // opções de fonte e de card do nome (0 = padrão)
 const look = v => (v != null && Number.isInteger(+v) && +v >= 0 && +v < LOOKS) ? +v : 0;
 // Limites de proteção do servidor
@@ -65,14 +67,24 @@ function serveFile(q, s, file) {
       const o = { m: st.mtimeMs, size: st.size, raw: d, type: MIME[ext] || 'application/octet-stream',
         etag: 'W/"' + st.size.toString(16) + '-' + Math.floor(st.mtimeMs).toString(16) + '"', compress: TEXT.has(ext),
         // páginas e scripts sempre conferem se mudou (304 é barato); imagens ficam 1 dia no navegador
-        cache: /\.(png|jpe?g|webp|gif)$/.test(ext) ? 'public, max-age=86400' : 'no-cache' };
+        cache: file.startsWith(COVERS_DIR) ? 'public, max-age=31536000, immutable' // capa tem nome novo a cada envio: pode ficar um ano no navegador
+          : /\.(png|jpe?g|webp|gif)$/.test(ext) ? 'public, max-age=86400' : 'no-cache' };
       if (st.size <= 1e6) fileCache.set(file, o);
       reply(q, s, o);
     });
   });
 }
 
-const body = q => new Promise(r => { let b = ''; q.on('data', c => { b += c; if (b.length > 2e6) q.destroy(); }); q.on('end', () => { try { r(JSON.parse(b)); } catch { r(null); } }); });
+const body = q => new Promise(r => {
+  let b = '';
+  q.on('data', c => { b += c; if (b.length > 2e6) { r(null); q.destroy(); } });
+  q.on('end', () => { try { r(JSON.parse(b)); } catch { r(null); } });
+  q.on('error', () => r(null)); q.on('close', () => r(null));
+});
+const ipOf = req => String((req.headers['x-forwarded-for'] || '').split(',')[0] || req.socket.remoteAddress || '?').trim();
+// Painel admin: no máximo 30 chamadas por minuto por endereço (dificulta adivinhar a senha)
+const adminHits = new Map();
+const adminOk = ip => { const now = Date.now(), h = (adminHits.get(ip) || []).filter(t => now - t < 60000); h.push(now); adminHits.set(ip, h); return h.length <= 30; };
 const json = (s, c, o) => { s.writeHead(c, { 'Content-Type': 'application/json' }); s.end(JSON.stringify(o)); };
 
 const server = http.createServer(async (q, s) => {
@@ -80,6 +92,7 @@ const server = http.createServer(async (q, s) => {
   try { u = decodeURIComponent(q.url.split('?')[0]); } catch { s.writeHead(400); return s.end(); }
   if (u === '/api/locations') { try { readLocs(); } catch { return json(s, 500, { error: 'Erro ao ler as localidades' }); } return reply(q, s, locReply); }
   if (u.startsWith('/api/admin/') && q.method === 'POST') {
+    if (!adminOk(ipOf(q))) return json(s, 429, { error: 'Muitas tentativas. Aguarde um minuto.' });
     const b = await body(q);
     if (!b || b.password !== PASS) return json(s, 401, { error: 'Senha incorreta' });
     if (u === '/api/admin/check') return json(s, 200, { ok: true });
@@ -89,11 +102,38 @@ const server = http.createServer(async (q, s) => {
       try { fs.writeFileSync(LOC + '.tmp', JSON.stringify(b.data, null, 2)); fs.renameSync(LOC + '.tmp', LOC); locChecked = 0; return json(s, 200, { ok: true }); }
       catch { return json(s, 500, { error: 'Erro ao salvar' }); }
     }
+    // Capas dos jogos da home: o painel /gerenciar-capas envia uma imagem JPEG (já reduzida no navegador).
+    // Cada envio vira um arquivo NOVO em public/images/covers/ (jogo-<hora>.jpg) e a capa anterior daquele jogo é apagada.
+    if (u === '/api/admin/cover') {
+      const game = String(b.game || '');
+      if (!GAME_IDS.includes(game)) return json(s, 400, { error: 'Jogo inválido.' });
+      let d; try { d = JSON.parse(fs.readFileSync(LOC, 'utf8')); } catch { return json(s, 500, { error: 'Erro ao ler as localidades.' }); }
+      d.covers = d.covers || {};
+      const mine = new RegExp('^' + game + '(-\\d+)?\\.jpg$'); // arquivos de capa deste jogo
+      const purge = keep => { try { for (const f of fs.readdirSync(COVERS_DIR)) if (mine.test(f) && f !== keep) fs.unlinkSync(path.join(COVERS_DIR, f)); } catch {} };
+      let name = '';
+      if (b.remove) d.covers[game] = '';
+      else {
+        const pre = 'data:image/jpeg;base64,', str = String(b.data || '');
+        if (!str.startsWith(pre)) return json(s, 400, { error: 'Envie uma imagem JPEG.' });
+        const buf = Buffer.from(str.slice(pre.length), 'base64');
+        if (buf.length < 100 || !(buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF)) return json(s, 400, { error: 'O arquivo não é uma imagem JPEG válida.' });
+        if (buf.length > 1.2e6) return json(s, 413, { error: 'Imagem grande demais (máximo 1,2 MB).' });
+        name = game + '-' + Date.now() + '.jpg';
+        try { fs.mkdirSync(COVERS_DIR, { recursive: true }); fs.writeFileSync(path.join(COVERS_DIR, name), buf); } catch { return json(s, 500, { error: 'Erro ao salvar a imagem.' }); }
+        d.covers[game] = '/images/covers/' + name;
+      }
+      try { fs.writeFileSync(LOC + '.tmp', JSON.stringify(d, null, 2)); fs.renameSync(LOC + '.tmp', LOC); locChecked = 0; }
+      catch { if (name) { try { fs.unlinkSync(path.join(COVERS_DIR, name)); } catch {} } return json(s, 500, { error: 'Erro ao salvar.' }); }
+      purge(name); // só depois de tudo certo: apaga a capa anterior (ou todas, se foi remoção)
+      return json(s, 200, { ok: true, url: d.covers[game] });
+    }
     return json(s, 404, {});
   }
   let file;
   if (u === '/') file = path.join(DIR, 'index.html');
   else if (u === '/gerenciar-locais') file = path.join(DIR, 'admin.html');
+  else if (u === '/gerenciar-capas') file = path.join(DIR, 'capas.html');
   else { file = path.join(PUB, path.normalize(u)); if (!file.startsWith(PUB)) { s.writeHead(403); return s.end(); } }
   serveFile(q, s, file);
 });
@@ -230,7 +270,6 @@ function closeRoom(r, msg) {
   delete rooms[r.code];
 }
 
-const ipOf = req => String((req.headers['x-forwarded-for'] || '').split(',')[0] || req.socket.remoteAddress || '?').trim();
 const ipCount = new Map();
 
 wss.on('connection', (ws, req) => {
@@ -374,6 +413,7 @@ setInterval(() => {
 setInterval(() => {
   const now = Date.now();
   for (const r of Object.values(rooms)) if (now - (r.lastAct || 0) > ROOM_TTL) closeRoom(r, 'A sala foi encerrada por inatividade.');
+  for (const [ip, h] of adminHits) if (!h.some(t => now - t < 60000)) adminHits.delete(ip);
 }, +process.env.SWEEP_MS || 5 * 60 * 1000);
 
 if (require.main === module) {

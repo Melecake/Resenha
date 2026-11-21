@@ -59,12 +59,8 @@ function pikaVote(id){const p=S.players.find(x=>x.id===id);pikaAsk('Votar em '+(
 function modalHtml(){return ''}
 
 // Votação compartilhada com o Impostor - Locais, o Impostor - Perguntas e o Cidade Dorme
-let VSEL=null;
 function board(s,items,end,o){o=o||{};
   const voted=s.voted.includes(s.you);
-  const cand=items.filter(e=>e.id!==s.you||s.players.length===1);
-  const canVote=!end&&!voted&&cand.length>0;
-  if(!cand.some(e=>e.id===VSEL))VSEL=cand.length?cand[0].id:null;
   const myInt=s.intents[s.you];
   const need=Math.floor(s.players.length/2)+1,waiting=s.players.filter(p=>!s.voted.includes(p.id));
   const intBtn=(mine,target)=>mine?`<button class="cx" onclick="tx({type:'unintent'},1)">Cancelar intenção</button>`:`<button class="sec" onclick="tx({type:'intent',target:${target}},1)">Declarar intenção</button>`;
@@ -72,8 +68,6 @@ function board(s,items,end,o){o=o||{};
     <div class="vl">${waiting.length?waiting.map(p=>`<span class="chip sm">${av(p.id)}<b>${esc(p.name)}</b></span>`).join(''):'<span style="color:var(--mut)">Todos já votaram</span>'}</div>
     <small style="display:block;margin-top:14px">Maioria: ${need} voto${need>1?'s':''} encerra a votação</small>
     <div class="legend"><span><i class="lg iv"></i>Intenção de voto</span><span><i class="lg cv"></i>Voto confirmado</span></div></div></aside>`;
-  const sel=canVote?`<div class="vsel card"><label>Escolha o jogador</label><select id="vsel" onchange="VSEL=+this.value;this.blur();render()">${cand.map(e=>`<option value="${e.id}" ${e.id===VSEL?'selected':''}>${esc(e.name)}${e.text!=null?' — '+esc(e.text):''}</option>`).join('')}</select>
-    <div class="vb">${intBtn(myInt===VSEL,'VSEL')}<button onclick="pikaVote(VSEL)">Votar</button></div></div>`:'';
   const cards=items.map(e=>{
     const me=e.id===s.you,c=s.counts[e.id]||0,who=Object.keys(s.intents).filter(k=>s.intents[k]===e.id);
     const n=who.length,cols=n>9?Math.ceil(Math.sqrt(n)):3,rows=Math.max(3,Math.ceil(n/cols));
@@ -84,7 +78,7 @@ function board(s,items,end,o){o=o||{};
       <div class="mv" style="--c:${cols};--h:${rows*34+(rows-1)*8+20}px">${who.map(k=>av(+k,s.voted.includes(+k)?'cv':'iv')).join('')}</div>
       ${can?`<div class="vb">${intBtn(myInt===e.id,e.id)}<button onclick="pikaVote(${e.id})">Votar</button></div>`:''}</div>`});
   const grid=`<div class="vgrid">${cards.join('')}</div>`;
-  return side+`<div class="vmain">${sel}${grid}</div>`;
+  return side+`<div class="vmain">${grid}</div>`;
 }
 
 function pikaView(){
