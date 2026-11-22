@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sentinela-rpg
+    runtime: node
+    plan: free
+    buildCommand: echo "sem dependencias"
+    startCommand: node server.js
+    healthCheckPath: /api/info
+    # Para persistir dados é necessário disco pago (ver README):
+    # disk: { name: dados, mountPath: /var/data, sizeGB: 1 }
+    # envVars: [ {key: DATA_DIR, value: /var/data}, {key: PERSISTENT_STORAGE, value: "true"} ]
