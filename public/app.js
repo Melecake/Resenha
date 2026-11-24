@@ -105,9 +105,10 @@ document.addEventListener('visibilitychange',()=>{
 // Celular: ao voltar de outra aba/app a página pode vir do cache do navegador com a conexão já morta
 window.addEventListener('pageshow',e=>{if(e.persisted)reopen()});
 window.addEventListener('online',()=>{reopen()});
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.classList.contains('xbtn')&&!b.classList.contains('pen')&&!b.classList.contains('fab')&&!b.classList.contains('mini')&&!b.classList.contains('nb')&&!b.classList.contains('bchip')&&!b.closest('.emos,.cols,.sug,.lbls,.opts,.sws')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.classList.contains('nbtn')&&!b.classList.contains('ibtn')&&!b.classList.contains('xbtn')&&!b.classList.contains('pen')&&!b.classList.contains('nobusy')&&!b.classList.contains('fab')&&!b.classList.contains('mini')&&!b.classList.contains('nb')&&!b.classList.contains('bchip')&&!b.closest('.emos,.cols,.sug,.lbls,.opts,.sws')){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),700)}});
 // Esc fecha a janela que estiver aberta (a de cima primeiro)
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;
+  if(AUTH.menu){AUTH.menu=false;render();return}
   if($('lk')&&$('lk').innerHTML.trim()){closeLook();return}
   const fx=$('fx'),cf=$('cfm');
   if(fx&&fx.querySelector('.modal')){fx.innerHTML='';return}
@@ -140,7 +141,8 @@ function patchKids(a,b){
     if(x.nodeType!==1){if(x.nodeValue!==y.nodeValue)x.nodeValue=y.nodeValue;continue}
     syncAttrs(x,y);patchKids(x,y);
     const t=x.nodeName,busy=x===document.activeElement;
-    if(t==='INPUT'){if(!busy){const v=y.getAttribute('value')||'';if(x.value!==v)x.value=v}}
+    if(t==='INPUT'&&x.type==='checkbox')x.checked=y.hasAttribute('checked');
+    else if(t==='INPUT'){if(!busy){const v=y.getAttribute('value')||'';if(x.value!==v)x.value=v}}
     else if(t==='TEXTAREA'){if(!busy&&x.value!==y.value)x.value=y.value}
     else if(t==='OPTION')x.selected=y.hasAttribute('selected')}}
 (()=>{const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
@@ -256,7 +258,7 @@ function askLeave(fn){window._lv=fn;
 function doLeave(){const f=window._lv;closeNote();if(f)f()}
 function leaveRoom(){if(S){tx({type:'leave'});S=null}store.set('inroom',false);err='';notes=[];saveNotes();NT.open=false;drawNotes();$('fx').innerHTML='';if(typeof closeConfirm==='function')closeConfirm()}
 function goHome(){if(S)return askLeave(()=>{leaveRoom();screen='home';mode='menu';render()});screen='home';mode='menu';invCode='';err='';render()}
-function back(){if(S)return askLeave(()=>{leaveRoom();mode='menu';err='';render()});if(mode==='join')mode='menu';else screen='home';err='';invCode='';render()}
+function back(){if(!S&&screen==='settings'){screen='profile';AUTH.draft=null;AUTH.dirty=false;render();return}if(S)return askLeave(()=>{leaveRoom();mode='menu';err='';render()});if(mode==='join')mode='menu';else screen='home';err='';invCode='';render()}
 
 // Painel de jogadores: reserva uma faixa à direita (telas grandes) para não encostar no conteúdo
 const ppIsOpen=()=>ppOpen===null?(!!S&&S.you===S.host&&window.matchMedia('(min-width:1360px)').matches):ppOpen;
@@ -309,8 +311,9 @@ function renderMain(){
   $('bk').classList.toggle('hide',screen==='home');$('hm').classList.toggle('hide',screen==='home');$('lg').style.visibility=screen==='home'?'hidden':'visible';
   A.classList.toggle('stack',!!(S&&S.game));A.classList.toggle('fw',!!(S&&!S.game&&S.phase!=='lobby'));
   if(!ready){A.innerHTML='<div class="splash"><div class="spin"></div><p>Conectando ao servidor…</p><small id="wk" style="max-width:340px;text-align:center"></small></div>';return}
+  if(AUTH_SCREENS.includes(screen)&&!S){A.innerHTML=authHtml();trans('auth|'+screen);return}
   if(screen==='home'){
-    h=`<div class="hero"><div class="eyebrow">Bem-vindo à</div><div class="title">Resenha<br>da Madrugada</div><p class="sub">Escolha um jogo e marcha!</p></div>${E}
+    h=`<div class="hero">${accountBar()}<div class="eyebrow">Bem-vindo à</div><div class="title">Resenha<br>da Madrugada</div><p class="sub">Escolha um jogo e marcha!</p></div>${E}
     <div class="games">${GAMES.map((g,i)=>{const im=g.img;return `<div class="gc ${g.ok?'':'off'}" ${g.ok?`onclick="pick('${g.id}')"`:''}><div class="art" style="${bg(g.name)}">${im?`<img src="${esc(im)}" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<i>${g.short}</i></div><span class="no">0${i+1}</span><button class="ibtn" title="Sobre o jogo" onclick="event.stopPropagation();showInfo('${g.id}',false)">i</button>${g.ok?'':'<span class="ribbon">Em breve</span>'}<div class="info"><b>${g.name}</b><span>${g.tag}</span></div></div>`}).join('')}</div>
     <div class="beta">Versão de testes: pode conter falhas.</div>`;
     A.innerHTML=h;trans('home');return;

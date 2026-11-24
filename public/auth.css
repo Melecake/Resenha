@@ -1,0 +1,87 @@
+/* ===== Login (parte visual): botão da home, login, cadastro, perfil e configurações ===== */
+main{position:relative}
+
+/* Botão "Entrar" / conta, no canto da página inicial */
+.acct{position:absolute;top:calc(3vh + 2px);right:clamp(16px,4vw,56px);z-index:25;display:flex;flex-direction:column;align-items:flex-end}
+.acctchip{display:inline-flex;align-items:center;gap:10px;padding:5px 14px 5px 5px;border-radius:14px;background:var(--n2);color:var(--txt);border:2px solid var(--line);box-shadow:0 4px 0 #0a1230;font:700 .9rem Rubik,sans-serif;max-width:min(260px,70vw)}
+.acctchip:hover{border-color:var(--acc);transform:translateY(-2px);filter:none}.acctchip:active{transform:translateY(3px);box-shadow:0 1px 0 #0a1230}
+.acctchip b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.acctchip .car{color:var(--mut);font-size:.8rem}
+.acctchip .av{width:34px;height:34px;flex:0 0 34px;font-size:1.1rem;border-radius:9px}
+.acctmenu{margin-top:10px;min-width:210px;background:linear-gradient(180deg,var(--n2),var(--n1));border:2px solid var(--acc);border-radius:16px;padding:8px;box-shadow:0 18px 50px rgba(0,0,0,.6);animation:pop .15s both}
+.acctmenu button{display:block;width:100%;text-align:left;padding:12px 14px;margin:0;border:0;border-radius:10px;background:transparent;color:var(--txt);box-shadow:none;font:500 .95rem Rubik,sans-serif;letter-spacing:0}
+.acctmenu button:hover{background:rgba(255,255,255,.08);transform:none;filter:none}.acctmenu button:active{transform:none;box-shadow:none}
+.acctmenu button.out{color:#ff8a8a}
+.acctmenu hr{border:0;border-top:1px solid var(--line);margin:6px 4px}
+
+/* Páginas */
+.authwrap{max-width:480px;margin:0 auto;width:100%}.authwrap.wide{max-width:760px}
+.authcard{padding:28px}
+.ah{text-align:center;font-size:clamp(1.8rem,5vw,2.6rem);margin:6px 0 10px}
+.fld{text-align:left;margin:16px 0}.fld label{margin-bottom:6px}
+.fhint{font-size:.78rem;color:var(--mut);margin:6px 2px 0;line-height:1.4;text-align:left}
+.ferr{font-size:.82rem;color:#ff8a8a;margin:6px 2px 0;font-weight:500;text-align:left}
+.fld input.bad{border-color:#e04848}
+.pwrow{position:relative}.pwrow input{padding-right:96px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:8px 12px;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;background:var(--n2);color:var(--txt);border:2px solid var(--line);box-shadow:none}
+.eye:hover,.eye:active{transform:translateY(-50%);box-shadow:none;filter:brightness(1.15)}
+.lnkrow{text-align:right;margin:-4px 2px 14px;font-size:.85rem}
+.authwrap a{color:var(--acc);font-weight:700;text-decoration:none;cursor:pointer}.authwrap a:hover{text-decoration:underline}
+.small{font-size:.82rem}
+.or{display:flex;align-items:center;gap:12px;margin:20px 0 6px;color:var(--mut);font-size:.72rem;letter-spacing:2px;text-transform:uppercase}
+.or::before,.or::after{content:"";flex:1;border-top:1px solid var(--line)}
+
+/* Botões de login social */
+button.oauth{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 12px;padding:13px 16px;font-size:.95rem}
+button.oauth svg{width:22px;height:22px;flex:0 0 22px}
+button.oauth.google{background:#fff;color:#1f1f1f;border-color:#dadce0;box-shadow:0 5px 0 #b9bcc2}
+button.oauth.discord{background:#5865f2;color:#fff;border-color:#4752c4;box-shadow:0 5px 0 #3c45a5}
+
+/* Caixa de aceite dos termos */
+.chk{display:flex;gap:12px;align-items:flex-start;text-align:left;cursor:pointer;padding:14px;margin:0;border:2px solid var(--line);border-radius:14px;background:rgba(10,18,48,.55);line-height:1.45;font:500 .92rem/1.45 Rubik,sans-serif;letter-spacing:0;text-transform:none;color:var(--txt)}
+.chk.bad{border-color:#e04848}
+input.cb2{appearance:none;-webkit-appearance:none;flex:0 0 26px;width:26px;height:26px;padding:0;margin:0;border-radius:8px;border:2px solid var(--mut);background:#0a1230;cursor:pointer;position:relative}
+input.cb2:checked{background:var(--acc);border-color:var(--acc)}
+input.cb2:checked::after{content:"";position:absolute;left:7px;top:2px;width:7px;height:13px;border:solid var(--ink);border-width:0 3px 3px 0;transform:rotate(45deg)}
+input.cb2:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(255,194,51,.3)}
+
+/* Força da senha */
+.pwm{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.pwm i{height:6px;border-radius:3px;background:var(--n2)}
+.pwm.s1 i:nth-child(-n+1){background:#e04848}.pwm.s2 i:nth-child(-n+2){background:#ff9a3d}.pwm.s3 i:nth-child(-n+3){background:#ffd23f}.pwm.s4 i{background:#2dbd78}
+
+/* Perfil */
+.pcard{padding:30px 24px}
+.pbig{display:flex;justify-content:center;margin-bottom:12px}.pbig .av{border-radius:26px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),0 10px 30px rgba(0,0,0,.4)}
+.pname{font-size:1.9rem;font-weight:700;margin:6px 0 2px;word-break:break-word}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:620px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{border:2px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center;background:rgba(10,18,48,.55)}
+.stat b{display:block;font:400 1.6rem Bungee,Impact,sans-serif;color:var(--acc);margin-bottom:4px}.stat span{font-size:.74rem;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
+
+/* Configurações */
+.setsec{margin:18px 0}
+.setsec h3{margin:0 0 14px;font-size:1rem}
+.prevbox{display:flex;justify-content:center;padding:16px;margin:0 0 6px;border-radius:14px;background:rgba(10,18,48,.55);border:1px dashed var(--line)}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid rgba(255,255,255,.07)}
+.setrow:first-of-type{border-top:0}
+.setrow .tx{text-align:left;min-width:0}.setrow .tx b{display:block}.setrow .tx small{display:block;line-height:1.35;margin-top:2px}
+.tgl{flex:0 0 60px;width:60px;height:36px;padding:0;border-radius:999px;background:var(--n1);border:2px solid var(--line);box-shadow:none;position:relative}
+.tgl::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:var(--mut);transition:.15s}
+.tgl.on{background:var(--acc);border-color:var(--acc)}.tgl.on::after{left:29px;background:var(--ink)}
+.tgl:hover,.tgl:active{transform:none;box-shadow:none;filter:none}
+.danger{border-color:#8c1f1f;background:linear-gradient(180deg,#2a1118,#1a0b10)}.danger::before{background:#e04848}
+.savebar{position:sticky;bottom:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px 14px;margin-top:10px;background:linear-gradient(transparent,#070b17 35%)}
+.savebar .msg{font-size:.82rem;color:var(--mut);text-align:left}.savebar .msg.dirty{color:var(--acc)}
+.savebar .row{margin:0;flex:0 0 auto}.savebar .row button{padding:11px 18px;font-size:.9rem}
+
+@media(max-width:560px){
+  .authcard{padding:22px 16px}
+  .acct{top:12px;right:12px}
+  .acctchip b{max-width:110px}
+  .savebar{flex-direction:column;align-items:stretch}.savebar .row{width:100%}.savebar .row>*{flex:1}
+  .eye{padding:9px 12px}
+  .setrow{gap:10px}
+}
+
+/* Celular: o botão da conta não cobre o título da página inicial */
+@media(max-width:760px){.acct+.eyebrow{margin-top:56px}}

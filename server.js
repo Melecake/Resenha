@@ -104,6 +104,7 @@ const server = http.createServer(async (q, s) => {
   let file;
   if (u === '/') file = path.join(DIR, 'index.html');
   else if (u === '/gerenciar-locais') file = path.join(DIR, 'admin.html');
+  else if (u === '/termos') file = path.join(DIR, 'termos.html');
   else {
     const rel = path.normalize(u);
     file = path.join(PUB, rel); if (!file.startsWith(PUB)) { s.writeHead(403); return s.end(); }
