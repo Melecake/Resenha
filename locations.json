@@ -504,6 +504,27 @@
       "labels": [
         "Locais Fictícios"
       ]
+    },
+    {
+      "name": "Los Pollos Hermandos (Breaking Bad)",
+      "img": "https://hips.hearstapps.com/digitalspyuk.cdnds.net/17/13/1490871814-los-pollos-hermanos-breaking-bad.jpg?resize=980:*",
+      "labels": [
+        "Locais Fictícios"
+      ]
+    },
+    {
+      "name": "Bairro Do Limoeiro (Turma da Mônica)",
+      "img": "https://i.pinimg.com/736x/0c/09/91/0c0991ef3911ffcddf826db840ef71a4.jpg",
+      "labels": [
+        "Locais Fictícios"
+      ]
+    },
+    {
+      "name": "Radiator Springs (Carros)",
+      "img": "https://static.wikia.nocookie.net/worldofcarsdrivein/images/9/9b/Radiatorspringsoverlook.jpeg/revision/latest/scale-to-width-down/1200?cb=20240212195406",
+      "labels": [
+        "Locais Fictícios"
+      ]
     }
   ],
   "covers": {

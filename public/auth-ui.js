@@ -12,8 +12,8 @@ const AUTH_LIVE = false;
 const AUTH_PUBLIC = false;
 const TERMS_VERSION = '2026-11-22'; // versão dos termos aceita no cadastro (o servidor deverá guardar junto com a data/hora)
 const AUTH_SCREENS = ['login', 'register', 'profile', 'settings'];
-const DEMO_USER = { name: 'Visitante Teste', email: 'teste@exemplo.com', emo: 3, color: 5, fnt: 1, col: 0, cd: 6, since: 'novembro de 2026', statsPublic: true, useLook: true };
-const AUTH = { user: null, menu: false, preview: false, showPw: {}, draft: null, dirty: false,
+const DEMO_USER = { name: 'Visitante Teste', email: 'teste@exemplo.com', emo: 3, color: 5, fnt: 1, col: 0, cd: 6, since: 'novembro de 2026', termsVersion: '2026-11-22', useLook: true };
+const AUTH = { user: null, menu: false, preview: false, showPw: {}, draft: null, dirty: false, pv: 'sala',
   form: { name: '', email: '', pw: '', pw2: '', accept: false, tried: false },
   lform: { email: '', pw: '', tried: false } };
 
@@ -37,6 +37,22 @@ function aModal(html, w = 420) {
 }
 function aSoon(what) {
   aModal(`<h3 style="margin:0 0 10px">Em breve</h3><p style="margin:0 0 18px;color:#cfd8f5;line-height:1.5">${esc(what)} ainda não está disponível. Por enquanto esta é só a parte visual do login; a conta de verdade chega em breve.</p><div style="text-align:center"><button onclick="closeNote()">Entendi</button></div>`);
+}
+
+// Prévia do visual: "Sala de espera" (card pequeno) e "Votação" (card grande, como aparece na hora de votar)
+function aPv(m) { AUTH.pv = m; render(); }
+function aVoteSample(u) {
+  const sa = (e, c, cls) => `<span class="av ${cls}" style="background:hsl(${HUES[c]} 55% 32%)">${EMOTES[e]}</span>`;
+  return `<div class="pvvote"><div class="vc"${(u.cd | 0) ? ` data-cs="${u.cd | 0}"` : ''}><span class="vcnt">1 voto</span>
+    <div class="vh">${aAv(u, 44)}<span class="cn"><b class="${aCls(u)}">${esc(u.name || 'Seu nome')}</b><small>(você)</small></span></div>
+    <div class="mv" style="--c:3;--h:62px">${sa(1, 2, 'cv')}${sa(5, 6, 'iv')}${sa(9, 9, 'iv')}</div>
+    <div class="vb"><button class="sec" tabindex="-1">Declarar intenção</button><button tabindex="-1">Votar</button></div></div></div>`;
+}
+function aPreviewBox(u) {
+  return `<div class="prevbox"><div class="lbls"><button class="lb nobusy ${AUTH.pv === 'sala' ? 'sel' : ''}" onclick="aPv('sala')">Sala de espera</button><button class="lb nobusy ${AUTH.pv === 'votacao' ? 'sel' : ''}" onclick="aPv('votacao')">Votação</button></div>${AUTH.pv === 'votacao' ? aVoteSample(u) : aChip(u)}</div>`;
+}
+function aDocs(u) {
+  return `<a class="doclink" href="/termos" target="_blank" rel="noopener">Termos de Uso e Condições<span>↗</span></a><a class="doclink" href="/termos#s7" target="_blank" rel="noopener">Privacidade e dados pessoais<span>↗</span></a><p class="mut small" style="margin:12px 0 0">Você aceitou a versão ${esc((u && u.termsVersion) || TERMS_VERSION)} dos termos ao criar a conta.</p>`;
 }
 
 // ---------- navegação ----------
@@ -118,7 +134,7 @@ function aRegister() {
   if (!f.accept) { render(); return; }
   if (Object.keys(aRegErrors(f)).length) { render(); return; }
   // SERVIDOR: criar a conta enviando { nome, email, senha, termsAccepted: true, termsVersion: TERMS_VERSION }
-  if (AUTH.preview) { aPreviewLogin({ name: f.name.trim(), email: f.email.trim() }); return; }
+  if (AUTH.preview) { aPreviewLogin({ name: f.name.trim(), email: f.email.trim(), termsVersion: TERMS_VERSION }); return; }
   aSoon('Criar a conta');
 }
 function registerPage() {
@@ -155,12 +171,13 @@ function profilePage() {
       <div class="row" style="max-width:420px;margin:20px auto 0"><button onclick="aGo('settings')">Editar perfil</button><button class="sec" onclick="aLogout()">Sair</button></div>
     </div>
     <div class="card"><label>Seu visual nas partidas</label>
-      <div class="prevbox">${aChip(u)}</div>
+      ${aPreviewBox(u)}
       <p class="mut small" style="margin:8px 0 14px">Fonte: ${f} · Cor do nome: ${k} · Card: ${c}</p>
       <button class="sec" style="width:100%" onclick="aGo('settings')">Mudar visual</button></div>
     <div class="card"><label>Estatísticas</label>
-      <div class="stats"><div class="stat"><b>—</b><span>Partidas</span></div><div class="stat"><b>—</b><span>Vitórias</span></div><div class="stat"><b>—</b><span>Aproveitamento</span></div><div class="stat"><b>—</b><span>Jogo favorito</span></div></div>
-      <p class="mut small" style="margin:14px 0 0">Em breve: as suas partidas e vitórias vão aparecer aqui.</p></div>
+      <div class="stats"><div class="stat"><b>—</b><span>Partidas</span></div><div class="stat"><b>—</b><span>Vitórias</span></div><div class="stat"><b>—</b><span>Pontos totais</span></div></div>
+      <p class="mut small" style="margin:14px 0 0">Em breve: as suas partidas, vitórias e pontos vão aparecer aqui.</p></div>
+    <div class="card"><label>Termos e privacidade</label>${aDocs(u)}</div>
   </div>`;
 }
 
@@ -217,7 +234,7 @@ function settingsPage() {
     </div>
 
     <div class="card setsec"><h3>Visual nas partidas</h3>
-      <div class="prevbox">${aChip(d)}</div>
+      ${aPreviewBox(d)}
       <label style="margin-top:16px">Ícone</label><div class="emos">${EMOTES.map((e, i) => `<button class="eb ${d.emo === i ? 'sel' : ''}" onclick="aSet('emo',${i})">${e}</button>`).join('')}</div>
       <label style="margin-top:16px">Cor do ícone</label><div class="cols">${HUES.map((h, i) => `<button class="cb ${d.color === i ? 'sel' : ''}" style="background:hsl(${h} 55% 40%)" aria-label="Cor ${i + 1}" onclick="aSet('color',${i})"></button>`).join('')}</div>
       <label style="margin-top:16px">Fonte</label><div class="opts">${FONTS.map((n, i) => `<button class="opt ${(d.fnt | 0) === i ? 'sel' : ''}" onclick="aSet('fnt',${i})"><span class="${i ? 'f' + i : ''}${(d.col | 0) ? ' k' + (d.col | 0) : ''}">${esc(d.name || 'Nome')}</span><small>${n}</small></button>`).join('')}</div>
@@ -227,15 +244,16 @@ function settingsPage() {
 
     <div class="card setsec"><h3>Preferências</h3>
       <div class="setrow"><div class="tx"><b>Entrar nas salas com o meu visual</b><small class="mut" style="text-align:left">Usa o visual salvo na conta ao criar ou entrar em uma sala.</small></div>${tg('useLook')}</div>
-      <div class="setrow"><div class="tx"><b>Mostrar minhas estatísticas</b><small class="mut" style="text-align:left">Deixa os outros jogadores verem as suas partidas e vitórias.</small></div>${tg('statsPublic')}</div>
     </div>
+
+    <div class="card setsec"><h3>Termos e privacidade</h3>${aDocs(u)}</div>
 
     <div class="card setsec danger"><h3 style="color:#ff8a8a">Zona de perigo</h3>
       <p class="mut" style="text-align:left;margin:0 0 14px;line-height:1.5">Apagar a conta remove o seu perfil, o seu visual e as suas estatísticas.</p>
       <button class="cx" onclick="aDelModal()">Apagar minha conta</button>
     </div>
 
-    <div class="savebar"><span class="msg ${AUTH.dirty ? 'dirty' : ''}">${AUTH.dirty ? 'Você tem alterações não salvas.' : 'Nenhuma alteração.'}</span>
+    <div class="savebar ${AUTH.dirty ? 'dirty' : ''}"><span class="msg ${AUTH.dirty ? 'dirty' : ''}">${AUTH.dirty ? 'Você tem alterações não salvas.' : 'Nenhuma alteração.'}</span>
       <div class="row"><button class="sec" onclick="aCancelSettings()">Cancelar</button><button ${AUTH.dirty && !nameBad ? '' : 'disabled'} onclick="aSaveSettings()">Salvar alterações</button></div></div>
   </div>`;
 }

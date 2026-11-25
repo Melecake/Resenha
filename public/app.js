@@ -313,7 +313,7 @@ function renderMain(){
   if(!ready){A.innerHTML='<div class="splash"><div class="spin"></div><p>Conectando ao servidor…</p><small id="wk" style="max-width:340px;text-align:center"></small></div>';return}
   if(AUTH_SCREENS.includes(screen)&&!S){A.innerHTML=authHtml();trans('auth|'+screen);return}
   if(screen==='home'){
-    h=`<div class="hero">${accountBar()}<div class="eyebrow">Bem-vindo à</div><div class="title">Resenha<br>da Madrugada</div><p class="sub">Escolha um jogo e marcha!</p></div>${E}
+    h=`${accountBar()}<div class="hero"><div class="eyebrow">Bem-vindo à</div><div class="title">Resenha<br>da Madrugada</div><p class="sub">Escolha um jogo e marcha!</p></div>${E}
     <div class="games">${GAMES.map((g,i)=>{const im=g.img;return `<div class="gc ${g.ok?'':'off'}" ${g.ok?`onclick="pick('${g.id}')"`:''}><div class="art" style="${bg(g.name)}">${im?`<img src="${esc(im)}" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<i>${g.short}</i></div><span class="no">0${i+1}</span><button class="ibtn" title="Sobre o jogo" onclick="event.stopPropagation();showInfo('${g.id}',false)">i</button>${g.ok?'':'<span class="ribbon">Em breve</span>'}<div class="info"><b>${g.name}</b><span>${g.tag}</span></div></div>`}).join('')}</div>
     <div class="beta">Versão de testes: pode conter falhas.</div>`;
     A.innerHTML=h;trans('home');return;

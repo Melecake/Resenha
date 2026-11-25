@@ -2,7 +2,7 @@
 main{position:relative}
 
 /* Botão "Entrar" / conta, no canto da página inicial */
-.acct{position:absolute;top:calc(3vh + 2px);right:clamp(16px,4vw,56px);z-index:25;display:flex;flex-direction:column;align-items:flex-end}
+.acct{animation:none!important;position:absolute;top:calc(3vh + 2px);right:clamp(16px,4vw,56px);z-index:25;display:flex;flex-direction:column;align-items:flex-end}
 .acctchip{display:inline-flex;align-items:center;gap:10px;padding:5px 14px 5px 5px;border-radius:14px;background:var(--n2);color:var(--txt);border:2px solid var(--line);box-shadow:0 4px 0 #0a1230;font:700 .9rem Rubik,sans-serif;max-width:min(260px,70vw)}
 .acctchip:hover{border-color:var(--acc);transform:translateY(-2px);filter:none}.acctchip:active{transform:translateY(3px);box-shadow:0 1px 0 #0a1230}
 .acctchip b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
@@ -53,15 +53,17 @@ input.cb2:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(255,194,51,.3)}
 .pcard{padding:30px 24px}
 .pbig{display:flex;justify-content:center;margin-bottom:12px}.pbig .av{border-radius:26px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),0 10px 30px rgba(0,0,0,.4)}
 .pname{font-size:1.9rem;font-weight:700;margin:6px 0 2px;word-break:break-word}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-@media(min-width:620px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .stat{border:2px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center;background:rgba(10,18,48,.55)}
 .stat b{display:block;font:400 1.6rem Bungee,Impact,sans-serif;color:var(--acc);margin-bottom:4px}.stat span{font-size:.74rem;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
 
 /* Configurações */
 .setsec{margin:18px 0}
 .setsec h3{margin:0 0 14px;font-size:1rem}
-.prevbox{display:flex;justify-content:center;padding:16px;margin:0 0 6px;border-radius:14px;background:rgba(10,18,48,.55);border:1px dashed var(--line)}
+.prevbox{display:flex;flex-direction:column;align-items:center;padding:14px 12px 16px;margin:0 0 6px;border-radius:14px;background:rgba(10,18,48,.55);border:1px dashed var(--line)}
+.prevbox .lbls{justify-content:center;margin:0 0 12px}
+.pvvote{width:min(300px,100%);margin:6px auto 4px;pointer-events:none}
+.pvvote .vc{margin:0}.pvvote .vcnt{animation:none}
 .setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid rgba(255,255,255,.07)}
 .setrow:first-of-type{border-top:0}
 .setrow .tx{text-align:left;min-width:0}.setrow .tx b{display:block}.setrow .tx small{display:block;line-height:1.35;margin-top:2px}
@@ -70,7 +72,8 @@ input.cb2:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(255,194,51,.3)}
 .tgl.on{background:var(--acc);border-color:var(--acc)}.tgl.on::after{left:29px;background:var(--ink)}
 .tgl:hover,.tgl:active{transform:none;box-shadow:none;filter:none}
 .danger{border-color:#8c1f1f;background:linear-gradient(180deg,#2a1118,#1a0b10)}.danger::before{background:#e04848}
-.savebar{position:sticky;bottom:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px 14px;margin-top:10px;background:linear-gradient(transparent,#070b17 35%)}
+.savebar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 2px 4px;margin-top:6px}
+.savebar.dirty{position:sticky;bottom:10px;z-index:10;padding:12px 14px;border:2px solid var(--acc);border-radius:16px;background:linear-gradient(180deg,var(--n2),var(--n1));box-shadow:0 12px 30px rgba(0,0,0,.5)}
 .savebar .msg{font-size:.82rem;color:var(--mut);text-align:left}.savebar .msg.dirty{color:var(--acc)}
 .savebar .row{margin:0;flex:0 0 auto}.savebar .row button{padding:11px 18px;font-size:.9rem}
 
@@ -84,4 +87,9 @@ input.cb2:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(255,194,51,.3)}
 }
 
 /* Celular: o botão da conta não cobre o título da página inicial */
-@media(max-width:760px){.acct+.eyebrow{margin-top:56px}}
+@media(max-width:760px){body.home .acct+.hero{padding-top:56px}}
+
+/* Termos e privacidade dentro da conta */
+.authwrap a.doclink{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:var(--n1);color:var(--txt);font-weight:500;text-decoration:none}
+.authwrap a.doclink:hover{border-color:var(--acc);text-decoration:none}.authwrap a.doclink span{color:var(--mut)}
+.prevbox .lb{min-height:38px;padding:8px 16px}
