@@ -10,12 +10,12 @@
 const AUTH_LIVE = false;
 // Mostra o botão "Entrar" para todo mundo. Enquanto for false, o botão (e o acesso às telas de conta) só aparece com ?preview=1.
 const AUTH_PUBLIC = false;
-const TERMS_VERSION = '2026-11-22'; // versão dos termos aceita no cadastro (o servidor deverá guardar junto com a data/hora)
+const TERMS_VERSION = '2026-11-25'; // versão dos termos aceita no cadastro (o servidor deverá guardar junto com a data/hora)
 const AUTH_SCREENS = ['login', 'register', 'profile', 'settings'];
-const DEMO_USER = { name: 'Visitante Teste', email: 'teste@exemplo.com', emo: 3, color: 5, fnt: 1, col: 0, cd: 6, since: 'novembro de 2026', termsVersion: '2026-11-22', useLook: true };
-const AUTH = { user: null, menu: false, preview: false, showPw: {}, draft: null, dirty: false, pv: 'sala',
-  form: { name: '', email: '', pw: '', pw2: '', accept: false, tried: false },
-  lform: { email: '', pw: '', tried: false } };
+const DEMO_USER = { username: 'visitante_teste', name: 'Visitante Teste', emo: 3, color: 5, fnt: 1, col: 0, cd: 6, since: 'novembro de 2026', termsVersion: TERMS_VERSION, useLook: true };
+const AUTH = { user: null, menu: false, preview: false, showPw: {}, draft: null, dirty: false, pv: 'sala', pwWarn: false,
+  form: { user: '', pw: '', pw2: '', accept: false, tried: false },
+  lform: { user: '', pw: '', tried: false } };
 
 (() => { try {
   if (new URLSearchParams(location.search).get('preview') === '1') sessionStorage.setItem('authPrev', '1');
@@ -23,14 +23,14 @@ const AUTH = { user: null, menu: false, preview: false, showPw: {}, draft: null,
   if (AUTH.preview) { const u = sessionStorage.getItem('authUser'); if (u) AUTH.user = JSON.parse(u); }
 } catch (e) {} })();
 
-const G_ICON = '<svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
-const D_ICON = '<svg viewBox="0 0 24 24"><path fill="#fff" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>';
 
 // ---------- peças reutilizáveis ----------
 const aAv = (u, s = 44) => `<span class="av" style="width:${s}px;height:${s}px;flex:0 0 ${s}px;font-size:${Math.round(s * .5)}px;background:hsl(${HUES[u.color] ?? 200} 55% 32%)">${EMOTES[u.emo] ?? '?'}</span>`;
 const aCls = u => { const f = u.fnt | 0, k = u.col | 0; return (f ? 'f' + f : '') + (k ? (f ? ' ' : '') + 'k' + k : ''); };
 const aChip = u => `<span class="chip"${(u.cd | 0) ? ` data-cs="${u.cd | 0}"` : ''}>${aAv(u, 44)}<span class="cn"><b class="${aCls(u)}">${esc(u.name || 'Seu nome')}</b></span></span>`;
-const aEmailOk = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+// Nome de usuário: único, de 3 a 20 caracteres (letras, números, "_" e "."). O servidor confere se já existe e aplica o filtro de nomes.
+const aUserOk = u => /^[A-Za-z0-9_.]{3,20}$/.test(u);
+const A_USER_MSG = 'Use de 3 a 20 caracteres: letras, números, "_" ou ".".';
 const aSave = () => { try { if (AUTH.preview) { if (AUTH.user) sessionStorage.setItem('authUser', JSON.stringify(AUTH.user)); else sessionStorage.removeItem('authUser'); } } catch (e) {} };
 function aModal(html, w = 420) {
   $('ntc').innerHTML = `<div class="modal" onclick="if(event.target===this)closeNote()"><div class="box" style="max-width:${w}px;text-align:left"><button class="xbtn" aria-label="Fechar" title="Fechar (Esc)" onclick="closeNote()">×</button>${html}</div></div>`;
@@ -86,39 +86,29 @@ function aInR(form, key, val) { AUTH[form][key] = val; render(); } // digitando 
 function aEye(k) { AUTH.showPw[k] = !AUTH.showPw[k]; render(); }
 function aLogin() {
   const f = AUTH.lform; f.tried = true;
-  if (!aEmailOk(f.email.trim()) || !f.pw) { render(); return; }
-  // SERVIDOR: enviar { email, senha } e abrir a sessão
-  if (AUTH.preview) { aPreviewLogin({ email: f.email.trim(), name: DEMO_USER.name }); return; }
+  if (!aUserOk(f.user.trim()) || !f.pw) { render(); return; }
+  // SERVIDOR: enviar { username, senha } e abrir a sessão
+  if (AUTH.preview) { aPreviewLogin({ username: f.user.trim(), name: f.user.trim() }); return; }
   aSoon('Entrar na conta');
 }
-function aOauth(provider, isRegister) {
-  if (isRegister && !AUTH.form.accept) { AUTH.form.tried = true; render(); return; }
-  // SERVIDOR: iniciar o login com o provedor (Google / Discord)
-  aSoon('Entrar com ' + provider);
-}
 function loginPage() {
-  const f = AUTH.lform, eE = f.tried && !aEmailOk(f.email.trim()) ? 'Digite um e-mail válido.' : '', eP = f.tried && !f.pw ? 'Digite a sua senha.' : '';
+  const f = AUTH.lform, eU = f.tried && !aUserOk(f.user.trim()) ? A_USER_MSG : '', eP = f.tried && !f.pw ? 'Digite a sua senha.' : '';
   return `<div class="authwrap"><div class="card ctr authcard">
     <div class="eyebrow">Resenha da Madrugada</div><h1 class="ah">Entrar</h1>
-    <p class="mut" style="margin:0 0 18px">Entre para salvar o seu visual e acompanhar as suas partidas.</p>
-    <button class="oauth google nobusy" onclick="aOauth('Google')">${G_ICON}Continuar com Google</button>
-    <button class="oauth discord nobusy" onclick="aOauth('Discord')">${D_ICON}Continuar com Discord</button>
-    <div class="or"><span>ou com e-mail</span></div>
-    <div class="fld"><label for="l-email">E-mail</label><input id="l-email" type="email" class="${eE ? 'bad' : ''}" autocomplete="email" inputmode="email" placeholder="voce@exemplo.com" value="${esc(f.email)}" oninput="aIn('lform','email',this.value)">${eE ? `<p class="ferr">${eE}</p>` : ''}</div>
+    <p class="mut" style="margin:0 0 6px">Entre para salvar o seu visual e acompanhar as suas partidas.</p>
+    <div class="fld"><label for="l-user">Nome de usuário</label><input id="l-user" class="${eU ? 'bad' : ''}" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="seu_usuario" value="${esc(f.user)}" oninput="aIn('lform','user',this.value)">${eU ? `<p class="ferr">${eU}</p>` : ''}</div>
     <div class="fld"><label for="l-pw">Senha</label><div class="pwrow"><input id="l-pw" type="${AUTH.showPw.l ? 'text' : 'password'}" class="${eP ? 'bad' : ''}" autocomplete="current-password" placeholder="Sua senha" value="${esc(f.pw)}" oninput="aIn('lform','pw',this.value)" onkeydown="if(event.key==='Enter')aLogin()"><button type="button" class="eye nobusy" onclick="aEye('l')">${AUTH.showPw.l ? 'Ocultar' : 'Mostrar'}</button></div>${eP ? `<p class="ferr">${eP}</p>` : ''}</div>
-    <p class="lnkrow"><a href="#" onclick="event.preventDefault();aSoon('Recuperar a senha')">Esqueci minha senha</a></p>
-    <button style="width:100%" onclick="aLogin()">Entrar</button>
+    <button style="width:100%;margin-top:6px" onclick="aLogin()">Entrar</button>
     ${AUTH.preview ? `<button class="sec nobusy" style="width:100%;margin-top:12px;border-style:dashed" onclick="aPreviewLogin()">Modo de teste: entrar como usuário de exemplo</button>` : ''}
     <p class="mut" style="margin:20px 0 0">Ainda não tem conta? <a href="#" onclick="event.preventDefault();aGo('register')">Criar conta</a></p>
     <p class="mut small" style="margin:10px 0 0">Você também pode jogar sem conta: é só voltar para o início.</p>
   </div></div>`;
 }
 
-// ---------- CADASTRO ----------
+// ---------- CADASTRO (só nome de usuário e senha; o e-mail fica para uma etapa futura) ----------
 function aRegErrors(f) {
-  const e = {}, n = f.name.trim();
-  if (n.length < 2) e.name = 'Use pelo menos 2 caracteres.'; else if (n.length > 30) e.name = 'No máximo 30 caracteres.';
-  if (!aEmailOk(f.email.trim())) e.email = 'Digite um e-mail válido.';
+  const e = {};
+  if (!aUserOk(f.user.trim())) e.user = A_USER_MSG;
   if (f.pw.length < 8) e.pw = 'A senha precisa ter pelo menos 8 caracteres.';
   if (!f.pw2 || f.pw2 !== f.pw) e.pw2 = 'As senhas não são iguais.';
   return e;
@@ -129,12 +119,16 @@ function aStrength(p) {
   return Math.max(1, s);
 }
 function aAccept(v) { AUTH.form.accept = v; render(); }
+function aPwWarn() { if (!AUTH.pwWarn) { AUTH.pwWarn = true; render(); } } // ao clicar no campo da senha, mostra o aviso
+// Aviso mostrado ao criar/trocar a senha (texto na primeira pessoa: quem fala é quem administra o site)
+const PW_WARN = '<b>Use uma senha diferente das que você costuma usar.</b> Escolha uma senha que você não usa em outros sites e apps. Apesar de ser pouco provável um ataque ou um vazamento de dados, e de eu me dedicar para manter o site seguro, reconheço que podem existir brechas, e não quero que você seja prejudicado de nenhuma maneira.';
 function aRegister() {
   const f = AUTH.form; f.tried = true;
   if (!f.accept) { render(); return; }
   if (Object.keys(aRegErrors(f)).length) { render(); return; }
-  // SERVIDOR: criar a conta enviando { nome, email, senha, termsAccepted: true, termsVersion: TERMS_VERSION }
-  if (AUTH.preview) { aPreviewLogin({ name: f.name.trim(), email: f.email.trim(), termsVersion: TERMS_VERSION }); return; }
+  // SERVIDOR: criar a conta enviando { username, senha, termsAccepted: true, termsVersion: TERMS_VERSION }.
+  // O servidor deve recusar nome de usuário já existente (sem diferenciar maiúsculas) e aplicar o filtro de nomes.
+  if (AUTH.preview) { aPreviewLogin({ username: f.user.trim(), name: f.user.trim(), termsVersion: TERMS_VERSION }); return; }
   aSoon('Criar a conta');
 }
 function registerPage() {
@@ -144,19 +138,17 @@ function registerPage() {
   return `<div class="authwrap"><div class="card ctr authcard">
     <div class="eyebrow">Resenha da Madrugada</div><h1 class="ah">Criar conta</h1>
     <p class="mut" style="margin:0 0 6px">Salve o seu visual e acompanhe as suas partidas em qualquer aparelho.</p>
-    <div class="fld"><label for="r-name">Nome de exibição</label><input id="r-name" class="${bad('name')}" maxlength="30" autocomplete="nickname" placeholder="Como você quer aparecer nas partidas" value="${esc(f.name)}" oninput="aInR('form','name',this.value)"><p class="fhint">É o nome que os outros jogadores veem. Nomes ofensivos ou preconceituosos não são aceitos.</p>${sh('name')}</div>
-    <div class="fld"><label for="r-email">E-mail</label><input id="r-email" type="email" class="${bad('email')}" autocomplete="email" inputmode="email" placeholder="voce@exemplo.com" value="${esc(f.email)}" oninput="aInR('form','email',this.value)">${sh('email')}</div>
-    <div class="fld"><label for="r-pw">Senha</label><div class="pwrow"><input id="r-pw" type="${AUTH.showPw.r ? 'text' : 'password'}" class="${bad('pw')}" autocomplete="new-password" placeholder="Pelo menos 8 caracteres" value="${esc(f.pw)}" oninput="aInR('form','pw',this.value)"><button type="button" class="eye nobusy" onclick="aEye('r')">${AUTH.showPw.r ? 'Ocultar' : 'Mostrar'}</button></div>
-      ${f.pw ? `<div class="pwm s${sc}"><i></i><i></i><i></i><i></i></div><p class="fhint">Força da senha: ${lbl}</p>` : ''}${sh('pw')}</div>
+    <div class="fld"><label for="r-user">Nome de usuário</label><input id="r-user" class="${bad('user')}" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Escolha um nome de usuário único" value="${esc(f.user)}" oninput="aInR('form','user',this.value)"><p class="fhint">Precisa ser único e é usado para entrar. Depois você pode escolher outro nome para aparecer nas partidas. Nomes ofensivos ou preconceituosos não são aceitos.</p>${sh('user')}</div>
+    <div class="fld"><label for="r-pw">Senha</label><div class="pwrow"><input id="r-pw" type="${AUTH.showPw.r ? 'text' : 'password'}" class="${bad('pw')}" autocomplete="new-password" placeholder="Pelo menos 8 caracteres" value="${esc(f.pw)}" onfocus="aPwWarn()" oninput="aInR('form','pw',this.value)"><button type="button" class="eye nobusy" onclick="aEye('r')">${AUTH.showPw.r ? 'Ocultar' : 'Mostrar'}</button></div>
+      ${AUTH.pwWarn ? `<div class="pwwarn" role="note">${PW_WARN}</div>` : ''}
+      ${f.pw ? `<div class="pwm s${sc}"><i></i><i></i><i></i><i></i></div><p class="fhint">Força da senha: ${lbl}</p>` : ''}${sh('pw')}
+      <p class="fhint">Guarde bem a sua senha: por enquanto não há recuperação por e-mail.</p></div>
     <div class="fld"><label for="r-pw2">Confirmar senha</label><input id="r-pw2" type="${AUTH.showPw.r ? 'text' : 'password'}" class="${bad('pw2')}" autocomplete="new-password" placeholder="Repita a senha" value="${esc(f.pw2)}" oninput="aInR('form','pw2',this.value)">${sh('pw2')}</div>
     <label class="chk ${noTerms ? 'bad' : ''}"><input type="checkbox" class="cb2" ${f.accept ? 'checked' : ''} onchange="aAccept(this.checked)"><span>Li e aceito os <a href="/termos" target="_blank" rel="noopener">Termos de Uso e Condições</a>, incluindo como os meus dados são tratados.</span></label>
     ${noTerms ? '<p class="ferr">Para criar a conta você precisa aceitar os termos.</p>' : ''}
     <button id="r-go" style="width:100%;margin-top:16px" ${f.accept ? '' : 'disabled'} onclick="aRegister()">Criar conta</button>
     ${f.accept ? '' : '<p class="fhint" style="text-align:center">Marque a aceitação dos termos para liberar o cadastro.</p>'}
-    <div class="or"><span>ou cadastre com</span></div>
-    <button class="oauth google nobusy" ${f.accept ? '' : 'disabled'} onclick="aOauth('Google',true)">${G_ICON}Cadastrar com Google</button>
-    <button class="oauth discord nobusy" ${f.accept ? '' : 'disabled'} onclick="aOauth('Discord',true)">${D_ICON}Cadastrar com Discord</button>
-    <p class="mut" style="margin:14px 0 0">Já tem conta? <a href="#" onclick="event.preventDefault();aGo('login')">Entrar</a></p>
+    <p class="mut" style="margin:18px 0 0">Já tem conta? <a href="#" onclick="event.preventDefault();aGo('login')">Entrar</a></p>
   </div></div>`;
 }
 
@@ -167,7 +159,7 @@ function profilePage() {
   return `<div class="authwrap wide">
     <div class="card ctr pcard"><div class="pbig">${aAv(u, 104)}</div>
       <div class="pname ${aCls(u)}">${esc(u.name)}</div>
-      <p class="mut" style="margin:0">${esc(u.email || '')}</p><p class="mut small" style="margin:6px 0 0">Membro desde ${esc(u.since || '')}</p>
+      <p class="mut" style="margin:0">@${esc(u.username || '')}</p><p class="mut small" style="margin:6px 0 0">Membro desde ${esc(u.since || '')}</p>
       <div class="row" style="max-width:420px;margin:20px auto 0"><button onclick="aGo('settings')">Editar perfil</button><button class="sec" onclick="aLogout()">Sair</button></div>
     </div>
     <div class="card"><label>Seu visual nas partidas</label>
@@ -194,6 +186,7 @@ function aSaveSettings() {
 function aCancelSettings() { AUTH.draft = null; AUTH.dirty = false; screen = 'profile'; render(); }
 function aPwModal() {
   aModal(`<h3 style="margin:0 0 12px">Alterar senha</h3>
+    <div class="pwwarn" role="note" style="margin:0 0 6px">${PW_WARN}</div>
     <div class="fld" style="margin:10px 0"><label for="pw0">Senha atual</label><input id="pw0" type="password" autocomplete="current-password"></div>
     <div class="fld" style="margin:10px 0"><label for="pw1">Nova senha</label><input id="pw1" type="password" autocomplete="new-password" placeholder="Pelo menos 8 caracteres"></div>
     <div class="fld" style="margin:10px 0"><label for="pw2">Confirmar nova senha</label><input id="pw2" type="password" autocomplete="new-password"></div>
@@ -229,8 +222,9 @@ function settingsPage() {
 
     <div class="card setsec"><h3>Conta</h3>
       <div class="fld" style="margin-top:0"><label for="s-name">Nome de exibição</label><input id="s-name" class="${nameBad ? 'bad' : ''}" maxlength="30" value="${esc(d.name || '')}" oninput="aSet('name',this.value)"><p class="fhint">É o nome que os outros jogadores veem nas partidas.</p>${nameBad ? '<p class="ferr">Use de 2 a 30 caracteres.</p>' : ''}</div>
-      <div class="fld"><label for="s-mail">E-mail</label><input id="s-mail" type="email" value="${esc(d.email || '')}" disabled><p class="fhint">Para trocar o e-mail, fale com a gente (em breve será possível aqui).</p></div>
+      <div class="fld"><label for="s-user">Nome de usuário</label><input id="s-user" value="${esc(d.username || '')}" disabled><p class="fhint">É o que você usa para entrar e não pode ser trocado.</p></div>
       <button class="sec" onclick="aPwModal()">Alterar senha</button>
+      <p class="fhint">Por enquanto não há recuperação de senha por e-mail. Guarde bem a sua senha.</p>
     </div>
 
     <div class="card setsec"><h3>Visual nas partidas</h3>

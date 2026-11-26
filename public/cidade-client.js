@@ -9,9 +9,9 @@ const NIGHTS=[10,15,20,30,45,60];
 @keyframes mfl{from{transform:translateY(-4px)}to{transform:translateY(6px)}}
 .dawncard{border-color:var(--acc);background:linear-gradient(180deg,#4a3a10,#1c1708)}.dawncard::before{background:var(--acc)}
 .dawnt{font-family:var(--disp);font-size:clamp(1.6rem,5vw,2.6rem);color:var(--acc);margin:8px 0 12px;text-shadow:0 4px 0 var(--acc2)}
-.card.t-assassino{border-color:#c2323c;background:linear-gradient(180deg,#3b0d12,#12060a)}.card.t-assassino::before{background:#e0454f}
-.card.t-detetive{border-color:#35b8c4;background:linear-gradient(180deg,#0b2d35,#061418)}.card.t-detetive::before{background:#58c8d0}
-.card.t-anjo{border-color:#f2e4a6;background:linear-gradient(180deg,#4a4426,#1b1809)}.card.t-anjo::before{background:#fff0b3}
+.card.t-assassino{border-color:#c2323c}.card.t-assassino::before{background:#e0454f}
+.card.t-detetive{border-color:#35b8c4}.card.t-detetive::before{background:#58c8d0}
+.card.t-anjo{border-color:#f2e4a6}.card.t-anjo::before{background:#fff0b3}
 .card.t-dead{opacity:.72}.card.t-dead::before{background:var(--line)}
 .card.t-assassino .rtitle{color:#ff7b84}.card.t-detetive .rtitle{color:#6fdde6}.card.t-anjo .rtitle{color:#fff3b0}
 .t-assassino .pc.sel{border-color:#e0454f;background:rgba(224,69,79,.22)}

@@ -93,3 +93,7 @@ input.cb2:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(255,194,51,.3)}
 .authwrap a.doclink{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:var(--n1);color:var(--txt);font-weight:500;text-decoration:none}
 .authwrap a.doclink:hover{border-color:var(--acc);text-decoration:none}.authwrap a.doclink span{color:var(--mut)}
 .prevbox .lb{min-height:38px;padding:8px 16px}
+
+/* Aviso ao criar ou trocar a senha */
+.pwwarn{margin:10px 0 0;padding:12px 14px;border:2px solid #b8860b;background:rgba(255,194,51,.09);border-radius:12px;color:#ffe9a8;font-size:.86rem;line-height:1.5;text-align:left}
+.pwwarn b{color:#fff3b0}
